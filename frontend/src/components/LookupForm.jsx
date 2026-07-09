@@ -1,14 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import { getPorts, getCities, getSSY, calculateERDLRD } from '../lib/cutoff';
 
+function todayLocalISO() {
+  const t = new Date();
+  return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+}
+
+// Flexible date entry:  "9" = 9th of THIS month · "8/9" = Aug 9 · "8/9/26" or "8/9/2026" = full.
+function parseFlexibleDate(input) {
+  const s = String(input).trim();
+  if (!s) return null;
+  const parts = s.split(/[/\-.]/).map(p => p.trim()).filter(Boolean);
+  const now = new Date();
+  let month, day, year;
+  if (parts.length === 1) { month = now.getMonth() + 1; day = Number(parts[0]); year = now.getFullYear(); }
+  else if (parts.length === 2) { month = Number(parts[0]); day = Number(parts[1]); year = now.getFullYear(); }
+  else if (parts.length === 3) { month = Number(parts[0]); day = Number(parts[1]); year = Number(parts[2]); if (year < 100) year += 2000; }
+  else return null;
+  if (![month, day, year].every(Number.isInteger)) return null;
+  if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+  const d = new Date(year, month - 1, day);
+  if (d.getMonth() !== month - 1 || d.getDate() !== day) return null; // reject overflow like 2/30
+  return {
+    iso: year + '-' + String(month).padStart(2, '0') + '-' + String(day).padStart(2, '0'),
+    display: d.toLocaleDateString('en-US', { weekday: 'short', month: '2-digit', day: '2-digit', year: 'numeric' })
+  };
+}
+
 export default function LookupForm() {
   const [formData, setFormData] = useState({
     pol: '',
     startCity: '',
     ssy: '',
-    portCutDate: new Date().toISOString().split('T')[0],
+    portCutDate: todayLocalISO(),
     reefer: 'N'
   });
+
+  // Raw text the user types for the date; defaults to today's day number.
+  const [dateInput, setDateInput] = useState(() => String(new Date().getDate()));
+  const resolvedDate = parseFlexibleDate(dateInput);
 
   const [results, setResults] = useState(null);
   const [error, setError] = useState('');
@@ -38,11 +68,23 @@ export default function LookupForm() {
     });
   };
 
+  const handleDateInput = (e) => {
+    const v = e.target.value;
+    setDateInput(v);
+    const parsed = parseFlexibleDate(v);
+    setFormData(prev => ({ ...prev, portCutDate: parsed ? parsed.iso : '' }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
     setResults(null);
     setCopyMessage('');
+
+    if (!formData.portCutDate) {
+      setError('Enter a valid Port Cut Date — e.g. 9, or 8/9, or 8/9/2026');
+      return;
+    }
 
     const res = calculateERDLRD(
       formData.pol, formData.startCity, formData.ssy, formData.portCutDate, formData.reefer
@@ -167,13 +209,20 @@ ${divider}`;
           <div>
             <label className="block text-sm font-semibold text-white mb-2">Port Cut Date *</label>
             <input
-              type="date"
-              name="portCutDate"
-              value={formData.portCutDate}
-              onChange={handleChange}
+              type="text"
+              inputMode="numeric"
+              value={dateInput}
+              onChange={handleDateInput}
+              onFocus={(e) => e.target.select()}
+              placeholder="Day (9), or 8/9, or 8/9/2026"
               required
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-slate-400"
             />
+            <p className="text-xs mt-1 text-white/90">
+              {resolvedDate
+                ? <>→ <span className="font-semibold">{resolvedDate.display}</span></>
+                : <span className="text-yellow-200">Type a day (9), or 8/9, or 8/9/2026</span>}
+            </p>
           </div>
 
           <div>
