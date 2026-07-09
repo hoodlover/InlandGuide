@@ -1,0 +1,17 @@
+# dependencies
+node_modules/
+
+# build output
+frontend/dist/
+
+# local env / secrets
+backend/.env
+
+# large tools / binaries (not part of the app)
+cloudflared.exe
+
+# junk / logs
+$null
+*.log
+Thumbs.db
+.DS_Store
