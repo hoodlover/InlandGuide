@@ -88,7 +88,22 @@ function laneCoversSSY(laneSSY, ssy) {
 }
 
 export function getPorts() {
-  return [...new Set(lanes.map(l => l.pol))].sort();
+  const all = [...new Set(lanes.map(l => l.pol))].sort();
+  const us = all.filter(p => p.startsWith('US'));
+  const ca = all.filter(p => p.startsWith('CA'));
+  const mx = all.filter(p => p.startsWith('MX'));
+  const other = all.filter(p => !/^(US|CA|MX)/.test(p));
+
+  // US ports A–Z, with the Mexico port(s) inserted right above USNYC.
+  const ordered = [];
+  for (const p of us) {
+    if (p === 'USNYC') ordered.push(...mx);
+    ordered.push(p);
+  }
+  if (!us.includes('USNYC')) ordered.push(...mx); // safety if USNYC ever missing
+
+  // Canada ports go at the very bottom.
+  return [...ordered, ...other, ...ca];
 }
 
 export function getCities(pol) {
