@@ -87,23 +87,21 @@ function laneCoversSSY(laneSSY, ssy) {
   return val.split(',').map(s => s.trim()).includes(ssy);
 }
 
-export function getPorts() {
+// Ports grouped by country for a dropdown with divider headings:
+// Canada first, United States in the middle, Mexico at the bottom.
+export function getPortGroups() {
   const all = [...new Set(lanes.map(l => l.pol))].sort();
   const us = all.filter(p => p.startsWith('US'));
   const ca = all.filter(p => p.startsWith('CA'));
   const mx = all.filter(p => p.startsWith('MX'));
   const other = all.filter(p => !/^(US|CA|MX)/.test(p));
 
-  // US ports A–Z, with the Mexico port(s) inserted right above USNYC.
-  const ordered = [];
-  for (const p of us) {
-    if (p === 'USNYC') ordered.push(...mx);
-    ordered.push(p);
-  }
-  if (!us.includes('USNYC')) ordered.push(...mx); // safety if USNYC ever missing
-
-  // Canada ports go at the very bottom.
-  return [...ordered, ...other, ...ca];
+  const groups = [];
+  if (us.length) groups.push({ label: 'United States', ports: us });
+  if (ca.length) groups.push({ label: 'Canada', ports: ca });
+  if (mx.length) groups.push({ label: 'Mexico', ports: mx });
+  if (other.length) groups.push({ label: 'Other', ports: other });
+  return groups;
 }
 
 export function getCities(pol) {

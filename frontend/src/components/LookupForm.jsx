@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getPorts, getCities, getSSY, calculateERDLRD } from '../lib/cutoff';
+import { getPortGroups, getCities, getSSY, calculateERDLRD } from '../lib/cutoff';
 
 function todayLocalISO() {
   const t = new Date();
@@ -23,6 +23,7 @@ function parseFlexibleDate(input) {
   if (d.getMonth() !== month - 1 || d.getDate() !== day) return null; // reject overflow like 2/30
   return {
     iso: year + '-' + String(month).padStart(2, '0') + '-' + String(day).padStart(2, '0'),
+    mdy: String(month).padStart(2, '0') + '/' + String(day).padStart(2, '0') + '/' + year,
     display: d.toLocaleDateString('en-US', { weekday: 'short', month: '2-digit', day: '2-digit', year: 'numeric' })
   };
 }
@@ -36,8 +37,11 @@ export default function LookupForm() {
     reefer: 'N'
   });
 
-  // Raw text the user types for the date; defaults to today's day number.
-  const [dateInput, setDateInput] = useState(() => String(new Date().getDate()));
+  // Raw text the user types for the date; defaults to today's full date.
+  const [dateInput, setDateInput] = useState(() => {
+    const t = new Date();
+    return String(t.getMonth() + 1).padStart(2, '0') + '/' + String(t.getDate()).padStart(2, '0') + '/' + t.getFullYear();
+  });
   const resolvedDate = parseFlexibleDate(dateInput);
 
   const [results, setResults] = useState(null);
@@ -45,7 +49,7 @@ export default function LookupForm() {
   const [copyMessage, setCopyMessage] = useState('');
 
   // All options are derived locally from the bundled data snapshot — no network.
-  const ports = getPorts();
+  const portGroups = getPortGroups();
   const cities = formData.pol ? getCities(formData.pol) : [];
   const ssyList = (formData.pol && formData.startCity) ? getSSY(formData.pol, formData.startCity) : [];
   // Only prompt for an SSY when the port+city actually offers more than one.
@@ -75,6 +79,12 @@ export default function LookupForm() {
     setFormData(prev => ({ ...prev, portCutDate: parsed ? parsed.iso : '' }));
   };
 
+  // On click-away / tab-off, expand the box to the full date so it's never confusing.
+  const handleDateBlur = () => {
+    const parsed = parseFlexibleDate(dateInput);
+    if (parsed) setDateInput(parsed.mdy);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
@@ -85,6 +95,8 @@ export default function LookupForm() {
       setError('Enter a valid Port Cut Date — e.g. 9, or 8/9, or 8/9/2026');
       return;
     }
+    // Normalize the box to the full date on submit (covers pressing Enter).
+    if (resolvedDate) setDateInput(resolvedDate.mdy);
 
     const res = calculateERDLRD(
       formData.pol, formData.startCity, formData.ssy, formData.portCutDate, formData.reefer
@@ -165,8 +177,12 @@ ${divider}`;
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-slate-400 bg-white"
             >
               <option value="">-- Select Port --</option>
-              {ports.map(port => (
-                <option key={port} value={port}>{port}</option>
+              {portGroups.map(group => (
+                <optgroup key={group.label} label={group.label}>
+                  {group.ports.map(port => (
+                    <option key={port} value={port}>{port}</option>
+                  ))}
+                </optgroup>
               ))}
             </select>
           </div>
@@ -214,6 +230,7 @@ ${divider}`;
               value={dateInput}
               onChange={handleDateInput}
               onFocus={(e) => e.target.select()}
+              onBlur={handleDateBlur}
               placeholder="Day (9), or 8/9, or 8/9/2026"
               required
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-slate-400"
