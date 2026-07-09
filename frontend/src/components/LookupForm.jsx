@@ -1,11 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getPortGroups, getCities, getSSY, calculateERDLRD } from '../lib/cutoff';
 
-function todayLocalISO() {
-  const t = new Date();
-  return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
-}
-
 // Flexible date entry:  "9" = 9th of THIS month · "8/9" = Aug 9 · "8/9/26" or "8/9/2026" = full.
 function parseFlexibleDate(input) {
   const s = String(input).trim();
@@ -28,20 +23,13 @@ function parseFlexibleDate(input) {
   };
 }
 
-export default function LookupForm() {
-  const [formData, setFormData] = useState({
-    pol: '',
-    startCity: '',
-    ssy: '',
-    portCutDate: todayLocalISO(),
-    reefer: 'N'
-  });
+const EMPTY_FORM = { pol: '', startCity: '', ssy: '', portCutDate: '', reefer: 'N' };
 
-  // Raw text the user types for the date; defaults to today's full date.
-  const [dateInput, setDateInput] = useState(() => {
-    const t = new Date();
-    return String(t.getMonth() + 1).padStart(2, '0') + '/' + String(t.getDate()).padStart(2, '0') + '/' + t.getFullYear();
-  });
+export default function LookupForm() {
+  const [formData, setFormData] = useState({ ...EMPTY_FORM });
+
+  // Raw text the user types for the date; starts empty on load.
+  const [dateInput, setDateInput] = useState('');
   const resolvedDate = parseFlexibleDate(dateInput);
 
   const [results, setResults] = useState(null);
@@ -83,6 +71,14 @@ export default function LookupForm() {
   const handleDateBlur = () => {
     const parsed = parseFlexibleDate(dateInput);
     if (parsed) setDateInput(parsed.mdy);
+  };
+
+  const handleReset = () => {
+    setFormData({ ...EMPTY_FORM });
+    setDateInput('');
+    setResults(null);
+    setError('');
+    setCopyMessage('');
   };
 
   const handleSubmit = (e) => {
@@ -275,6 +271,14 @@ ${divider}`;
             className="w-full mt-6 px-4 py-3 bg-slate-800 text-white rounded-lg hover:bg-slate-900 transition font-semibold"
           >
             Calculate Cutoff Dates
+          </button>
+
+          <button
+            type="button"
+            onClick={handleReset}
+            className="w-full mt-3 px-4 py-2 bg-white/10 border border-white/60 text-white rounded-lg hover:bg-white/20 transition font-semibold"
+          >
+            Reset
           </button>
 
           {error && (
