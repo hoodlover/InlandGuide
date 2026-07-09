@@ -231,11 +231,11 @@ ${divider}`;
               required
               className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-slate-400"
             />
-            <p className="text-xs mt-1 text-white/90">
-              {resolvedDate
-                ? <>→ <span className="font-semibold">{resolvedDate.display}</span></>
-                : <span className="text-yellow-200">Type a day (9), or 8/9, or 8/9/2026</span>}
-            </p>
+            {resolvedDate && (
+              <p className="text-xs mt-1 text-white/90">
+                → <span className="font-semibold">{resolvedDate.display}</span>
+              </p>
+            )}
           </div>
 
           <div>
