@@ -107,6 +107,37 @@ function ObieWalkOn() {
   );
 }
 
+// One-time-per-session nudge to pin/install the app (dismissible, auto-hides).
+function WebappReminder() {
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (!sessionStorage.getItem('icg_webapp_reminder')) {
+        sessionStorage.setItem('icg_webapp_reminder', '1');
+        setShow(true);
+      }
+    } catch { /* sessionStorage may be unavailable */ }
+  }, []);
+
+  useEffect(() => {
+    if (!show) return;
+    const t = setTimeout(() => setShow(false), 12000);
+    return () => clearTimeout(t);
+  }, [show]);
+
+  if (!show) return null;
+  return (
+    <div className="webapp-reminder">
+      <button className="wr-close" onClick={() => setShow(false)} aria-label="Dismiss">×</button>
+      <p className="wr-text">
+        <span>💡</span>
+        <span><b>Make it an app.</b> Pin this page (or use your browser&apos;s Install button) for one-click access.</span>
+      </p>
+    </div>
+  );
+}
+
 export default function App() {
   if (isMobileDevice()) {
     return <MobileBlock />;
@@ -131,6 +162,7 @@ export default function App() {
         <LookupForm />
       </main>
 
+      <WebappReminder />
       <ObieWalkOn />
 
       <img
