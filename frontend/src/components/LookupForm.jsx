@@ -273,13 +273,15 @@ ${divider}`;
             Calculate Cutoff Dates
           </button>
 
-          <button
-            type="button"
-            onClick={handleReset}
-            className="w-full mt-3 px-4 py-2 bg-white/10 border border-white/60 text-white rounded-lg hover:bg-white/20 transition font-semibold"
-          >
-            Reset
-          </button>
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick={handleReset}
+              className="px-4 py-1 text-sm bg-white/10 border border-white/50 text-white rounded-full hover:bg-white/20 transition font-semibold"
+            >
+              Reset
+            </button>
+          </div>
 
           {error && (
             <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">

@@ -10,6 +10,10 @@ backend/.env
 # large tools / binaries (not part of the app)
 cloudflared.exe
 
+# generated managerial brief + working screenshots (deliverables, not source)
+brief/
+InlandCutoffGuide-Overview.*
+
 # junk / logs
 $null
 *.log
