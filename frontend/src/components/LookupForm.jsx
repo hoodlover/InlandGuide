@@ -294,7 +294,7 @@ ${divider}`;
               <ResultCard label="Earliest Return Date (ERD)" value={results.erd} />
               <ResultCard label="Latest Return Date (LRD)" value={results.lrd} />
               <ResultCard label="Ramp Cut Time" value={results.rampCutTime} />
-              <ResultCard label="Ramp MC Code" value={results.rampMC} />
+              <RailCard railroad={results.railroad} rampMC={results.rampMC} />
             </div>
 
             <button
@@ -325,6 +325,22 @@ function ResultCard({ label, value }) {
     <div className="flex items-center justify-between py-3">
       <p className="text-sm font-bold text-black">{label}</p>
       <p className="text-lg font-bold text-black">{value || 'N/A'}</p>
+    </div>
+  );
+}
+
+// Rail row: railroad name big, ramp MC code small underneath.
+function RailCard({ railroad, rampMC }) {
+  const rail = railroad || rampMC || 'N/A';
+  return (
+    <div className="flex items-center justify-between py-3">
+      <p className="text-sm font-bold text-black">Rail</p>
+      <div className="text-right leading-tight">
+        <p className="text-xl font-extrabold text-[#002D72]">{rail}</p>
+        {railroad && rampMC && (
+          <p className="text-xs font-semibold text-slate-500 mt-0.5">{rampMC}</p>
+        )}
+      </div>
     </div>
   );
 }
