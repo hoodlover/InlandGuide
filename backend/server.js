@@ -149,7 +149,8 @@ function calculateERDLRD(pol, startCity, ssy, portCutDate, reefer = 'N') {
     reeferAdj = lane.windowReefer;
   }
 
-  let portCut = new Date(portCutDate);
+  const [py, pm, pd] = String(portCutDate).split('-').map(Number);
+  let portCut = new Date(py, pm - 1, pd);
   
   let lrd = new Date(portCut);
   lrd.setDate(lrd.getDate() - transit);

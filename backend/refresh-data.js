@@ -37,6 +37,22 @@ fs.mkdirSync(dataDir, { recursive: true });
 fs.writeFileSync(path.join(dataDir, 'lanes.json'), JSON.stringify(lanes, null, 2));
 console.log('  Data: wrote ' + lanes.length + ' lanes');
 
+// 1b) Export the HOLIDAYS sheet -> frontend/src/data/holidays.json, grouped by country.
+const holRows = XLSX.utils.sheet_to_json(wb.Sheets['HOLIDAYS'], { header: 1 });
+const holidays = {};
+for (const r of holRows) {
+  const country = r[0];
+  const serial = r[2];
+  if ((country === 'US' || country === 'CA' || country === 'MX') && typeof serial === 'number') {
+    const d = XLSX.SSF.parse_date_code(serial);
+    const iso = d.y + '-' + String(d.m).padStart(2, '0') + '-' + String(d.d).padStart(2, '0');
+    (holidays[country] = holidays[country] || []).push(iso);
+  }
+}
+Object.keys(holidays).forEach(c => holidays[c].sort());
+fs.writeFileSync(path.join(dataDir, 'holidays.json'), JSON.stringify(holidays, null, 2));
+console.log('  Holidays: wrote ' + Object.entries(holidays).map(([c, a]) => c + '=' + a.length).join(', '));
+
 // 2) Convert the current banners (from /public) to WebP and embed as data URIs.
 const publicDir = path.join(ROOT, 'public');
 
