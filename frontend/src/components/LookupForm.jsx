@@ -59,10 +59,10 @@ export default function LookupForm() {
 
     const railroad = results.railroad || results.rampMC;
     const header = `Here are the ramp cuts in ${formData.startCity} on ${railroad}`;
-    // Match the divider to the header length so it grows for longer rail names (e.g. Norfolk Southern).
-    const divider = '─'.repeat(header.length);
+    // Divider tracks the header length, trimmed a bit so it doesn't overshoot the text.
+    const divider = '─'.repeat(Math.max(0, header.length - 14));
 
-    // Plain-text version (used when pasting into plain fields).
+    // Plain-text version (used when pasting into plain fields like Notepad).
     const text = `${header}
 ${divider}
 Port of Loading: ${formData.pol}
@@ -74,17 +74,20 @@ Ramp Cuts:
 - Ramp Cut Time: ${results.rampCutTime}
 ${divider}`;
 
-    // Rich version (Outlook/Gmail/Teams) — bolds the Port and Port Cut Date values.
-    const html = `<div style="font-family:Arial,sans-serif;white-space:pre-wrap">${header}
-${divider}
-Port of Loading: <b>${formData.pol}</b>
-Port Cut Date: <b>${formData.portCutDate}</b>
-
-Ramp Cuts:
-- Earliest Return Date (ERD): ${results.erd}
-- Latest Return Date (LRD): ${results.lrd}
-- Ramp Cut Time: ${results.rampCutTime}
-${divider}</div>`;
+    // Rich version (Outlook/Gmail/Teams/Salesforce) — uses <br> so line breaks survive
+    // rich-text editors that collapse plain newlines; bolds the Port and Port Cut Date.
+    const html = `<div style="font-family:Arial,sans-serif">` + [
+      header,
+      divider,
+      `Port of Loading: <b>${formData.pol}</b>`,
+      `Port Cut Date: <b>${formData.portCutDate}</b>`,
+      '',
+      'Ramp Cuts:',
+      `- Earliest Return Date (ERD): ${results.erd}`,
+      `- Latest Return Date (LRD): ${results.lrd}`,
+      `- Ramp Cut Time: ${results.rampCutTime}`,
+      divider
+    ].join('<br>') + `</div>`;
 
     try {
       if (navigator.clipboard && window.ClipboardItem) {
