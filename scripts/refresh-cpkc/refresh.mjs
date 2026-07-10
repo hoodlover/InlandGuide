@@ -32,6 +32,11 @@ const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Se
 // A cutoff cell looks like "Mon 29-Jun 18:30"; ETA/ETD/Rail-Port cells like "Tue 7-Jul".
 const DATETIME_RE = /^[A-Z][a-z]{2}\s+\d{1,2}-[A-Z][a-z]{2}\s+\d{1,2}:\d{2}$/;
 
+// CN date formats: cut-off cells "Fri, Jul-03"; ERD / port-cutoff cells "28-Jun".
+const CN_CUT_RE = /^[A-Za-z]{3},\s*[A-Za-z]{3}-\d{1,2}$/;
+const CN_ERD_RE = /^\d{1,2}-[A-Za-z]{3}$/;
+const WEEKDAY_RE = /^(Mon|Tue|Wed|Thu|Fri|Sat|Sun)$/;
+
 async function loadPages(data) {
   const doc = await getDocument({ data }).promise;
   const pages = [];
@@ -153,7 +158,8 @@ function isoToRunDate(iso) {
   return `${WEEKDAYS[dt.getDay()]} ${d}-${MONTH_NAMES[m - 1]}`;
 }
 
-function parse(pages, slug, name) {
+function parseCPKC(pages, port) {
+  const { slug, name } = port;
   const pageRows = pages.map(toRows);
 
   // Header/notes/run-date come from the first page that has a header.
@@ -210,8 +216,122 @@ function parse(pages, slug, name) {
     throw new Error(`[${slug}] validation failed for ${errors.length} row(s):\n${errors.join('\n')}`);
   }
 
-  return { name, runDate, generatedAt, cities: head.cities, notes, vessels };
+  return { name, rail: port.rail || 'CPKC', runDate, generatedAt, cities: head.cities, notes, vessels };
 }
+
+// CN's port-cutoff PDFs (e.g. Prince Rupert) are a single wide table split ACROSS
+// pages by destination group — the same vessels repeat on every page, each page
+// carrying a different set of inland cities. Each destination has two sub-columns:
+// a published Cut-off AND a published ERD (CN gives both; we don't derive ERD).
+function parseCN(pages, port) {
+  const { slug, name } = port;
+  const pageRows = pages.map(toRows);
+
+  // generatedAt from "Last updated: MM-DD-YYYY HH:MM"
+  let generatedAt = '';
+  for (const items of pages) {
+    const s = items.find(it => /Last updated:/i.test(it.s));
+    const m = s && s.s.match(/(\d{2})-(\d{2})-(\d{4})/);
+    if (m) { generatedAt = `${m[3]}-${m[1]}-${m[2]}`; break; }
+  }
+
+  const cities = [];
+  const cutTimes = {};
+  const notes = [];
+  const vesselMap = new Map();   // vessel -> row object (merged across pages)
+  const order = [];              // preserve first-seen vessel order
+  const errors = [];
+
+  for (const rows of pageRows) {
+    // Sub-header row: the one with several "Cut-off/Limite" + "ERD/DRPP" labels.
+    const sub = rows.find(r => r.items.filter(it => /^(Cut-off\/Limite|ERD\/DRPP)$/i.test(it.s)).length >= 4);
+    if (!sub) continue;
+    const cutCols = sub.items.filter(it => /Cut-off/i.test(it.s)).map(it => it.x).sort((a, b) => a - b);
+    const erdCols = sub.items.filter(it => /ERD/i.test(it.s)).map(it => it.x).sort((a, b) => a - b);
+    if (!cutCols.length || cutCols.length !== erdCols.length) {
+      throw new Error(`[${slug}] sub-header cut/erd column mismatch (${cutCols.length}/${erdCols.length})`);
+    }
+
+    // Destination names sit in the band just above the sub-header, over the columns.
+    const destItems = rows
+      .filter(r => r.y > sub.y && r.y < sub.y + 45)
+      .flatMap(r => r.items)
+      .filter(it => it.x > cutCols[0] - 90)
+      .sort((a, b) => a.x - b.x);
+    if (destItems.length !== cutCols.length) {
+      throw new Error(`[${slug}] found ${destItems.length} destinations for ${cutCols.length} columns`);
+    }
+    const pageCities = destItems.map(it => it.s);
+    pageCities.forEach(c => { if (!cities.includes(c)) cities.push(c); });
+
+    // Collect notes + per-destination cut-off times once (first page is enough).
+    if (!notes.length) {
+      for (const items of pages) {
+        for (const it of items) {
+          if (/Subject to change/i.test(it.s) || /Please contact/i.test(it.s)) {
+            const n = it.s.replace(/\*/g, '').trim();
+            if (n && !notes.includes(n)) notes.push(n);
+          }
+        }
+      }
+    }
+    const timeRow = rows.find(r => r.items.filter(it => /\bhrs\b/i.test(it.s)).length >= 2);
+    if (timeRow) {
+      for (const it of timeRow.items.filter(it => /\bhrs\b/i.test(it.s) && it.x > cutCols[0] - 90)) {
+        let bi = 0, bd = Infinity;
+        cutCols.forEach((x, i) => { const d = Math.abs(x - it.x); if (d < bd) { bd = d; bi = i; } });
+        cutTimes[pageCities[bi]] = it.s.trim();
+      }
+    }
+
+    // Data rows: below the sub-header, carrying destination dates.
+    for (const r of rows) {
+      if (r.y >= sub.y) continue;
+      const dates = r.items.filter(it => CN_CUT_RE.test(it.s) || CN_ERD_RE.test(it.s));
+      if (dates.length < 3) continue;
+
+      const vesselItem = r.items
+        .filter(it => /[A-Za-z]/.test(it.s) && !WEEKDAY_RE.test(it.s) && !CN_CUT_RE.test(it.s) && !CN_ERD_RE.test(it.s) && it.x < cutCols[0])
+        .sort((a, b) => a.x - b.x)[0];
+      if (!vesselItem) continue;
+      const vessel = vesselItem.s;
+
+      // Port cut-off = the DD-Mon date left of the first destination column.
+      const portItem = dates.find(it => it.x < cutCols[0] - 30 && CN_ERD_RE.test(it.s));
+      const rest = dates.filter(it => it !== portItem);
+
+      // Bucket remaining dates to their nearest cut/erd column.
+      const anchors = [];
+      pageCities.forEach((c, i) => { anchors.push({ k: 'c' + i, x: cutCols[i] }); anchors.push({ k: 'e' + i, x: erdCols[i] }); });
+      const buck = {};
+      for (const it of rest) {
+        let best = anchors[0], bd = Infinity;
+        for (const a of anchors) { const d = Math.abs(a.x - it.x); if (d < bd) { bd = d; best = a; } }
+        if (buck[best.k]) errors.push(`  ${vessel}: two values collided at column ${best.k} [${buck[best.k]} | ${it.s}]`);
+        buck[best.k] = it.s;
+      }
+
+      let row = vesselMap.get(vessel);
+      if (!row) {
+        row = { vessel, terminal: '', eta: '', etd: '', railPortCutoff: portItem ? portItem.s : '', comments: '', cutoffs: {}, erds: {} };
+        vesselMap.set(vessel, row);
+        order.push(vessel);
+      }
+      pageCities.forEach((c, i) => {
+        row.cutoffs[c] = buck['c' + i] || '';
+        row.erds[c] = buck['e' + i] || '';
+      });
+    }
+  }
+
+  const vessels = order.map(v => vesselMap.get(v));
+  if (!vessels.length) throw new Error(`[${slug}] parsed zero vessel rows`);
+  if (errors.length) throw new Error(`[${slug}] validation failed:\n${errors.join('\n')}`);
+
+  return { name, rail: port.rail || 'CN', runDate: isoToRunDate(generatedAt), generatedAt, cities, notes, cutTimes, vessels };
+}
+
+const PARSERS = { cpkc: parseCPKC, cn: parseCN };
 
 async function fetchPdf(port) {
   if (process.env.CPKC_PDF_DIR) {
@@ -230,7 +350,9 @@ async function main() {
   for (const port of ports) {
     const data = await fetchPdf(port);
     const pages = await loadPages(data);
-    const parsed = parse(pages, port.slug, port.name);
+    const parser = PARSERS[port.parser || 'cpkc'];
+    if (!parser) throw new Error(`[${port.slug}] unknown parser "${port.parser}"`);
+    const parsed = parser(pages, port);
     out.ports[port.slug] = parsed;
     if (parsed.generatedAt && parsed.generatedAt > out.generatedAt) out.generatedAt = parsed.generatedAt;
     console.log(`[${port.slug}] OK — ${parsed.vessels.length} vessels, ${parsed.cities.length} cities, run ${parsed.runDate}`);

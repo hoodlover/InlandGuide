@@ -342,7 +342,7 @@ export default function App() {
         <div className="flex gap-2 mb-5">
           {[
             { id: 'calculator', label: 'Rail Cutoff Calculator' },
-            { id: 'cpkc', label: 'CPKC Port Schedule' }
+            { id: 'cpkc', label: 'Port Cut-Off Schedule' }
           ].map(t => (
             <button
               key={t.id}

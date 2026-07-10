@@ -12,9 +12,9 @@ const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Se
 
 export const generatedAt = schedules.generatedAt || '';
 
-// [{ slug, name }] for the port picker.
+// [{ slug, name, rail }] for the port picker.
 export function getPorts() {
-  return Object.entries(schedules.ports || {}).map(([slug, p]) => ({ slug, name: p.name || slug }));
+  return Object.entries(schedules.ports || {}).map(([slug, p]) => ({ slug, name: p.name || slug, rail: p.rail || '' }));
 }
 
 function port(slug) {
@@ -24,7 +24,13 @@ function port(slug) {
 export function getPortInfo(slug) {
   const p = port(slug);
   if (!p) return null;
-  return { name: p.name, runDate: p.runDate || '', generatedAt: p.generatedAt || generatedAt, notes: p.notes || [] };
+  return { name: p.name, rail: p.rail || '', runDate: p.runDate || '', generatedAt: p.generatedAt || generatedAt, notes: p.notes || [] };
+}
+
+// Published per-destination cut-off time (CN schedules), e.g. "2300 hrs". Empty if none.
+export function getCutTime(slug, city) {
+  const p = port(slug);
+  return (p && p.cutTimes && p.cutTimes[city]) || '';
 }
 
 // Vessel names in published order (services stay grouped as on the sheet).
@@ -78,12 +84,18 @@ function fmtDate(d) {
   return `${WEEKDAYS[d.getDay()]} ${d.getDate()}-${MONTH_NAMES[d.getMonth()]}`;
 }
 
-// ERD = the inland cutoff date minus 5 days (receiving opens), per the PDF note.
-// Returned in the same "Www D-Mon" style the sheet uses. Empty if unparseable.
+// ERD (receiving opens). CN publishes it explicitly per destination; CPKC does
+// not, so we derive it as the inland cutoff minus 5 days per the PDF note.
+// Returned in the "Www D-Mon" style for consistency. Empty if unavailable.
 export function getERD(slug, vessel, city) {
-  const cutoff = getCutoff(slug, vessel, city);
   const info = getPortInfo(slug);
-  const d = parseCutoff(cutoff, info && info.generatedAt);
+  const meta = getVesselMeta(slug, vessel);
+  // Published ERD (e.g. CN "28-Jun") takes precedence over the derived rule.
+  if (meta && meta.erds && meta.erds[city]) {
+    const pub = parseCutoff(meta.erds[city], info && info.generatedAt);
+    return pub ? fmtDate(pub) : meta.erds[city];
+  }
+  const d = parseCutoff(getCutoff(slug, vessel, city), info && info.generatedAt);
   if (!d) return '';
   d.setDate(d.getDate() - ERD_DAYS_BEFORE);
   return fmtDate(d);

@@ -2,16 +2,26 @@
   {
     "slug": "montreal",
     "name": "Port of Montreal",
+    "rail": "CPKC",
     "url": "https://www.cpkcr.com/content/dam/cpkc/documents/english/pdfs/port-schedules/port-of-montreal.pdf"
   },
   {
     "slug": "metro-vancouver",
     "name": "Port of Metro Vancouver",
+    "rail": "CPKC",
     "url": "https://www.cpkcr.com/content/dam/cpkc/documents/english/pdfs/port-schedules/port-of-metro-vancouver.pdf"
   },
   {
     "slug": "saint-john",
     "name": "Port of Saint John",
+    "rail": "CPKC",
     "url": "https://www.cpkcr.com/content/dam/cpkc/documents/english/pdfs/port-schedules/port-of-saint-john-NB.pdf"
+  },
+  {
+    "slug": "prince-rupert",
+    "name": "Prince Rupert",
+    "rail": "CN",
+    "parser": "cn",
+    "url": "https://www.cn.ca/-/media/files/customer-centre/port-cutoffs/princerupert-cutoff-erd.pdf"
   }
 ]

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Combobox from './Combobox';
-import { getPorts, getVessels, getCities, getVesselMeta, getCutoff, getERD, getPortInfo } from '../lib/cpkc';
+import { getPorts, getVessels, getCities, getVesselMeta, getCutoff, getERD, getPortInfo, getCutTime } from '../lib/cpkc';
 import { hlLogo } from '../assets/hlLogo';
 
 const EMPTY = { port: '', vessel: '', city: '' };
@@ -41,7 +41,9 @@ export default function PortScheduleLookup() {
     city: sel.city,
     vessel: sel.vessel,
     cutoff,
+    cutTime: getCutTime(sel.port, sel.city),
     erd,
+    rail: info?.rail || '',
     terminal: meta?.terminal || '',
     eta: meta?.eta || '',
     etd: meta?.etd || '',
@@ -71,7 +73,7 @@ export default function PortScheduleLookup() {
   // Plain-text note, mirroring the "Copy Kind Text Note" style of the calculator.
   const handleCopyText = () => {
     if (!results) return;
-    const railTerminal = `CPKC${results.terminal ? ' / ' + results.terminal : ''}`;
+    const railTerminal = `${results.rail || 'Rail'}${results.terminal ? ' / ' + results.terminal : ''}`;
     const top = `${results.city}    ${railTerminal}`;
     const divider = '─'.repeat(Math.max(24, top.length));
     const text = [
@@ -79,6 +81,7 @@ export default function PortScheduleLookup() {
       divider,
       `Vessel: ${results.vessel}`,
       `Inland Cut-Off (LRD): ${results.cutoff}`,
+      results.cutTime ? `Cut-Off Time: ${results.cutTime}` : null,
       `Earliest Receiving (ERD): ${results.erd}`,
       results.comments ? `Note: ${results.comments}` : null,
       '',
@@ -93,6 +96,7 @@ export default function PortScheduleLookup() {
       divider,
       `Vessel: <b>${results.vessel}</b>`,
       `Inland Cut-Off (LRD): <b>${results.cutoff}</b>`,
+      results.cutTime ? `Cut-Off Time: <b>${results.cutTime}</b>` : null,
       `Earliest Receiving (ERD): <b>${results.erd}</b>`,
       results.comments ? `Note: ${results.comments}` : null,
       '',
@@ -108,7 +112,7 @@ export default function PortScheduleLookup() {
   // Rich "pretty note" card, matching the calculator's styled box.
   const handleCopyPretty = () => {
     if (!results) return;
-    const railTerminal = `CPKC${results.terminal ? ' / ' + results.terminal : ''}`;
+    const railTerminal = `${results.rail || 'Rail'}${results.terminal ? ' / ' + results.terminal : ''}`;
     const titlePlain = `${results.city}    ${railTerminal}`;
     const titleHtml = `${results.city}&nbsp;&nbsp;&nbsp;&nbsp;${railTerminal}`;
     const titleSize = titlePlain.length > 34 ? 15 : (titlePlain.length > 26 ? 17 : 20);
@@ -124,6 +128,7 @@ export default function PortScheduleLookup() {
           `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:separate;background:#ffffff;border-radius:8px">` +
             row('Vessel', results.vessel) +
             row('Inland Cut-Off (LRD)', results.cutoff) +
+            (results.cutTime ? row('Cut-Off Time', results.cutTime) : '') +
             row('Earliest Receiving (ERD)', results.erd) +
             (results.comments ? row('Note', results.comments) : '') +
           `</table>` +
@@ -136,6 +141,7 @@ export default function PortScheduleLookup() {
       titlePlain,
       `Vessel: ${results.vessel}`,
       `Inland Cut-Off (LRD): ${results.cutoff}`,
+      results.cutTime ? `Cut-Off Time: ${results.cutTime}` : null,
       `Earliest Receiving (ERD): ${results.erd}`,
       results.comments ? `Note: ${results.comments}` : null,
       '',
@@ -148,7 +154,7 @@ export default function PortScheduleLookup() {
   return (
     <div className="grid md:grid-cols-2 gap-6">
       <div className="bg-[#EB6608] rounded-lg border border-[#EB6608] shadow-sm p-6">
-        <h2 className="text-xl font-extrabold tracking-wide uppercase mb-1 pb-2 border-b-2 border-white/60 text-white txt-shadow-heavy">CPKC Port Schedule</h2>
+        <h2 className="text-xl font-extrabold tracking-wide uppercase mb-1 pb-2 border-b-2 border-white/60 text-white txt-shadow-heavy">Port Cut-Off Schedule</h2>
         {info && (
           <p className="text-xs text-white/90 mb-4 txt-shadow-soft">Schedule as published: <span className="font-semibold">{info.runDate}</span></p>
         )}
@@ -160,7 +166,7 @@ export default function PortScheduleLookup() {
               <Combobox
                 value={sel.port}
                 onSelect={(v) => pick('port', v)}
-                options={ports.map(p => ({ value: p.slug, label: p.name }))}
+                options={ports.map(p => ({ value: p.slug, label: p.rail ? `${p.name} (${p.rail})` : p.name }))}
                 placeholder="Type or select a port…"
                 required
               />
@@ -220,7 +226,9 @@ export default function PortScheduleLookup() {
             <div className="bg-white divide-y divide-slate-200 rounded-lg px-4 shadow-md">
               <Row label="Vessel" value={results.vessel} />
               <Row label="Inland Cut-Off (LRD)" value={results.cutoff} strong />
+              {results.cutTime && <Row label="Cut-Off Time" value={results.cutTime} />}
               <Row label="Earliest Receiving (ERD)" value={results.erd} strong />
+              {results.rail && <Row label="Rail" value={results.rail} />}
               {results.terminal && <Row label="Terminal" value={results.terminal} />}
               {results.eta && <Row label="Vessel ETA" value={results.eta} />}
               {results.etd && <Row label="Vessel ETD" value={results.etd} />}
