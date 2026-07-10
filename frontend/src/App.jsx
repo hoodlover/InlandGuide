@@ -275,6 +275,7 @@ function InstallModal({ onClose }) {
 // the GitHub Action. Only works on the live web app (needs the serverless function).
 function RefreshModal({ onClose }) {
   const [pass, setPass] = useState('');
+  const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState(null);
 
@@ -304,15 +305,26 @@ function RefreshModal({ onClose }) {
       <p className="text-sm text-slate-600 dark:text-slate-300 mb-3">
         Pull the latest CPKC &amp; CN schedules right now. Enter the passphrase.
       </p>
-      <input
-        type="password"
-        value={pass}
-        autoFocus
-        onChange={(e) => setPass(e.target.value)}
-        onKeyDown={(e) => { if (e.key === 'Enter') submit(); }}
-        placeholder="Passphrase"
-        className="w-full px-3 py-2 border border-slate-300 rounded-lg mb-3 focus:ring-2 focus:ring-slate-400"
-      />
+      <div className="relative mb-3">
+        <input
+          type={show ? 'text' : 'password'}
+          value={pass}
+          autoFocus
+          onChange={(e) => setPass(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') submit(); }}
+          placeholder="Passphrase"
+          className="w-full px-3 py-2 pr-11 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400"
+        />
+        <button
+          type="button"
+          onClick={() => setShow(s => !s)}
+          aria-label={show ? 'Hide passphrase' : 'Show passphrase'}
+          title={show ? 'Hide' : 'Show'}
+          className="absolute inset-y-0 right-0 px-3 flex items-center text-lg text-slate-500 hover:text-slate-700"
+        >
+          {show ? '🙈' : '👁️'}
+        </button>
+      </div>
       <button
         onClick={submit}
         disabled={busy || !pass}
