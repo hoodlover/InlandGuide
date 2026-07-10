@@ -2,6 +2,7 @@
 // The data is a committed snapshot exported from the Excel DATABASE sheet.
 import rawLanes from '../data/lanes.json';
 import holidays from '../data/holidays.json';
+import terminals from '../data/terminals.json';
 
 // Drop the spreadsheet header row and any blank rows.
 const lanes = rawLanes.filter(
@@ -35,14 +36,26 @@ const RAILROAD_PREFIXES = [
   { prefix: 'YUSENT', name: 'Union Pacific' },
   { prefix: 'NORFOL', name: 'Norfolk Southern' },
   { prefix: 'SYNCRE', name: 'Norfolk Southern' },
-  { prefix: 'CPR', name: 'CP Rail' },
-  { prefix: 'CANADI', name: 'CP Rail' },
-  { prefix: 'IOWAIN', name: 'CP Rail' },
-  { prefix: 'SOOLIN', name: 'CP Rail' },
+  { prefix: 'CPR', name: 'CP Rail (CPKC)' },
+  { prefix: 'CANADI', name: 'CP Rail (CPKC)' },
+  { prefix: 'IOWAIN', name: 'CP Rail (CPKC)' },
+  { prefix: 'SOOLIN', name: 'CP Rail (CPKC)' },
   { prefix: 'CNR', name: 'CN Rail' },
   { prefix: 'CSX', name: 'CSX' },
   { prefix: 'APPREG', name: 'CSX' },
-  { prefix: 'BURLIN', name: 'Burlington Northern' }
+  { prefix: 'SCIPDI', name: 'CSX' },
+  { prefix: 'BURLIN', name: 'Burlington Northern' },
+  // Reuse existing canonical names so a railroad displays consistently across lanes.
+  { prefix: 'DUNCAN', name: 'Union Pacific' },
+  { prefix: 'SAVSER', name: 'Union Pacific' },
+  { prefix: 'SOUTHC', name: 'Norfolk Southern' },
+  { prefix: 'VIRGIN', name: 'Norfolk Southern' },
+  { prefix: 'BLUER', name: 'CSX' }, // Gainesville, GA yard — CSX-operated
+  { prefix: 'KANSAS', name: 'CP Rail (CPKC)' },
+  { prefix: 'OUACHI', name: 'CP Rail (CPKC)' },
+  { prefix: 'GEORGI', name: 'Savannah Port Terminal Railroad' },
+  { prefix: 'FLORID', name: 'Florida East Coast Railway' },
+  { prefix: 'MOBILE', name: 'Terminal Railway Alabama' }
 ];
 
 export function railroadFromCode(code) {
@@ -106,6 +119,53 @@ export function getPortGroups() {
 
 export function getCities(pol) {
   return [...new Set(lanes.filter(l => l.pol === pol).map(l => l.name))].sort();
+}
+
+// Display-only loccode lookup. Pulls the loccode already present in the data
+// (we do NOT modify the underlying database). Overrides pin the code for a few
+// cities that appear with more than one loccode across lanes.
+const LOCCODE_OVERRIDES = {
+  'SAINT LOUIS, MO': 'USSTL',
+  'SASKATOON, SK': 'CASAK',
+};
+
+export function getLoccode(name) {
+  if (LOCCODE_OVERRIDES[name]) return LOCCODE_OVERRIDES[name];
+  const row = lanes.find(l => l.name === name && l.loccode);
+  return row ? String(row.loccode).trim() : '';
+}
+
+// "DETROIT, MI - USDET" for the picker and the copied result (falls back to the
+// bare city name if no loccode is on file).
+export function cityLabel(name) {
+  const code = getLoccode(name);
+  return code ? `${name} - ${code}` : name;
+}
+
+// "railroad / terminal" label per ramp, sourced from data/terminals.json (keyed
+// by rampMC code; a couple of shared codes are disambiguated by city). This is the
+// exact string dropped at the top of the copied notes. Falls back to the city.
+const normCode = (c) => String(c || '').trim().replace(/\s+/g, ' ');
+const TERMINAL_BY_RAMP = new Map();
+const TERMINAL_BY_RAMP_CITY = new Map();
+for (const t of terminals) {
+  const key = normCode(t.rampMC);
+  TERMINAL_BY_RAMP.set(key, t.label);
+  TERMINAL_BY_RAMP_CITY.set(key + '|' + String(t.city).trim().toUpperCase(), t.label);
+}
+
+export function getRailTerminal(rampMC, city) {
+  const key = normCode(rampMC);
+  const byCity = TERMINAL_BY_RAMP_CITY.get(key + '|' + String(city || '').trim().toUpperCase());
+  return byCity || TERMINAL_BY_RAMP.get(key) || city || '';
+}
+
+// Just the railroad abbreviation (e.g. "NS", "UP", "CPKC") — the part before the
+// " / " in the terminal label. Falls back to the prefix-based railroad name.
+export function getRail(rampMC, city) {
+  const label = getRailTerminal(rampMC, city);
+  const i = label.indexOf(' / ');
+  return i >= 0 ? label.slice(0, i).trim() : (railroadFromCode(rampMC) || label);
 }
 
 export function getSSY(pol, city) {

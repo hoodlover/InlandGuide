@@ -29,6 +29,11 @@ textarea {
   letter-spacing: 0.02em;
 }
 
+/* Depth on white text over the orange/blue panels — heavy on titles, soft on labels. */
+.txt-shadow-heavy { text-shadow: 0 2px 3px rgba(0, 0, 0, 0.6), 0 5px 12px rgba(0, 0, 0, 0.5); }
+.txt-shadow-strong { text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); }
+.txt-shadow-soft { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35); }
+
 /* OB the Ops-Base Bot entrance + joke fade on the mobile block */
 @keyframes obbot-in {
   from { transform: translateY(40px) scale(0.9); opacity: 0; }

@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import LookupForm from './components/LookupForm';
 import { bannerTop, bannerBottom, obBot } from './assets/banners';
+import themeSunset from './assets/theme-sunset.webp';
+import themeShip from './assets/theme-ship.webp';
+import themeHelp from './assets/theme-help.webp';
 import './index.css';
 
 // Proof-of-concept block for phones/tablets (soft — can be bypassed via "desktop site").
@@ -205,20 +208,31 @@ function HelpModal({ onClose }) {
   );
 }
 
-// Fixed controls, upper-right: Help + light/dark toggle.
+// Help + light/dark toggle, both as round photo buttons. The theme toggle shows
+// the mode you'll switch TO: sunset (evening) in light mode, daylit ship in dark.
 function TopControls() {
   const [dark, toggle] = useTheme();
   const [helpOpen, setHelpOpen] = useState(false);
-  const btn = 'w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 shadow-md hover:shadow-lg transition text-lg';
+  const circleBtn = 'w-20 h-20 rounded-full overflow-hidden shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition';
 
   return (
     <>
-      <div className="fixed top-4 right-4 z-[70] flex items-center gap-2">
-        <button className={btn} onClick={() => setHelpOpen(true)} aria-label="Help" title="Help">
-          <span className="text-[#002D72] dark:text-white font-bold">?</span>
+      <div className="flex items-center gap-2">
+        <button
+          className={circleBtn}
+          onClick={() => setHelpOpen(true)}
+          aria-label="Help"
+          title="Help"
+        >
+          <img src={themeHelp} alt="Help" className="w-full h-full object-cover" />
         </button>
-        <button className={btn} onClick={toggle} aria-label="Toggle dark mode" title="Toggle dark mode">
-          {dark ? '☀️' : '🌙'}
+        <button
+          className={circleBtn}
+          onClick={toggle}
+          aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+          title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+        >
+          <img src={dark ? themeShip : themeSunset} alt="" className="w-full h-full object-cover" />
         </button>
       </div>
       {helpOpen && <HelpModal onClose={() => setHelpOpen(false)} />}
@@ -233,33 +247,40 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-900 flex flex-col">
-      <TopControls />
+      {/* Banner constrained to just past the content edges (~5% wider each side). */}
+      <div className="w-full max-w-[70rem] mx-auto px-4 pt-4">
+        <img
+          src={bannerTop}
+          alt="Hapag-Lloyd IDT Ops Base"
+          className="w-full h-auto block rounded-xl"
+        />
+      </div>
 
-      <img
-        src={bannerTop}
-        alt="Hapag-Lloyd IDT Ops Base"
-        className="w-full h-auto block"
-      />
+      {/* Header constrained to the hero width so it no longer draws a full-width line. */}
+      <div className="w-full max-w-[70rem] mx-auto px-4 mt-3">
+        <header className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-5 py-3 flex items-center justify-between gap-3">
+          <div>
+            <h1 className="text-xl font-bold text-[#002D72] dark:text-white smallcaps txt-shadow-heavy">Inland Cutoff Guide</h1>
+            <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">Rail cutoff &amp; delivery date calculator</p>
+          </div>
+          <TopControls />
+        </header>
+      </div>
 
-      <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <h1 className="text-2xl font-bold text-[#002D72] dark:text-white smallcaps">Inland Cutoff Guide</h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Rail cutoff &amp; delivery date calculator</p>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-6 py-8 w-full flex-1">
+      <main className="max-w-5xl mx-auto px-5 py-6 w-full flex-1">
         <LookupForm />
       </main>
 
       <WebappReminder />
       <ObieWalkOn />
 
-      <img
-        src={bannerBottom}
-        alt="Hapag-Lloyd IDT Ops Base"
-        className="w-full h-auto block mt-8"
-      />
+      <div className="w-full max-w-[70rem] mx-auto px-4 mt-8 mb-4">
+        <img
+          src={bannerBottom}
+          alt="Hapag-Lloyd IDT Ops Base"
+          className="w-full h-auto block rounded-xl"
+        />
+      </div>
     </div>
   );
 }

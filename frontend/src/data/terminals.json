@@ -1,0 +1,437 @@
+[
+  {
+    "rampMC": "CSX 071",
+    "city": "Atlanta, GA",
+    "label": "CSX / Fairburn"
+  },
+  {
+    "rampMC": "NORFOL 123",
+    "city": "Atlanta, GA",
+    "label": "NS / Austell"
+  },
+  {
+    "rampMC": "CSXINT 027",
+    "city": "Battleboro, NC",
+    "label": "CSX / Rocky Mount"
+  },
+  {
+    "rampMC": "CSXBES 001",
+    "city": "Bessemer, AL",
+    "label": "CSX / CAICTF"
+  },
+  {
+    "rampMC": "CSX 050",
+    "city": "Buffalo, NY",
+    "label": "CSX / Buffalo"
+  },
+  {
+    "rampMC": "CNRCAL 001",
+    "city": "Calgary, AB",
+    "label": "CN Rail / Calgary"
+  },
+  {
+    "rampMC": "CPRCAL 001",
+    "city": "Calgary, AB",
+    "label": "CPKC / Calgary"
+  },
+  {
+    "rampMC": "CSXINT 008",
+    "city": "Charlotte, NC",
+    "label": "CSX / Charlotte"
+  },
+  {
+    "rampMC": "NORFOL 070",
+    "city": "Charlotte, NC",
+    "label": "NS / Charlotte"
+  },
+  {
+    "rampMC": "BURLIN 244",
+    "city": "Chicago, IL",
+    "label": "BNSF / Corwith"
+  },
+  {
+    "rampMC": "CANADI 083",
+    "city": "Chicago, IL",
+    "label": "CN Rail / Harvey"
+  },
+  {
+    "rampMC": "CSX 040",
+    "city": "Chicago, IL",
+    "label": "CSX / Bedford Park"
+  },
+  {
+    "rampMC": "CSX 047",
+    "city": "Chicago, IL",
+    "label": "CSX / 59th St"
+  },
+  {
+    "rampMC": "NORFOL 020",
+    "city": "Chicago, IL",
+    "label": "NS / Landers"
+  },
+  {
+    "rampMC": "SOOLIN 003",
+    "city": "Chicago, IL",
+    "label": "CPKC / Bensenville"
+  },
+  {
+    "rampMC": "CSX 004",
+    "city": "Cincinnati, OH",
+    "label": "CSX / Cincinnati"
+  },
+  {
+    "rampMC": "NORFOL 666",
+    "city": "Cincinnati, OH",
+    "label": "NS / Sharonville"
+  },
+  {
+    "rampMC": "CSX 063",
+    "city": "Cleveland, OH",
+    "label": "CSX / Cleveland"
+  },
+  {
+    "rampMC": "NORFOL 021",
+    "city": "Cleveland, OH",
+    "label": "NS / Cleveland"
+  },
+  {
+    "rampMC": "NORFOL 680",
+    "city": "Columbus, OH",
+    "label": "NS / Rickenbacker"
+  },
+  {
+    "rampMC": "NORFOL 030",
+    "city": "Columbus, OH Discovery Park",
+    "label": "NS / Discovery Park"
+  },
+  {
+    "rampMC": "IOWAIN 010",
+    "city": "Council Bluffs, IA",
+    "label": "Iowa Interstate / Council Bluffs"
+  },
+  {
+    "rampMC": "UNIONP 096",
+    "city": "Council Bluffs, IA",
+    "label": "UP / Council Bluffs"
+  },
+  {
+    "rampMC": "APPREG 001",
+    "city": "Crandall, GA",
+    "label": "Appalachian Regional Port / Crandall"
+  },
+  {
+    "rampMC": "KANSAS 089",
+    "city": "Dallas, TX",
+    "label": "CPKC / Wylie"
+  },
+  {
+    "rampMC": "UNIONP 081",
+    "city": "Dallas, TX",
+    "label": "UP / Wilmer"
+  },
+  {
+    "rampMC": "UNIONP 026",
+    "city": "Denver, CO",
+    "label": "UP / Denver"
+  },
+  {
+    "rampMC": "CPRDET 001",
+    "city": "Detroit, MI",
+    "label": "CPKC / Detroit"
+  },
+  {
+    "rampMC": "NORFOL 101",
+    "city": "Detroit, MI",
+    "label": "NS / Livernois"
+  },
+  {
+    "rampMC": "SCIPDI 001",
+    "city": "Dillon, SC",
+    "label": "South Carolina Inland Port / Dillon"
+  },
+  {
+    "rampMC": "UNIONP 023",
+    "city": "East Saint Louis, MO",
+    "label": "UP / East St Louis - Dupo"
+  },
+  {
+    "rampMC": "CPRYEG 001",
+    "city": "Edmonton, AB",
+    "label": "CPKC / Edmonton"
+  },
+  {
+    "rampMC": "VIRGIN 023",
+    "city": "Front Royal, VA",
+    "label": "Virginia Inland Port / Front Royal"
+  },
+  {
+    "rampMC": "BLUER 023",
+    "city": "Gainesville, GA",
+    "label": "Blue Ridge Connector / Gainesville"
+  },
+  {
+    "rampMC": "SOUTHC 189",
+    "city": "Greer, SC",
+    "label": "South Carolina Inland Port / Greer"
+  },
+  {
+    "rampMC": "SYNCRE 016",
+    "city": "Greer, SC via BMW",
+    "label": "BMW / Syncreon Automotive"
+  },
+  {
+    "rampMC": "KANSAS 071",
+    "city": "Houston, TX",
+    "label": "CPKC / Kendleton"
+  },
+  {
+    "rampMC": "UNIONP 015",
+    "city": "Houston, TX",
+    "label": "UP / Houston"
+  },
+  {
+    "rampMC": "NORFOL 036",
+    "city": "Huntsville, AL",
+    "label": "NS / Huntsville"
+  },
+  {
+    "rampMC": "CNR 015",
+    "city": "Indianapolis, IN",
+    "label": "CN Rail / Indianapolis"
+  },
+  {
+    "rampMC": "CSX 100",
+    "city": "Indianapolis, IN",
+    "label": "CSX / ICTF"
+  },
+  {
+    "rampMC": "CSX 097",
+    "city": "Jacksonville, FL",
+    "label": "CSX / Dames Point"
+  },
+  {
+    "rampMC": "UNIONP 170",
+    "city": "Joliet, IL",
+    "label": "UP / Global4 - Joliet"
+  },
+  {
+    "rampMC": "UNIONP 078",
+    "city": "Kansas City, KS",
+    "label": "UP / KCIT"
+  },
+  {
+    "rampMC": "KANSAS 112",
+    "city": "Kansas City, MO",
+    "label": "CPKC / IFG"
+  },
+  {
+    "rampMC": "NORFOL 061",
+    "city": "Kansas City, MO",
+    "label": "NS / Kansas City"
+  },
+  {
+    "rampMC": "CPRMTR 002",
+    "city": "Lachine, QC",
+    "label": "CPKC / Montreal - Lachine"
+  },
+  {
+    "rampMC": "KANSAS 109",
+    "city": "Laredo, TX",
+    "label": "CPKC / Laredo"
+  },
+  {
+    "rampMC": "UNIONP 046",
+    "city": "Laredo, TX",
+    "label": "UP / Laredo"
+  },
+  {
+    "rampMC": "UNIONP 090",
+    "city": "Long Beach, CA",
+    "label": "UP / ICTF"
+  },
+  {
+    "rampMC": "YUSENT 002",
+    "city": "Los Angeles, CA",
+    "label": "Yusen / Terminal"
+  },
+  {
+    "rampMC": "CSX 091",
+    "city": "Louisville, KY",
+    "label": "CSX / Louisville"
+  },
+  {
+    "rampMC": "NORFOL 065",
+    "city": "Louisville, KY",
+    "label": "NS / Appliance Park"
+  },
+  {
+    "rampMC": "UNIONP 085",
+    "city": "Marion, AR",
+    "label": "UP / Marion"
+  },
+  {
+    "rampMC": "BURLIN 103",
+    "city": "Memphis, TN",
+    "label": "BNSF / Memphis"
+  },
+  {
+    "rampMC": "CNR 007",
+    "city": "Memphis, TN",
+    "label": "CN Rail / Memphis"
+  },
+  {
+    "rampMC": "CSXINT 010",
+    "city": "Memphis, TN",
+    "label": "CSX / Memphis"
+  },
+  {
+    "rampMC": "NORFOL 697",
+    "city": "Memphis, TN",
+    "label": "NS / Rossville"
+  },
+  {
+    "rampMC": "FLORID 035",
+    "city": "Miami, FL",
+    "label": "FEC / Miami Ramp"
+  },
+  {
+    "rampMC": "SOOLIN 001",
+    "city": "Minneapolis, MN",
+    "label": "CPKC / Minneapolis"
+  },
+  {
+    "rampMC": "MOBILE 112",
+    "city": "Mobile, AL",
+    "label": "APM / Mobile"
+  },
+  {
+    "rampMC": "CNRMTR 002",
+    "city": "Montreal, QC",
+    "label": "CN Rail / Taschereau"
+  },
+  {
+    "rampMC": "CSXINT 011",
+    "city": "Nashville, TN",
+    "label": "CSX / Nashville"
+  },
+  {
+    "rampMC": "CSX 009",
+    "city": "New Orleans, LA",
+    "label": "CSX / New Orleans"
+  },
+  {
+    "rampMC": "UNIONP 070",
+    "city": "New Orleans, LA",
+    "label": "UP / New Orleans"
+  },
+  {
+    "rampMC": "BURLIN 324",
+    "city": "Oakland, CA",
+    "label": "BNSF / Oakland"
+  },
+  {
+    "rampMC": "UNIONP 060",
+    "city": "Oakland, CA",
+    "label": "UP / Oakland"
+  },
+  {
+    "rampMC": "DUNCAN 018",
+    "city": "Phoenix, AZ",
+    "label": "UP / Tucson - Wilmot"
+  },
+  {
+    "rampMC": "NORFOL 091",
+    "city": "Pittsburgh, PA",
+    "label": "NS / Pittsburgh"
+  },
+  {
+    "rampMC": "SAVSER 002",
+    "city": "Pocatello, ID",
+    "label": "UP / Pocatello"
+  },
+  {
+    "rampMC": "CPRREG 001",
+    "city": "Regina, SK",
+    "label": "CPKC / Regina"
+  },
+  {
+    "rampMC": "NORFOL 028",
+    "city": "Saint Louis, MO",
+    "label": "NS / St Louis"
+  },
+  {
+    "rampMC": "UNIONP 023",
+    "city": "Saint Louis, MO",
+    "label": "UP / St Louis"
+  },
+  {
+    "rampMC": "UNIONP 012",
+    "city": "Salt Lake City, UT",
+    "label": "UP / Salt Lake City"
+  },
+  {
+    "rampMC": "UNIONP 197",
+    "city": "San Antonio, TX",
+    "label": "UP / San Antonio"
+  },
+  {
+    "rampMC": "UNIONP 192",
+    "city": "Santa Teresa, NM",
+    "label": "UP / Santa Teresa"
+  },
+  {
+    "rampMC": "CNRSAS 001",
+    "city": "Saskatoon, SK",
+    "label": "CN Rail / Saskatoon"
+  },
+  {
+    "rampMC": "GEORGI 022",
+    "city": "Savannah, GA",
+    "label": "Georgia Ports Authority / Savannah"
+  },
+  {
+    "rampMC": "UNIONP 009",
+    "city": "Seattle, WA",
+    "label": "UP / Seattle"
+  },
+  {
+    "rampMC": "UNIONP 256",
+    "city": "St. Paul, MN",
+    "label": "UP / St Paul - TCIT"
+  },
+  {
+    "rampMC": "CSX 048",
+    "city": "Tampa, FL",
+    "label": "CSX / Tampa"
+  },
+  {
+    "rampMC": "CNRTOR 002",
+    "city": "Toronto, ON",
+    "label": "CN Rail / Brampton"
+  },
+  {
+    "rampMC": "CPRVAN 001",
+    "city": "Vancouver, BC",
+    "label": "CPKC / Vancouver"
+  },
+  {
+    "rampMC": "CPRVAU 001",
+    "city": "Vaughan, ON",
+    "label": "CPKC / Toronto - Vaughan"
+  },
+  {
+    "rampMC": "OUACHI 1",
+    "city": "West Monroe, LA",
+    "label": "CPKC / West Monroe"
+  },
+  {
+    "rampMC": "CPRWNP 001",
+    "city": "Winnipeg, MB",
+    "label": "CPKC / Winnipeg"
+  },
+  {
+    "rampMC": "CSX 058",
+    "city": "Worcester, MA",
+    "label": "CSX / Stackbridge"
+  }
+]
