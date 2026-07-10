@@ -39,9 +39,23 @@ export function getVessels(slug) {
   return p ? p.vessels.map(v => v.vessel) : [];
 }
 
+// US inland ramps that appear in the CPKC/CN schedules. Used only to sort US
+// destinations to the top of the city picker. Add new US ramps here if a schedule
+// introduces one (everything not listed is treated as Canadian).
+const US_CITIES = new Set([
+  'MINNEAPOLIS', 'BENSENVILLE', 'DETROIT', 'JEFFERSONVILLE', 'CHIPPEWA FALLS',
+  'JOLIET', 'INDIANAPOLIS', 'CHICAGO', 'MEMPHIS', 'NEW ORLEANS', 'ARCADIA',
+]);
+function isUSCity(city) {
+  const key = String(city).toUpperCase().replace(/\(.*?\)/g, '').replace(/[^A-Z ]/g, '').trim();
+  return US_CITIES.has(key);
+}
+
 export function getCities(slug) {
   const p = port(slug);
-  return p ? [...p.cities] : [];
+  if (!p) return [];
+  // US ramps (Detroit, Chicago, …) first; each group keeps its published order.
+  return [...p.cities].sort((a, b) => (isUSCity(b) ? 1 : 0) - (isUSCity(a) ? 1 : 0));
 }
 
 export function getVesselMeta(slug, vessel) {
