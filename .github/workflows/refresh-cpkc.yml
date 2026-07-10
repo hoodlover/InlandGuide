@@ -1,0 +1,50 @@
+name: Refresh CPKC port schedules
+
+# Downloads the CPKC port-schedule PDFs, parses them into
+# frontend/src/data/cpkc-schedules.json, and commits when the data changed.
+# A push to main triggers Vercel's existing auto-deploy.
+
+on:
+  # CPKC publishes ~twice a week. Run Tue & Fri mornings (13:00 UTC ≈ 08:00 ET)
+  # a bit after the typical publish time. Adjust the cron if the cadence shifts.
+  schedule:
+    - cron: '0 13 * * 2'
+    - cron: '0 13 * * 5'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-cpkc
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install parser deps
+        working-directory: scripts/refresh-cpkc
+        run: npm ci
+
+      - name: Parse CPKC PDFs
+        working-directory: scripts/refresh-cpkc
+        run: node refresh.mjs
+
+      - name: Commit updated schedule (if changed)
+        run: |
+          git config user.name "cpkc-refresh-bot"
+          git config user.email "actions@github.com"
+          if git diff --quiet -- frontend/src/data/cpkc-schedules.json; then
+            echo "No schedule changes."
+          else
+            git add frontend/src/data/cpkc-schedules.json
+            git commit -m "Refresh CPKC port schedules"
+            git push
+          fi

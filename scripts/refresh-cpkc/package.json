@@ -1,0 +1,13 @@
+{
+  "name": "refresh-cpkc",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Downloads CPKC port-schedule PDFs and writes a JSON snapshot for the Inland Cutoff Guide.",
+  "scripts": {
+    "refresh": "node refresh.mjs"
+  },
+  "dependencies": {
+    "pdfjs-dist": "^4.7.76"
+  }
+}

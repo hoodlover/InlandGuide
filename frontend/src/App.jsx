@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import LookupForm from './components/LookupForm';
-import { bannerTop, bannerBottom, obBot } from './assets/banners';
+import PortScheduleLookup from './components/PortScheduleLookup';
+import { bannerBottom, obBot } from './assets/banners';
+import heroTop from './assets/hero-top.webp';
 import themeSunset from './assets/theme-sunset.webp';
 import themeShip from './assets/theme-ship.webp';
 import themeHelp from './assets/theme-help.webp';
@@ -158,14 +160,83 @@ function useTheme() {
   return [dark, toggle];
 }
 
-// Simple how-to overlay with a blurred backdrop.
-function HelpModal({ onClose }) {
+// Reusable modal shell with a blurred backdrop, Esc-to-close and scroll.
+function ModalShell({ title, onClose, children }) {
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [onClose]);
 
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-md"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
+    >
+      <div
+        className="w-full max-w-md max-h-[85vh] overflow-y-auto bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 text-left"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-extrabold text-[#002D72] dark:text-white smallcaps">{title}</h2>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="text-slate-400 hover:text-slate-700 dark:hover:text-white text-2xl leading-none"
+          >
+            ×
+          </button>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// "Install as an app" instructions — Edge & Chrome on Windows only.
+function PwaInstallInfo() {
+  return (
+    <div className="text-sm text-slate-700 dark:text-slate-200 space-y-4">
+      <p>
+        <b>What is a PWA?</b> A Progressive Web App lets you install this site like a normal
+        desktop program. It opens in its own clean window (no tabs or address bar), gets an
+        icon on your taskbar / Start menu, and still works if you briefly lose connection.
+        Nothing to download from a store — it installs straight from the browser.
+      </p>
+
+      <div>
+        <p className="font-bold text-[#002D72] dark:text-white mb-1">Microsoft Edge</p>
+        <ol className="list-decimal list-inside space-y-1">
+          <li>Open the <b>⋯</b> menu (top-right of Edge).</li>
+          <li>Choose <b>Apps</b> → <b>Install this site as an app</b>.</li>
+          <li>Click <b>Install</b>, then allow it to pin to the taskbar / Start menu.</li>
+        </ol>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          Shortcut: the install icon (a monitor with a ↓) also appears at the right end of the address bar.
+        </p>
+      </div>
+
+      <div>
+        <p className="font-bold text-[#002D72] dark:text-white mb-1">Google Chrome</p>
+        <ol className="list-decimal list-inside space-y-1">
+          <li>Click the <b>install icon</b> (a monitor with a ↓) at the right of the address bar.</li>
+          <li>Or open the <b>⋮</b> menu → <b>Cast, save, and share</b> → <b>Install page as app…</b></li>
+          <li>Click <b>Install</b>.</li>
+        </ol>
+      </div>
+
+      <p className="text-xs text-slate-500 dark:text-slate-400">
+        Once installed, launch it any time from your taskbar, Start menu, or desktop — just like a regular app.
+      </p>
+    </div>
+  );
+}
+
+// Full help: how-to steps + the install section.
+function HelpModal({ onClose }) {
   const steps = [
     'Select the Port of Loading.',
     'Choose the Start City (rail ramp).',
@@ -176,35 +247,26 @@ function HelpModal({ onClose }) {
   ];
 
   return (
-    <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-md"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-label="How to use the Inland Cutoff Guide"
-    >
-      <div
-        className="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 text-left"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-extrabold text-[#002D72] dark:text-white smallcaps">How to use it</h2>
-          <button
-            onClick={onClose}
-            aria-label="Close help"
-            className="text-slate-400 hover:text-slate-700 dark:hover:text-white text-2xl leading-none"
-          >
-            ×
-          </button>
-        </div>
-        <ol className="list-decimal list-inside space-y-2 text-slate-700 dark:text-slate-200 text-sm">
-          {steps.map((s, i) => <li key={i}>{s}</li>)}
-        </ol>
-        <p className="mt-5 text-xs text-slate-400 dark:text-slate-500">
-          Tip: the copied result drops straight into a reply — dates and all.
-        </p>
-      </div>
-    </div>
+    <ModalShell title="How to use it" onClose={onClose}>
+      <ol className="list-decimal list-inside space-y-2 text-slate-700 dark:text-slate-200 text-sm">
+        {steps.map((s, i) => <li key={i}>{s}</li>)}
+      </ol>
+      <p className="mt-4 text-xs text-slate-400 dark:text-slate-500">
+        Tip: the copied result drops straight into a reply — dates and all.
+      </p>
+      <hr className="my-5 border-slate-200 dark:border-slate-600" />
+      <h3 className="text-base font-extrabold text-[#002D72] dark:text-white smallcaps mb-2">Install as an app</h3>
+      <PwaInstallInfo />
+    </ModalShell>
+  );
+}
+
+// Install-only modal (opened by the "Install as an App" button).
+function InstallModal({ onClose }) {
+  return (
+    <ModalShell title="Install as an App" onClose={onClose}>
+      <PwaInstallInfo />
+    </ModalShell>
   );
 }
 
@@ -241,35 +303,64 @@ function TopControls() {
 }
 
 export default function App() {
+  const [installOpen, setInstallOpen] = useState(false);
+  const [tab, setTab] = useState('calculator');
+
   if (isMobileDevice()) {
     return <MobileBlock />;
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-900 flex flex-col">
+    <div className="min-h-screen bg-[#EDE6D6] dark:bg-slate-900 flex flex-col">
       {/* Banner constrained to just past the content edges (~5% wider each side). */}
       <div className="w-full max-w-[70rem] mx-auto px-4 pt-4">
         <img
-          src={bannerTop}
-          alt="Hapag-Lloyd IDT Ops Base"
+          src={heroTop}
+          alt="IDT Inland Cutoff Rail Guide"
           className="w-full h-auto block rounded-xl"
         />
       </div>
 
       {/* Header constrained to the hero width so it no longer draws a full-width line. */}
       <div className="w-full max-w-[70rem] mx-auto px-4 mt-3">
-        <header className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-5 py-3 flex items-center justify-between gap-3">
+        <header className="bg-[#F8F3EA] dark:bg-slate-800 border border-[#E0D8C5] dark:border-slate-700 rounded-xl px-5 py-3 flex items-center justify-between gap-3">
           <div>
             <h1 className="text-xl font-bold text-[#002D72] dark:text-white smallcaps txt-shadow-heavy">Inland Cutoff Guide</h1>
             <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">Rail cutoff &amp; delivery date calculator</p>
+            <button
+              onClick={() => setInstallOpen(true)}
+              className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-full bg-[#002D72] text-white hover:bg-[#01245c] transition shadow-[0_6px_14px_rgba(0,0,0,0.35)]"
+            >
+              ⬇ Install as an App
+            </button>
           </div>
           <TopControls />
         </header>
       </div>
 
       <main className="max-w-5xl mx-auto px-5 py-6 w-full flex-1">
-        <LookupForm />
+        <div className="flex gap-2 mb-5">
+          {[
+            { id: 'calculator', label: 'Rail Cutoff Calculator' },
+            { id: 'cpkc', label: 'CPKC Port Schedule' }
+          ].map(t => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`px-4 py-2 text-sm font-bold rounded-lg transition shadow-[0_4px_10px_rgba(0,0,0,0.25)] ${
+                tab === t.id
+                  ? 'bg-[#002D72] text-white'
+                  : 'bg-[#F8F3EA] dark:bg-slate-800 text-[#002D72] dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        {tab === 'calculator' ? <LookupForm /> : <PortScheduleLookup />}
       </main>
+
+      {installOpen && <InstallModal onClose={() => setInstallOpen(false)} />}
 
       <WebappReminder />
       <ObieWalkOn />
