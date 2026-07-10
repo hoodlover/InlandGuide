@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import LookupForm from './components/LookupForm';
 import PortScheduleLookup from './components/PortScheduleLookup';
 import { bannerBottom, obBot } from './assets/banners';
@@ -270,6 +270,65 @@ function InstallModal({ onClose }) {
   );
 }
 
+// Hidden manual-refresh modal — revealed by a secret gesture (tap the title 5×).
+// Posts to /api/refresh, which verifies the passphrase server-side and triggers
+// the GitHub Action. Only works on the live web app (needs the serverless function).
+function RefreshModal({ onClose }) {
+  const [pass, setPass] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [status, setStatus] = useState(null);
+
+  const submit = async () => {
+    if (!pass || busy) return;
+    setBusy(true); setStatus(null);
+    try {
+      const r = await fetch('/api/refresh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ passphrase: pass }),
+      });
+      const data = await r.json().catch(() => ({}));
+      if (r.ok && data.ok) setStatus({ ok: true, msg: '✓ Refresh started — new schedules deploy in a few minutes.' });
+      else if (r.status === 401) setStatus({ ok: false, msg: 'Wrong passphrase.' });
+      else if (r.status === 500) setStatus({ ok: false, msg: 'Not set up yet — add GH_TOKEN & REFRESH_PASSPHRASE in Vercel.' });
+      else setStatus({ ok: false, msg: data.error || 'Could not trigger the refresh.' });
+    } catch {
+      setStatus({ ok: false, msg: 'Network error — this only works on the live web app.' });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <ModalShell title="Manual Refresh" onClose={onClose}>
+      <p className="text-sm text-slate-600 dark:text-slate-300 mb-3">
+        Pull the latest CPKC &amp; CN schedules right now. Enter the passphrase.
+      </p>
+      <input
+        type="password"
+        value={pass}
+        autoFocus
+        onChange={(e) => setPass(e.target.value)}
+        onKeyDown={(e) => { if (e.key === 'Enter') submit(); }}
+        placeholder="Passphrase"
+        className="w-full px-3 py-2 border border-slate-300 rounded-lg mb-3 focus:ring-2 focus:ring-slate-400"
+      />
+      <button
+        onClick={submit}
+        disabled={busy || !pass}
+        className="w-full px-4 py-2 bg-[#002D72] text-white rounded-lg font-semibold hover:bg-[#01245c] transition disabled:opacity-50"
+      >
+        {busy ? 'Triggering…' : 'Trigger Refresh'}
+      </button>
+      {status && (
+        <div className={`mt-3 p-3 rounded-lg text-sm border ${status.ok ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
+          {status.msg}
+        </div>
+      )}
+    </ModalShell>
+  );
+}
+
 // Help + light/dark toggle, both as round photo buttons. The theme toggle shows
 // the mode you'll switch TO: sunset (evening) in light mode, daylit ship in dark.
 function TopControls() {
@@ -304,7 +363,19 @@ function TopControls() {
 
 export default function App() {
   const [installOpen, setInstallOpen] = useState(false);
+  const [refreshOpen, setRefreshOpen] = useState(false);
   const [tab, setTab] = useState('calculator');
+
+  // Secret gesture: tap the title 5× within ~1.2s each to open the manual refresh.
+  const tapRef = useRef({ n: 0, t: 0 });
+  const secretTap = () => {
+    const now = Date.now();
+    const c = tapRef.current;
+    if (now - c.t > 1200) c.n = 0;
+    c.t = now;
+    c.n += 1;
+    if (c.n >= 5) { c.n = 0; setRefreshOpen(true); }
+  };
 
   if (isMobileDevice()) {
     return <MobileBlock />;
@@ -325,7 +396,7 @@ export default function App() {
       <div className="w-full max-w-[70rem] mx-auto px-4 mt-3">
         <header className="bg-[#F8F3EA] dark:bg-slate-800 border border-[#E0D8C5] dark:border-slate-700 rounded-xl px-5 py-3 flex items-center justify-between gap-3">
           <div>
-            <h1 className="text-xl font-bold text-[#002D72] dark:text-white smallcaps txt-shadow-heavy">Inland Cutoff Guide</h1>
+            <h1 onClick={secretTap} className="text-xl font-bold text-[#002D72] dark:text-white smallcaps txt-shadow-heavy select-none">Inland Cutoff Guide</h1>
             <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">Rail cutoff &amp; delivery date calculator</p>
             <button
               onClick={() => setInstallOpen(true)}
@@ -361,6 +432,7 @@ export default function App() {
       </main>
 
       {installOpen && <InstallModal onClose={() => setInstallOpen(false)} />}
+      {refreshOpen && <RefreshModal onClose={() => setRefreshOpen(false)} />}
 
       <WebappReminder />
       <ObieWalkOn />

@@ -86,6 +86,18 @@ export default function LookupForm() {
     if (parsed) setDateInput(parsed.mdy);
   };
 
+  // Calendar picker → keep the text box and the resolved ISO date in sync.
+  const handleDatePick = (e) => {
+    const iso = e.target.value; // "yyyy-mm-dd" (or "" when cleared)
+    setFormData(prev => ({ ...prev, portCutDate: iso }));
+    if (iso) {
+      const [y, m, d] = iso.split('-');
+      setDateInput(`${Number(m)}/${Number(d)}/${y}`);
+    } else {
+      setDateInput('');
+    }
+  };
+
   const handleReset = () => {
     setFormData({ ...EMPTY_FORM });
     setDateInput('');
@@ -297,22 +309,27 @@ export default function LookupForm() {
 
           <div>
             <label className="block text-xs font-semibold text-white mb-1 txt-shadow-soft">Port Cut Date *</label>
-            <input
-              type="text"
-              inputMode="numeric"
-              value={dateInput}
-              onChange={handleDateInput}
-              onFocus={(e) => e.target.select()}
-              onBlur={handleDateBlur}
-              placeholder="Day (9), or 8/9, or 8/9/2026"
-              required
-              className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-slate-400"
-            />
-            {resolvedDate && (
-              <p className="text-xs mt-1 text-white/90">
-                → <span className="font-semibold">{resolvedDate.display}</span>
-              </p>
-            )}
+            <div className="flex gap-2 items-stretch">
+              <input
+                type="text"
+                inputMode="numeric"
+                value={dateInput}
+                onChange={handleDateInput}
+                onFocus={(e) => e.target.select()}
+                onBlur={handleDateBlur}
+                placeholder="Day (9), or 8/9, or 8/9/2026"
+                required
+                className="flex-1 min-w-0 px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-slate-400"
+              />
+              <input
+                type="date"
+                aria-label="Pick date from calendar"
+                title="Pick from calendar"
+                value={formData.portCutDate || ''}
+                onChange={handleDatePick}
+                className="shrink-0 px-2 py-1.5 border border-slate-300 rounded-lg bg-white text-slate-700"
+              />
+            </div>
           </div>
 
           <div>

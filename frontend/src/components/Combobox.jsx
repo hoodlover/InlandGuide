@@ -16,10 +16,12 @@ export default function Combobox({ value, onSelect, options, placeholder, disabl
   useEffect(() => { setQuery(selectedLabel); }, [selectedLabel]);
 
   // Untouched (query still equals the selection) shows the full list; typing filters.
+  // Match on any substring of the label — so "nyc" finds "USNYC" and "york" finds
+  // "NEW YORK, NY - USNYC" — and require every space-separated term to appear.
   const typing = query !== selectedLabel;
-  const q = query.trim().toLowerCase();
-  const filtered = (typing && q)
-    ? options.filter(o => o.label.toLowerCase().includes(q))
+  const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const filtered = (typing && terms.length)
+    ? options.filter(o => { const l = o.label.toLowerCase(); return terms.every(t => l.includes(t)); })
     : options;
 
   useEffect(() => {
