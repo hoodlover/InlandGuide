@@ -23,6 +23,12 @@ textarea {
   font-size: 16px;
 }
 
+/* Brand-blue headings rendered in small caps (app title + railroad name). */
+.smallcaps {
+  font-variant: small-caps;
+  letter-spacing: 0.02em;
+}
+
 /* OB the Ops-Base Bot entrance + joke fade on the mobile block */
 @keyframes obbot-in {
   from { transform: translateY(40px) scale(0.9); opacity: 0; }

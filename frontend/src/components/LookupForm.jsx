@@ -23,6 +23,17 @@ function parseFlexibleDate(input) {
   };
 }
 
+// ISO date (2026-08-06) -> short "M/D" (8/6), no leading zeros. Falls back to input.
+function formatShortDate(iso) {
+  if (!iso) return '';
+  const parts = String(iso).split('-');
+  if (parts.length !== 3) return iso;
+  const m = Number(parts[1]);
+  const d = Number(parts[2]);
+  if (!m || !d) return iso;
+  return `${m}/${d}`;
+}
+
 const EMPTY_FORM = { pol: '', startCity: '', ssy: '', portCutDate: '', reefer: 'N' };
 
 export default function LookupForm() {
@@ -108,35 +119,47 @@ export default function LookupForm() {
     if (!results) return;
 
     const railroad = results.railroad || results.rampMC;
-    const header = `Here are the ramp cuts in ${formData.startCity} on ${railroad}`;
+    const city = formData.startCity;
+    const header = `Here are the ramp cuts in ${city} on ${railroad}`;
     // Divider tracks the header length, trimmed a bit so it doesn't overshoot the text.
     const divider = '─'.repeat(Math.max(0, header.length - 14));
+    // Port Cut Date shown short (e.g. 8/6) to match the rest of the result.
+    const cutDate = formatShortDate(formData.portCutDate);
 
     // Plain-text version (used when pasting into plain fields like Notepad).
-    const text = `${header}
-${divider}
-Port of Loading: ${formData.pol}
-Port Cut Date: ${formData.portCutDate}
-
-Ramp Cuts:
-- Earliest Return Date (ERD): ${results.erd}
-- Latest Return Date (LRD): ${results.lrd}
-- Ramp Cut Time: ${results.rampCutTime}
-${divider}`;
-
-    // Rich version (Outlook/Gmail/Teams/Salesforce) — uses <br> so line breaks survive
-    // rich-text editors that collapse plain newlines; bolds the Port and Port Cut Date.
-    const html = `<div style="font-family:Arial,sans-serif">` + [
+    // Ramp Cuts (ERD/LRD) come first — they're the important part — then the port info.
+    // Two trailing blank lines leave the cursor ready to type a goodbye.
+    const text = [
       header,
       divider,
-      `Port of Loading: <b>${formData.pol}</b>`,
-      `Port Cut Date: <b>${formData.portCutDate}</b>`,
-      '',
       'Ramp Cuts:',
       `- Earliest Return Date (ERD): ${results.erd}`,
       `- Latest Return Date (LRD): ${results.lrd}`,
       `- Ramp Cut Time: ${results.rampCutTime}`,
-      divider
+      '',
+      `Port of Loading: ${formData.pol}`,
+      `Port Cut Date: ${cutDate}`,
+      divider,
+      '',
+      ''
+    ].join('\n');
+
+    // Rich version (Outlook/Gmail/Teams/Salesforce) — serif to match their system,
+    // <br> so line breaks survive rich editors, and bolds the city, rail name, and
+    // the ERD/LRD dates. Two trailing <br> for the goodbye line.
+    const html = `<div style="font-family:'Times New Roman',Times,serif">` + [
+      `Here are the ramp cuts in <b>${city}</b> on <b>${railroad}</b>`,
+      divider,
+      'Ramp Cuts:',
+      `- Earliest Return Date (ERD): <b>${results.erd}</b>`,
+      `- Latest Return Date (LRD): <b>${results.lrd}</b>`,
+      `- Ramp Cut Time: ${results.rampCutTime}`,
+      '',
+      `Port of Loading: <b>${formData.pol}</b>`,
+      `Port Cut Date: <b>${cutDate}</b>`,
+      divider,
+      '',
+      ''
     ].join('<br>') + `</div>`;
 
     try {
@@ -342,7 +365,7 @@ function RailCard({ railroad, rampMC }) {
     <div className="flex items-center justify-between py-3">
       <p className="text-sm font-bold text-black">Rail</p>
       <div className="text-right leading-tight">
-        <p className="text-xl font-extrabold text-[#002D72]">{rail}</p>
+        <p className="text-xl font-extrabold text-[#002D72] smallcaps">{rail}</p>
         {railroad && rampMC && (
           <p className="text-xs font-semibold text-slate-500 mt-0.5">{rampMC}</p>
         )}

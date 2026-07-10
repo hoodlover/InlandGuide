@@ -138,23 +138,113 @@ function WebappReminder() {
   );
 }
 
+// Light/dark theme. The initial class is set by an inline script in index.html
+// (before paint), so we just read/sync it here.
+function useTheme() {
+  const [dark, setDark] = useState(() =>
+    typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+  );
+  const toggle = () => {
+    setDark(prev => {
+      const next = !prev;
+      document.documentElement.classList.toggle('dark', next);
+      try { localStorage.setItem('icg-theme', next ? 'dark' : 'light'); } catch { /* ignore */ }
+      return next;
+    });
+  };
+  return [dark, toggle];
+}
+
+// Simple how-to overlay with a blurred backdrop.
+function HelpModal({ onClose }) {
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  const steps = [
+    'Select the Port of Loading.',
+    'Choose the Start City (rail ramp).',
+    'If prompted, pick the SSY service code.',
+    'Enter the Port Cut Date — e.g. 9, 8/9, or 8/9/2026.',
+    'Choose Dry Container or Reefer.',
+    'Click Calculate, then Copy to Clipboard to paste into your email.',
+  ];
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-md"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="How to use the Inland Cutoff Guide"
+    >
+      <div
+        className="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 text-left"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-extrabold text-[#002D72] dark:text-white smallcaps">How to use it</h2>
+          <button
+            onClick={onClose}
+            aria-label="Close help"
+            className="text-slate-400 hover:text-slate-700 dark:hover:text-white text-2xl leading-none"
+          >
+            ×
+          </button>
+        </div>
+        <ol className="list-decimal list-inside space-y-2 text-slate-700 dark:text-slate-200 text-sm">
+          {steps.map((s, i) => <li key={i}>{s}</li>)}
+        </ol>
+        <p className="mt-5 text-xs text-slate-400 dark:text-slate-500">
+          Tip: the copied result drops straight into a reply — dates and all.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// Fixed controls, upper-right: Help + light/dark toggle.
+function TopControls() {
+  const [dark, toggle] = useTheme();
+  const [helpOpen, setHelpOpen] = useState(false);
+  const btn = 'w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 shadow-md hover:shadow-lg transition text-lg';
+
+  return (
+    <>
+      <div className="fixed top-4 right-4 z-[70] flex items-center gap-2">
+        <button className={btn} onClick={() => setHelpOpen(true)} aria-label="Help" title="Help">
+          <span className="text-[#002D72] dark:text-white font-bold">?</span>
+        </button>
+        <button className={btn} onClick={toggle} aria-label="Toggle dark mode" title="Toggle dark mode">
+          {dark ? '☀️' : '🌙'}
+        </button>
+      </div>
+      {helpOpen && <HelpModal onClose={() => setHelpOpen(false)} />}
+    </>
+  );
+}
+
 export default function App() {
   if (isMobileDevice()) {
     return <MobileBlock />;
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col">
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-900 flex flex-col">
+      <TopControls />
+
       <img
         src={bannerTop}
         alt="Hapag-Lloyd IDT Ops Base"
         className="w-full h-auto block"
       />
 
-      <header className="bg-white border-b border-slate-200">
+      <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
         <div className="max-w-7xl mx-auto px-6 py-4">
-          <h1 className="text-2xl font-bold text-slate-900">Inland Cutoff Guide</h1>
-          <p className="text-slate-500 text-sm mt-1">Rail cutoff &amp; delivery date calculator</p>
+          <h1 className="text-2xl font-bold text-[#002D72] dark:text-white smallcaps">Inland Cutoff Guide</h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Rail cutoff &amp; delivery date calculator</p>
         </div>
       </header>
 
