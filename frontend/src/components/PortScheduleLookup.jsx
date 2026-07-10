@@ -273,10 +273,12 @@ export default function PortScheduleLookup() {
 }
 
 function Row({ label, value, strong }) {
+  // Stack label/value on narrow widths (keeps the value next to its label instead
+  // of stranded on the far right of a wide single-column card); inline on md+.
   return (
-    <div className="flex items-center justify-between py-2">
-      <p className="text-sm font-bold text-black">{label}</p>
-      <p className={`${strong ? 'text-lg text-[#002D72]' : 'text-base text-black'} font-bold text-right`}>{value || 'N/A'}</p>
+    <div className="flex flex-col gap-0.5 md:flex-row md:items-center md:justify-between md:gap-3 py-2">
+      <p className="text-sm font-bold text-slate-600 md:text-black">{label}</p>
+      <p className={`${strong ? 'text-lg text-[#002D72]' : 'text-base text-black'} font-bold md:text-right`}>{value || 'N/A'}</p>
     </div>
   );
 }
