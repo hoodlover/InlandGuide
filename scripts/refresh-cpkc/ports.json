@@ -8,5 +8,10 @@
     "slug": "metro-vancouver",
     "name": "Port of Metro Vancouver",
     "url": "https://www.cpkcr.com/content/dam/cpkc/documents/english/pdfs/port-schedules/port-of-metro-vancouver.pdf"
+  },
+  {
+    "slug": "saint-john",
+    "name": "Port of Saint John",
+    "url": "https://www.cpkcr.com/content/dam/cpkc/documents/english/pdfs/port-schedules/port-of-saint-john-NB.pdf"
   }
 ]

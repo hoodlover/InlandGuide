@@ -1319,6 +1319,171 @@
           }
         }
       ]
+    },
+    "saint-john": {
+      "name": "Port of Saint John",
+      "runDate": "Wed 8-Jul",
+      "generatedAt": "2026-07-08",
+      "cities": [
+        "Vancouver",
+        "Edmonton",
+        "Calgary",
+        "Regina",
+        "Winnipeg",
+        "Vaughan",
+        "Minneapolis",
+        "Bensenville",
+        "Detroit",
+        "Lachine"
+      ],
+      "notes": [
+        "The date published is subject to change based on vessel schedule changes;",
+        "Units may be ingated at any time prior to the terminal vessel cutoff date. CP will not be liable for ERD at the port of loading;",
+        "This schedule is valid for dry traffic, please contact CST for PPS schedules;",
+        "Dates in red reflect changes from the previous published version"
+      ],
+      "vessels": [
+        {
+          "vessel": "KIEL EXPRESS",
+          "terminal": "St John",
+          "eta": "Sun 12-Jul",
+          "etd": "Tue 14-Jul",
+          "railPortCutoff": "Sat 11-Jul",
+          "comments": "",
+          "cutoffs": {
+            "Vancouver": "Wed 1-Jul 20:30",
+            "Edmonton": "Wed 1-Jul 17:00",
+            "Calgary": "Wed 1-Jul 23:00",
+            "Regina": "Thu 2-Jul 17:00",
+            "Winnipeg": "Thu 2-Jul 15:00",
+            "Vaughan": "Mon 6-Jul 17:00",
+            "Minneapolis": "Fri 3-Jul 12:00",
+            "Bensenville": "Sat 4-Jul 17:00",
+            "Detroit": "Sat 4-Jul 15:00",
+            "Lachine": "Mon 6-Jul 17:00"
+          }
+        },
+        {
+          "vessel": "AL MANAMAH",
+          "terminal": "St John",
+          "eta": "Mon 20-Jul",
+          "etd": "Wed 22-Jul",
+          "railPortCutoff": "Sun 19-Jul",
+          "comments": "AL3/802",
+          "cutoffs": {
+            "Vancouver": "Thu 9-Jul 20:30",
+            "Edmonton": "Thu 9-Jul 17:00",
+            "Calgary": "Thu 9-Jul 23:00",
+            "Regina": "Fri 10-Jul 17:00",
+            "Winnipeg": "Fri 10-Jul 15:00",
+            "Vaughan": "Tue 14-Jul 17:00",
+            "Minneapolis": "Sat 11-Jul 12:00",
+            "Bensenville": "Sun 12-Jul 17:00",
+            "Detroit": "Sat 11-Jul 15:00",
+            "Lachine": "Tue 14-Jul 17:00"
+          }
+        },
+        {
+          "vessel": "AL SAFAT",
+          "terminal": "St John",
+          "eta": "Sun 26-Jul",
+          "etd": "Tue 28-Jul",
+          "railPortCutoff": "Sat 25-Jul",
+          "comments": "",
+          "cutoffs": {
+            "Vancouver": "Wed 15-Jul 20:30",
+            "Edmonton": "Wed 15-Jul 17:00",
+            "Calgary": "Wed 15-Jul 23:00",
+            "Regina": "Thu 16-Jul 17:00",
+            "Winnipeg": "Thu 16-Jul 15:00",
+            "Vaughan": "Mon 20-Jul 17:00",
+            "Minneapolis": "Fri 17-Jul 12:00",
+            "Bensenville": "Sat 18-Jul 17:00",
+            "Detroit": "Sat 18-Jul 15:00",
+            "Lachine": "Mon 20-Jul 17:00"
+          }
+        },
+        {
+          "vessel": "YANTIAN EXPRESS",
+          "terminal": "St John",
+          "eta": "Sun 2-Aug",
+          "etd": "Tue 4-Aug",
+          "railPortCutoff": "Sat 1-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Vancouver": "Wed 22-Jul 20:30",
+            "Edmonton": "Wed 22-Jul 17:00",
+            "Calgary": "Wed 22-Jul 23:00",
+            "Regina": "Thu 23-Jul 17:00",
+            "Winnipeg": "Thu 23-Jul 15:00",
+            "Vaughan": "Mon 27-Jul 17:00",
+            "Minneapolis": "Fri 24-Jul 12:00",
+            "Bensenville": "Sat 25-Jul 17:00",
+            "Detroit": "Sat 25-Jul 15:00",
+            "Lachine": "Mon 27-Jul 17:00"
+          }
+        },
+        {
+          "vessel": "SFL MAUI",
+          "terminal": "St John",
+          "eta": "Tue 14-Jul",
+          "etd": "Tue 14-Jul",
+          "railPortCutoff": "Mon 13-Jul",
+          "comments": "",
+          "cutoffs": {
+            "Vancouver": "Thu 2-Jul 20:30",
+            "Edmonton": "Thu 2-Jul 17:00",
+            "Calgary": "Thu 2-Jul 23:00",
+            "Regina": "Fri 3-Jul 17:00",
+            "Winnipeg": "Fri 3-Jul 15:00",
+            "Vaughan": "Tue 7-Jul 17:00",
+            "Minneapolis": "Sat 4-Jul 12:00",
+            "Bensenville": "Sun 5-Jul 17:00",
+            "Detroit": "Sat 4-Jul 15:00",
+            "Lachine": "Tue 7-Jul 17:00"
+          }
+        },
+        {
+          "vessel": "MAERSK FREDERICIA",
+          "terminal": "St John",
+          "eta": "Tue 21-Jul",
+          "etd": "Tue 21-Jul",
+          "railPortCutoff": "Mon 20-Jul",
+          "comments": "803",
+          "cutoffs": {
+            "Vancouver": "Thu 9-Jul 20:30",
+            "Edmonton": "Thu 9-Jul 17:00",
+            "Calgary": "Thu 9-Jul 23:00",
+            "Regina": "Fri 10-Jul 17:00",
+            "Winnipeg": "Fri 10-Jul 15:00",
+            "Vaughan": "Tue 14-Jul 17:00",
+            "Minneapolis": "Sat 11-Jul 12:00",
+            "Bensenville": "Sun 12-Jul 17:00",
+            "Detroit": "Sat 11-Jul 15:00",
+            "Lachine": "Tue 14-Jul 17:00"
+          }
+        },
+        {
+          "vessel": "SFL HAWAII",
+          "terminal": "St John",
+          "eta": "Tue 4-Aug",
+          "etd": "Tue 4-Aug",
+          "railPortCutoff": "Mon 3-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Vancouver": "Thu 23-Jul 20:30",
+            "Edmonton": "Thu 23-Jul 17:00",
+            "Calgary": "Thu 23-Jul 23:00",
+            "Regina": "Fri 24-Jul 17:00",
+            "Winnipeg": "Fri 24-Jul 15:00",
+            "Vaughan": "Tue 28-Jul 17:00",
+            "Minneapolis": "Sat 25-Jul 12:00",
+            "Bensenville": "Sun 26-Jul 17:00",
+            "Detroit": "Sat 25-Jul 15:00",
+            "Lachine": "Tue 28-Jul 17:00"
+          }
+        }
+      ]
     }
   }
 }
