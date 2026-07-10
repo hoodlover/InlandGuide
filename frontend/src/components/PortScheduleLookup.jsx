@@ -34,6 +34,8 @@ export default function PortScheduleLookup() {
   const ready = sel.port && sel.vessel && sel.city;
   const cutoff = ready ? getCutoff(sel.port, sel.vessel, sel.city) : '';
   const erd = ready ? getERD(sel.port, sel.vessel, sel.city) : '';
+  // Some vessels legitimately have no cutoff for a given inland city (they don't serve it).
+  const noCutoff = ready && !cutoff;
 
   const results = ready && cutoff ? {
     city: sel.city,
@@ -219,10 +221,10 @@ export default function PortScheduleLookup() {
               <Row label="Vessel" value={results.vessel} />
               <Row label="Inland Cut-Off (LRD)" value={results.cutoff} strong />
               <Row label="Earliest Receiving (ERD)" value={results.erd} strong />
-              <Row label="Terminal" value={results.terminal} />
-              <Row label="Vessel ETA" value={results.eta} />
-              <Row label="Vessel ETD" value={results.etd} />
-              <Row label="Rail Port Cut-Off" value={results.railPortCutoff} />
+              {results.terminal && <Row label="Terminal" value={results.terminal} />}
+              {results.eta && <Row label="Vessel ETA" value={results.eta} />}
+              {results.etd && <Row label="Vessel ETD" value={results.etd} />}
+              {results.railPortCutoff && <Row label="Rail Port Cut-Off" value={results.railPortCutoff} />}
               {results.comments && <Row label="Note" value={results.comments} />}
             </div>
 
@@ -246,6 +248,11 @@ export default function PortScheduleLookup() {
                 {copyMessage}
               </div>
             )}
+          </div>
+        ) : noCutoff ? (
+          <div className="bg-[#002D72] border border-[#002D72] rounded-lg p-6 text-center shadow-sm">
+            <p className="text-white font-semibold">No published cut-off</p>
+            <p className="text-white/80 text-sm mt-1">{sel.vessel} has no listed cut-off for {sel.city} on this schedule — try another rail city.</p>
           </div>
         ) : (
           <div className="bg-[#002D72] border border-[#002D72] rounded-lg p-6 text-center shadow-sm">
