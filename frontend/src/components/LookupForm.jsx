@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { getPortGroups, getCities, getSSY, calculateERDLRD, cityLabel, getRailTerminal, getRail } from '../lib/cutoff';
 import { hlLogo } from '../assets/hlLogo';
+import { hlLogoOrange } from '../assets/hlLogoOrange';
 import Combobox from './Combobox';
+import { SalesforceIcon, OutlookIcon, TeamsIcon, TextIcon } from './BrandIcons';
 
 // Flexible date entry:  "9" = 9th of THIS month · "8/9" = Aug 9 · "8/9/26" or "8/9/2026" = full.
 function parseFlexibleDate(input) {
@@ -199,31 +201,55 @@ export default function LookupForm() {
     }
   };
 
-  // "Pretty note" — copies the styled RESULTS card as rich HTML so it pastes with
-  // colors/formatting into Outlook/Gmail. Uses table + inline styles for email
-  // client compatibility. Omits the small ramp-MC (loccode) line by design.
-  const handleCopyPretty = async () => {
-    if (!results) return;
-    // Title = "City, ST    RR / terminal" (4 spaces). Wraps + auto-shrinks to fit.
+  const writeClip = async (text, html, okMsg) => {
+    try {
+      if (navigator.clipboard && window.ClipboardItem) {
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            'text/plain': new Blob([text], { type: 'text/plain' }),
+            'text/html': new Blob([html], { type: 'text/html' })
+          })
+        ]);
+      } else {
+        await navigator.clipboard.writeText(text);
+      }
+      setCopyMessage(okMsg);
+      setTimeout(() => setCopyMessage(''), 2000);
+    } catch {
+      setCopyMessage('Failed to copy');
+    }
+  };
+
+  // Shared title + plain-text body for both card variants. Title = "City, ST    RR
+  // / terminal"; a smaller size for long titles so the box never overflows.
+  const cardParts = () => {
     const cityST = formData.startCity || '';
     const railTerminal = getRailTerminal(results.rampMC, formData.startCity);
     const titlePlain = `${cityST}    ${railTerminal}`;
     const titleHtml = `${cityST}&nbsp;&nbsp;&nbsp;&nbsp;${railTerminal}`;
-    // Long labels get a smaller title so the box never overflows.
     const titleSize = titlePlain.length > 34 ? 15 : (titlePlain.length > 26 ? 17 : 20);
+    const text = [
+      'Here are the ramp cuts you requested:', '',
+      titlePlain,
+      `Earliest Return Date (ERD): ${results.erd}`,
+      `Latest Return Date (LRD): ${results.lrd}`,
+      `Ramp Cut Time: ${results.rampCutTime}`,
+      '', ''
+    ].join('\n');
+    return { titleHtml, titleSize, text };
+  };
 
-    // Div-based (no <table>) so Salesforce doesn't overlay dashed cell guides and
-    // the logo stays on the clean orange background. Rail is intentionally omitted
-    // (the title already shows the railroad). Label floats left, value right.
+  // Salesforce card — div layout (SF shows no dashed cell guides; transparent
+  // logo sits clean on the orange). Rail omitted (title already shows it).
+  const handleCopySalesforce = () => {
+    if (!results) return;
+    const { titleHtml, titleSize, text } = cardParts();
     const rowStyle = 'padding:9px 16px;border-bottom:1px solid #e2e8f0;overflow:hidden';
     const rowStyleLast = 'padding:9px 16px;overflow:hidden';
     const labelStyle = 'float:left;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;color:#000000';
     const valStyle = 'float:right;font-family:Arial,sans-serif;font-size:15px;font-weight:bold;color:#000000';
     const row = (label, value, rs = rowStyle) =>
       `<div style="${rs}"><span style="${labelStyle}">${label}</span><span style="${valStyle}">${value}</span></div>`;
-
-    // HL-orange box, thick HL-blue border, city/rail title, and the Hapag-Lloyd
-    // logo tucked in the lower-right on the transparent orange background.
     const html =
       `Here are the ramp cuts you requested:<br><br>` +
       `<div style="background:#EB6608;border:5px solid #002D72;border-radius:12px;max-width:470px;padding:22px;font-family:Arial,sans-serif">` +
@@ -236,35 +262,32 @@ export default function LookupForm() {
         `<div style="text-align:right;margin-top:14px"><img src="${hlLogo}" width="150" alt="Hapag-Lloyd" style="display:inline-block;width:150px;height:auto" /></div>` +
       `</div>` +
       `<br><br>`;
+    writeClip(text, html, '✓ Copied for Salesforce!');
+  };
 
-    // Plain-text fallback mirrors the box (for plain editors / Notepad).
-    const text = [
-      'Here are the ramp cuts you requested:',
-      '',
-      titlePlain,
-      `Earliest Return Date (ERD): ${results.erd}`,
-      `Latest Return Date (LRD): ${results.lrd}`,
-      `Ramp Cut Time: ${results.rampCutTime}`,
-      '',
-      ''
-    ].join('\n');
-
-    try {
-      if (navigator.clipboard && window.ClipboardItem) {
-        await navigator.clipboard.write([
-          new ClipboardItem({
-            'text/plain': new Blob([text], { type: 'text/plain' }),
-            'text/html': new Blob([html], { type: 'text/html' })
-          })
-        ]);
-      } else {
-        await navigator.clipboard.writeText(text);
-      }
-      setCopyMessage('✓ Pretty note copied!');
-      setTimeout(() => setCopyMessage(''), 2000);
-    } catch {
-      setCopyMessage('Failed to copy');
-    }
+  // Outlook & Teams card — table layout with bgcolor attrs (they strip div
+  // float/background) and the orange-baked logo (avoids a white box).
+  const handleCopyOutlook = () => {
+    if (!results) return;
+    const { titleHtml, titleSize, text } = cardParts();
+    const rowLabel = 'padding:9px 16px;border-bottom:1px solid #e2e8f0;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;color:#000000;text-align:left';
+    const rowVal = 'padding:9px 16px;border-bottom:1px solid #e2e8f0;font-family:Arial,sans-serif;font-size:15px;font-weight:bold;color:#000000;text-align:right';
+    const row = (label, value) => `<tr><td bgcolor="#ffffff" style="${rowLabel}">${label}</td><td bgcolor="#ffffff" style="${rowVal}">${value}</td></tr>`;
+    const html =
+      `Here are the ramp cuts you requested:<br><br>` +
+      `<table role="presentation" cellpadding="0" cellspacing="0" bgcolor="#EB6608" style="border-collapse:separate;background-color:#EB6608;border:5px solid #002D72;border-radius:12px;max-width:470px">` +
+        `<tr><td bgcolor="#EB6608" style="background-color:#EB6608;padding:22px">` +
+          `<div style="font-family:Arial,sans-serif;color:#ffffff;font-size:${titleSize}px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;border-bottom:2px solid #ffffff;padding-bottom:8px;margin-bottom:16px">${titleHtml}</div>` +
+          `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff" style="border-collapse:separate;background-color:#ffffff;border-radius:8px">` +
+            row('Earliest Return Date (ERD)', results.erd) +
+            row('Latest Return Date (LRD)', results.lrd) +
+            row('Ramp Cut Time', results.rampCutTime) +
+          `</table>` +
+          `<div style="text-align:right;margin-top:14px"><img src="${hlLogoOrange}" width="150" alt="Hapag-Lloyd" style="display:inline-block;width:150px;height:auto" /></div>` +
+        `</td></tr>` +
+      `</table>` +
+      `<br><br>`;
+    writeClip(text, html, '✓ Copied for Outlook / Teams!');
   };
 
   return (
@@ -404,18 +427,24 @@ export default function LookupForm() {
               <RailCard railroad={getRail(results.rampMC, formData.startCity)} rampMC={results.rampMC} />
             </div>
 
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-2.5">
               <button
-                onClick={handleCopyResults}
-                className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm bg-[#EB6608] text-white rounded-full hover:bg-[#cf5a07] transition font-semibold shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
+                onClick={handleCopySalesforce}
+                className="inline-flex items-center gap-2 px-4 py-1.5 text-sm bg-white text-slate-800 rounded-full hover:bg-slate-100 transition font-semibold shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
               >
-                📝 Copy Kind Text Note
+                <SalesforceIcon /> Salesforce
               </button>
               <button
-                onClick={handleCopyPretty}
-                className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm bg-white/10 border border-white/40 text-white rounded-full hover:bg-white/20 transition font-semibold shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
+                onClick={handleCopyOutlook}
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm bg-white text-slate-800 rounded-full hover:bg-slate-100 transition font-semibold shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
               >
-                ✨ Copy Pretty Note
+                <OutlookIcon /><TeamsIcon /> <span className="ml-0.5">Outlook &amp; Teams</span>
+              </button>
+              <button
+                onClick={handleCopyResults}
+                className="inline-flex items-center gap-2 px-4 py-1.5 text-sm bg-white/10 border border-white/40 text-white rounded-full hover:bg-white/20 transition font-semibold shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
+              >
+                <TextIcon /> Boring Text
               </button>
             </div>
 
