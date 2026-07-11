@@ -543,7 +543,7 @@ export default function App() {
       <ObieWalkOn />
 
       <div className="w-full max-w-[70rem] mx-auto px-4 mt-8 text-right">
-        <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500" title="days touched · est hours by Lance · commits">v {APP_VERSION}</span>
+        <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">v {APP_VERSION}</span>
       </div>
       <div className="w-full max-w-[70rem] mx-auto px-4 mt-1 mb-4">
         <img
