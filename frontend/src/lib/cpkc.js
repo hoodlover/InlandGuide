@@ -24,7 +24,8 @@ function port(slug) {
 export function getPortInfo(slug) {
   const p = port(slug);
   if (!p) return null;
-  return { name: p.name, rail: p.rail || '', runDate: p.runDate || '', generatedAt: p.generatedAt || generatedAt, notes: p.notes || [] };
+  const ref = p.generatedAt || generatedAt;
+  return { name: p.name, rail: p.rail || '', runDate: formatDate(p.runDate || '', ref), generatedAt: ref, notes: p.notes || [] };
 }
 
 // Published per-destination cut-off time (CN schedules), e.g. "2300 hrs". Empty if none.
@@ -94,8 +95,44 @@ export function parseCutoff(cutoffStr, refISO = generatedAt) {
   return best;
 }
 
+// House date format: "Fri, 7/24" (weekday, M/D — no leading zeros).
 function fmtDate(d) {
-  return `${WEEKDAYS[d.getDay()]} ${d.getDate()}-${MONTH_NAMES[d.getMonth()]}`;
+  return `${WEEKDAYS[d.getDay()]}, ${d.getMonth() + 1}/${d.getDate()}`;
+}
+
+// Weekday for a month(0-indexed)/day, inferring the year from the schedule date.
+function weekdayFor(month0, day, refISO) {
+  const [ry, rmo, rd] = String(refISO || '').split('-').map(Number);
+  const ref = ry ? new Date(ry, (rmo || 1) - 1, rd || 1) : new Date(2000, month0, day);
+  const refYear = ref.getFullYear();
+  let best = null, bd = Infinity;
+  for (const y of [refYear - 1, refYear, refYear + 1]) {
+    const d = new Date(y, month0, day);
+    const diff = Math.abs(d - ref);
+    if (diff < bd) { bd = diff; best = d; }
+  }
+  return WEEKDAYS[best.getDay()];
+}
+
+// Normalize any published date string — "Fri 24-Jul 15:00", "Fri, Jul-03",
+// "Tue 7-Jul", "28-Jun", "11-Jul" — to the house format "Fri, 7/24 15:00".
+// Keeps the time (24h) when present; computes the weekday when the string omits it.
+export function formatDate(str, refISO = generatedAt) {
+  if (!str) return str || '';
+  const s = String(str).trim();
+  const tm = s.match(/(\d{1,2}):(\d{2})/);
+  const time = tm ? `${tm[1]}:${tm[2]}` : '';
+  let day, month0;
+  let m = s.match(/(\d{1,2})-([A-Z][a-z]{2})/);        // D-Mon
+  if (m && MONTHS[m[2]] !== undefined) { day = Number(m[1]); month0 = MONTHS[m[2]]; }
+  else {
+    m = s.match(/([A-Z][a-z]{2})-(\d{1,2})/);          // Mon-DD
+    if (m && MONTHS[m[1]] !== undefined) { month0 = MONTHS[m[1]]; day = Number(m[2]); }
+  }
+  if (day === undefined || month0 === undefined) return str; // unknown shape — leave as-is
+  let wd = (s.match(/^([A-Za-z]{3})/) || [])[1];
+  if (!wd || !WEEKDAYS.includes(wd)) wd = weekdayFor(month0, day, refISO);
+  return `${wd}, ${month0 + 1}/${day}${time ? ' ' + time : ''}`;
 }
 
 // ERD (receiving opens). CN publishes it explicitly per destination; CPKC does

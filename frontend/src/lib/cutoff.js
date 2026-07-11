@@ -211,8 +211,8 @@ export function calculateERDLRD(pol, startCity, ssy, portCutDate, reefer = 'N') 
   rollBackToBusinessDay(erd, country);
 
   return {
-    erd: erd.toLocaleDateString('en-US', { weekday: 'short', month: '2-digit', day: '2-digit' }),
-    lrd: lrd.toLocaleDateString('en-US', { weekday: 'short', month: '2-digit', day: '2-digit' }),
+    erd: erd.toLocaleDateString('en-US', { weekday: 'short', month: 'numeric', day: 'numeric' }),
+    lrd: lrd.toLocaleDateString('en-US', { weekday: 'short', month: 'numeric', day: 'numeric' }),
     rampCutTime: formatCutTime(lane.rampCutTime),
     rampMC: lane.rampMC,
     railroad: railroadFromCode(lane.rampMC)

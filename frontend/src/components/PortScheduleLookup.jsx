@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Combobox from './Combobox';
-import { getPorts, getVessels, getCities, getVesselMeta, getCutoff, getERD, getPortInfo, getCutTime } from '../lib/cpkc';
+import { getPorts, getVessels, getCities, getVesselMeta, getCutoff, getERD, getPortInfo, getCutTime, formatDate } from '../lib/cpkc';
 import { hlLogo } from '../assets/hlLogo';
 import { hlLogoOrange } from '../assets/hlLogoOrange';
 import { SalesforceIcon, OutlookIcon, TeamsIcon, TextIcon } from './BrandIcons';
@@ -39,17 +39,18 @@ export default function PortScheduleLookup() {
   // Some vessels legitimately have no cutoff for a given inland city (they don't serve it).
   const noCutoff = ready && !cutoff;
 
+  const ref = info?.generatedAt;
   const results = ready && cutoff ? {
     city: sel.city,
     vessel: sel.vessel,
-    cutoff,
+    cutoff: formatDate(cutoff, ref),
     cutTime: getCutTime(sel.port, sel.city),
     erd,
     rail: info?.rail || '',
     terminal: meta?.terminal || '',
-    eta: meta?.eta || '',
-    etd: meta?.etd || '',
-    railPortCutoff: meta?.railPortCutoff || '',
+    eta: formatDate(meta?.eta || '', ref),
+    etd: formatDate(meta?.etd || '', ref),
+    railPortCutoff: formatDate(meta?.railPortCutoff || '', ref),
     comments: meta?.comments || ''
   } : null;
 
