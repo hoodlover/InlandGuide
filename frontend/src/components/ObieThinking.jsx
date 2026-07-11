@@ -3,6 +3,9 @@ import { obBot } from '../assets/banners';
 
 // Obie's idle thoughts — cargo/ops humor + encouragement. Rotate every 15s.
 const THOUGHTS = [
+  "Hi, I'm Obie — your IDT Mascot & Assistant. 👋",
+  "Obie here — IDT Mascot and Assistant, at your service.",
+  "Name's Obie. Mascot, assistant, and professional box enthusiast.",
   "Where's that container headed? The suspense is unreal.",
   "Hope it didn't miss the cut… nah, you've got this.",
   "Wow, you might have to roll that one — am I right?",
@@ -48,7 +51,7 @@ export default function ObieThinking() {
       <div key={i} className="joke-fade thought-bubble relative mb-5 max-w-[17rem] bg-white text-slate-800 rounded-2xl px-4 py-3 shadow-lg text-center text-sm font-semibold leading-snug">
         {THOUGHTS[i]}
       </div>
-      <img src={obBot} alt="OB the Ops-Base Bot" className="obie-float w-48 h-auto drop-shadow-2xl" />
+      <img src={obBot} alt="OB the Ops-Base Bot" className="obie-float w-[21.5rem] max-w-full h-auto drop-shadow-2xl" />
     </div>
   );
 }

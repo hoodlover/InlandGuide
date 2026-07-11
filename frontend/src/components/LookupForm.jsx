@@ -456,9 +456,9 @@ export default function LookupForm() {
             )}
           </div>
         ) : (
-          <div className="bg-[#002D72] border border-[#002D72] rounded-lg p-6 shadow-sm h-full flex flex-col items-center justify-center min-h-[24rem]">
+          <div className="rounded-lg p-6 h-full flex flex-col items-center justify-center min-h-[32rem]">
             <ObieThinking />
-            <p className="text-white/70 text-sm mt-4 text-center">Fill in the form and click Calculate to see results</p>
+            <p className="text-slate-500 dark:text-slate-300 text-sm mt-6 text-center">Fill in the form and click Calculate to see results</p>
           </div>
         )}
       </div>

@@ -302,9 +302,9 @@ export default function PortScheduleLookup() {
             <p className="text-white/80 text-sm mt-1">{sel.vessel} has no listed cut-off for {sel.city} on this schedule — try another rail city.</p>
           </div>
         ) : (
-          <div className="bg-[#002D72] border border-[#002D72] rounded-lg p-6 shadow-sm h-full flex flex-col items-center justify-center min-h-[24rem]">
+          <div className="rounded-lg p-6 h-full flex flex-col items-center justify-center min-h-[32rem]">
             <ObieThinking />
-            <p className="text-white/70 text-sm mt-4 text-center">Pick a vessel and rail city to see the cut-off</p>
+            <p className="text-slate-500 dark:text-slate-300 text-sm mt-6 text-center">Pick a vessel and rail city to see the cut-off</p>
           </div>
         )}
       </div>

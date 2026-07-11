@@ -158,7 +158,7 @@ function ObieWalkOn() {
         <p className="text-[11px] uppercase tracking-widest text-[#EB6608] font-bold mb-1">OB says…</p>
         <p className="text-base font-semibold text-slate-800 leading-snug">{joke}</p>
       </div>
-      <img src={obBot} alt="OB the Ops-Base Bot" className="w-[10.5rem] h-auto drop-shadow-xl" />
+      <img src={obBot} alt="OB the Ops-Base Bot" className={`obie-jokebot ${visible ? 'obie-jokebot-in' : 'obie-jokebot-out'} w-[10.5rem] h-auto drop-shadow-xl`} />
     </div>
   );
 }

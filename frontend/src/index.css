@@ -102,3 +102,8 @@ textarea {
 }
 .thought-bubble::after { width: 15px; height: 15px; bottom: -16px; margin-left: -18px; }
 .thought-bubble::before { width: 9px; height: 9px; bottom: -28px; margin-left: -6px; }
+
+/* Jokester Obie flips to face the way he's "pushing" the joke bubble. */
+.obie-jokebot { transition: transform 0.7s ease; }
+.obie-jokebot-in { transform: scaleX(-1); }   /* brings the joke out facing the opposite way */
+.obie-jokebot-out { transform: scaleX(1); }   /* flips back to push it away */
