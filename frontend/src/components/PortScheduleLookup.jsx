@@ -4,6 +4,7 @@ import { getPorts, getVessels, getCities, getVesselMeta, getCutoff, getERD, getP
 import { hlLogo } from '../assets/hlLogo';
 import { hlLogoOrange } from '../assets/hlLogoOrange';
 import { SalesforceIcon, OutlookIcon, TeamsIcon, TextIcon } from './BrandIcons';
+import ObieThinking from './ObieThinking';
 
 const EMPTY = { port: '', vessel: '', city: '' };
 
@@ -186,7 +187,7 @@ export default function PortScheduleLookup() {
   return (
     <div className="grid md:grid-cols-2 gap-6">
       <div className="bg-[#EB6608] rounded-lg border border-[#EB6608] shadow-sm p-6">
-        <h2 className="text-xl font-extrabold tracking-wide uppercase mb-1 pb-2 border-b-2 border-white/60 text-white txt-shadow-heavy">Port Cut-Off Schedule</h2>
+        <h2 className="text-xl font-extrabold tracking-wide uppercase mb-1 pb-2 border-b-2 border-white/60 text-white txt-shadow-heavy">Rail Cut-Off Schedule</h2>
         {info && (
           <p className="text-xs text-white/90 mb-4 txt-shadow-soft">Schedule as published: <span className="font-semibold">{info.runDate}</span></p>
         )}
@@ -301,8 +302,9 @@ export default function PortScheduleLookup() {
             <p className="text-white/80 text-sm mt-1">{sel.vessel} has no listed cut-off for {sel.city} on this schedule — try another rail city.</p>
           </div>
         ) : (
-          <div className="bg-[#002D72] border border-[#002D72] rounded-lg p-6 text-center shadow-sm">
-            <p className="text-white">Pick a vessel and rail city to see the cut-off</p>
+          <div className="bg-[#002D72] border border-[#002D72] rounded-lg p-6 shadow-sm h-full flex flex-col items-center justify-center min-h-[24rem]">
+            <ObieThinking />
+            <p className="text-white/70 text-sm mt-4 text-center">Pick a vessel and rail city to see the cut-off</p>
           </div>
         )}
       </div>

@@ -85,3 +85,20 @@ textarea {
   font-size: 18px; line-height: 1; cursor: pointer;
 }
 .webapp-reminder .wr-close:hover { color: #fff; }
+/* Obie idle bob + thought bubble tail (floating in the empty results area). */
+@keyframes obieFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+.obie-float { animation: obieFloat 3s ease-in-out infinite; }
+.thought-bubble::after,
+.thought-bubble::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  background: #fff;
+  border-radius: 9999px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+}
+.thought-bubble::after { width: 15px; height: 15px; bottom: -16px; margin-left: -18px; }
+.thought-bubble::before { width: 9px; height: 9px; bottom: -28px; margin-left: -6px; }

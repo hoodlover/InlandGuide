@@ -4,6 +4,7 @@ import { hlLogo } from '../assets/hlLogo';
 import { hlLogoOrange } from '../assets/hlLogoOrange';
 import Combobox from './Combobox';
 import { SalesforceIcon, OutlookIcon, TeamsIcon, TextIcon } from './BrandIcons';
+import ObieThinking from './ObieThinking';
 
 // Flexible date entry:  "9" = 9th of THIS month · "8/9" = Aug 9 · "8/9/26" or "8/9/2026" = full.
 function parseFlexibleDate(input) {
@@ -455,8 +456,9 @@ export default function LookupForm() {
             )}
           </div>
         ) : (
-          <div className="bg-[#002D72] border border-[#002D72] rounded-lg p-6 text-center shadow-sm">
-            <p className="text-white">Fill in the form and click Calculate to see results</p>
+          <div className="bg-[#002D72] border border-[#002D72] rounded-lg p-6 shadow-sm h-full flex flex-col items-center justify-center min-h-[24rem]">
+            <ObieThinking />
+            <p className="text-white/70 text-sm mt-4 text-center">Fill in the form and click Calculate to see results</p>
           </div>
         )}
       </div>

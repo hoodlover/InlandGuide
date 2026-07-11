@@ -44,6 +44,57 @@ const OB_JOKES = [
   "What's smarter than a talking parrot? A spelling bee.",
   "My first time using an elevator was uplifting. The second time let me down.",
   "Why do birds fly south for the winter? Because it's too far to walk.",
+  // 50 more dad jokes
+  "I only know 25 letters of the alphabet. I don't know y.",
+  "What do you call a fish with no eyes? A fsh.",
+  "I'm reading a book about anti-gravity. It's impossible to put down.",
+  "Did you hear about the restaurant on the moon? Great food, no atmosphere.",
+  "Why don't scientists trust atoms? They make up everything.",
+  "I used to hate facial hair, but then it grew on me.",
+  "What do you call cheese that isn't yours? Nacho cheese.",
+  "I'm on a seafood diet. I see food and I eat it.",
+  "What did the ocean say to the beach? Nothing, it just waved.",
+  "Why can't your nose be 12 inches long? Because then it'd be a foot.",
+  "I would tell you a construction joke, but I'm still working on it.",
+  "What do you call a bear with no teeth? A gummy bear.",
+  "How do you organize a space party? You planet.",
+  "What do you call a factory that makes okay products? A satisfactory.",
+  "I don't trust stairs. They're always up to something.",
+  "What's brown and sticky? A stick.",
+  "Why did the coffee file a police report? It got mugged.",
+  "How do you make a tissue dance? You put a little boogie in it.",
+  "I bought some shoes from a drug dealer. I don't know what he laced them with, but I was tripping all day.",
+  "What do you call a pile of cats? A meow-tain.",
+  "Why did the golfer bring two pairs of pants? In case he got a hole in one.",
+  "What's orange and sounds like a parrot? A carrot.",
+  "I used to play piano by ear, but now I use my hands.",
+  "Why did the math book look sad? It had too many problems.",
+  "What did the buffalo say to his son when he left? Bison.",
+  "Why don't eggs tell jokes? They'd crack each other up.",
+  "I made a pencil with two erasers. It was pointless.",
+  "What do you call a dinosaur that crashes his car? Tyrannosaurus wrecks.",
+  "How does the moon cut his hair? Eclipse it.",
+  "Why did the picture go to jail? It was framed.",
+  "What do you call a sleeping bull? A bulldozer.",
+  "I told my suitcase there'd be no vacation this year. Now I'm dealing with emotional baggage.",
+  "What do you call fake spaghetti? An impasta.",
+  "Why did the cookie go to the doctor? It was feeling crummy.",
+  "How do you catch a squirrel? Climb a tree and act like a nut.",
+  "What kind of shoes do ninjas wear? Sneakers.",
+  "Why was the broom late? It over-swept.",
+  "What do you call a belt made of watches? A waist of time.",
+  "Why don't skeletons ever fight each other? They don't have the guts.",
+  "What did the grape do when it got stepped on? Nothing, it just let out a little wine.",
+  "Why did the banana go to the doctor? It wasn't peeling well.",
+  "How do you fix a broken tomato? Tomato paste.",
+  "What do you call a boomerang that won't come back? A stick.",
+  "Why do cows wear bells? Because their horns don't work.",
+  "What's a skeleton's least favorite room? The living room.",
+  "I ordered a chicken and an egg online. I'll let you know.",
+  "What do you call a can opener that doesn't work? A can't opener.",
+  "Why did the scarecrow keep getting promoted? He was head and shoulders above everyone.",
+  "I couldn't figure out why the baseball kept getting bigger. Then it hit me.",
+  "What do you call a fake noodle? An impasta. (Worth saying twice.)",
 ];
 
 function MobileBlock() {
@@ -103,11 +154,11 @@ function ObieWalkOn() {
 
   return (
     <div className={`obie-walkon ${visible ? 'obie-in' : 'obie-out'}`} aria-hidden={!visible}>
-      <div className="relative max-w-[240px] bg-white border-2 border-[#002D72] rounded-2xl px-4 py-3 shadow-xl">
-        <p className="text-[10px] uppercase tracking-widest text-[#EB6608] font-bold mb-1">OB says…</p>
-        <p className="text-sm font-semibold text-slate-800 leading-snug">{joke}</p>
+      <div className="relative max-w-[300px] bg-white border-2 border-[#002D72] rounded-2xl px-5 py-4 shadow-xl">
+        <p className="text-[11px] uppercase tracking-widest text-[#EB6608] font-bold mb-1">OB says…</p>
+        <p className="text-base font-semibold text-slate-800 leading-snug">{joke}</p>
       </div>
-      <img src={obBot} alt="OB the Ops-Base Bot" className="w-24 h-auto drop-shadow-xl" />
+      <img src={obBot} alt="OB the Ops-Base Bot" className="w-[10.5rem] h-auto drop-shadow-xl" />
     </div>
   );
 }
