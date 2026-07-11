@@ -134,31 +134,57 @@ const OBIE_FIRST_MS = 15_000;   // first appearance shortly after load
 const OBIE_SHOW_MS = 30_000;    // stays on screen 30s
 const OBIE_HIDE_MS = 600_000;   // hidden 10 min between visits
 
+// Split a Q&A joke into the setup (question) and the punchline. Statement jokes
+// (no "? ") come back whole with an empty punchline.
+function splitJoke(joke) {
+  const i = joke.indexOf('? ');
+  if (i === -1) return { q: joke, a: '' };
+  return { q: joke.slice(0, i + 1), a: joke.slice(i + 2) };
+}
+
 function ObieWalkOn() {
   const [visible, setVisible] = useState(false);
+  const [flipped, setFlipped] = useState(false);
+  const [revealed, setRevealed] = useState(false);
   const [joke, setJoke] = useState(() => OB_JOKES[Math.floor(Math.random() * OB_JOKES.length)]);
 
   useEffect(() => {
-    let showT, hideT;
+    let timers = [];
+    const push = (fn, ms) => timers.push(setTimeout(fn, ms));
     const enter = () => {
       setJoke(OB_JOKES[Math.floor(Math.random() * OB_JOKES.length)]);
+      setRevealed(false);
+      setFlipped(false);
       setVisible(true);
-      hideT = setTimeout(() => {
+      push(() => setRevealed(true), 4000);                      // punchline lands after 4s
+      push(() => setFlipped(true), OBIE_SHOW_MS / 2);           // flip halfway through…
+      push(() => setFlipped(false), OBIE_SHOW_MS / 2 + 1500);   // …for 1.5s, then flip back
+      push(() => {
         setVisible(false);
-        showT = setTimeout(enter, OBIE_HIDE_MS);
+        push(enter, OBIE_HIDE_MS);
       }, OBIE_SHOW_MS);
     };
-    showT = setTimeout(enter, OBIE_FIRST_MS);
-    return () => { clearTimeout(showT); clearTimeout(hideT); };
+    push(enter, OBIE_FIRST_MS);
+    return () => timers.forEach(clearTimeout);
   }, []);
+
+  const { q, a } = splitJoke(joke);
 
   return (
     <div className={`obie-walkon ${visible ? 'obie-in' : 'obie-out'}`} aria-hidden={!visible}>
       <div className="relative max-w-[300px] bg-white border-2 border-[#002D72] rounded-2xl px-5 py-4 shadow-xl">
         <p className="text-[11px] uppercase tracking-widest text-[#EB6608] font-bold mb-1">OB says…</p>
-        <p className="text-base font-semibold text-slate-800 leading-snug">{joke}</p>
+        <p className="text-base font-semibold text-slate-800 leading-snug">{q}</p>
+        {a && (
+          <p
+            className="text-base font-semibold text-slate-800 leading-snug mt-1"
+            style={{ opacity: revealed ? 1 : 0, transition: 'opacity 0.6s ease' }}
+          >
+            {a}
+          </p>
+        )}
       </div>
-      <img src={obBot} alt="OB the Ops-Base Bot" className={`obie-jokebot ${visible ? 'obie-jokebot-in' : 'obie-jokebot-out'} w-[10.5rem] h-auto drop-shadow-xl`} />
+      <img src={obBot} alt="OB the Ops-Base Bot" className={`obie-jokebot ${flipped ? 'obie-jokebot-in' : 'obie-jokebot-out'} w-[10.5rem] h-auto drop-shadow-xl`} />
     </div>
   );
 }
@@ -459,8 +485,8 @@ export default function App() {
       <div className="w-full max-w-[70rem] mx-auto px-4 mt-3">
         <header className="bg-[#F8F3EA] dark:bg-slate-800 border border-[#E0D8C5] dark:border-slate-700 rounded-xl px-5 py-3 flex items-center justify-between gap-3">
           <div>
-            <h1 onClick={secretTap} className="text-xl font-bold text-[#002D72] dark:text-white smallcaps txt-shadow-heavy select-none">Inland Cutoff Guide</h1>
-            <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">Rail cutoff &amp; delivery date calculator</p>
+            <h1 onClick={secretTap} className="text-[1.5rem] font-bold text-[#002D72] dark:text-white smallcaps txt-shadow-heavy select-none">Inland Cutoff Rail Guide</h1>
+            <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Rail cutoff &amp; delivery date calculator</p>
             <button
               onClick={() => setInstallOpen(true)}
               className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-full bg-[#002D72] text-white hover:bg-[#01245c] transition shadow-[0_6px_14px_rgba(0,0,0,0.35)]"
