@@ -105,5 +105,5 @@ textarea {
 
 /* Jokester Obie flips to face the way he's "pushing" the joke bubble. */
 .obie-jokebot { transition: transform 0.7s ease; }
-.obie-jokebot-in { transform: scaleX(1); }     /* mid-show flip */
-.obie-jokebot-out { transform: scaleX(-1); }   /* the way he enters + leaves */
+.obie-jokebot-out { transform: scaleX(-1); }   /* faces his entry direction while shown */
+.obie-jokebot-in { transform: scaleX(1); }     /* one flip: turns to leave */

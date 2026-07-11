@@ -160,7 +160,6 @@ function splitJoke(joke) {
 
 function ObieWalkOn() {
   const [visible, setVisible] = useState(false);
-  const [flipped, setFlipped] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const [joke, setJoke] = useState(() => OB_JOKES[Math.floor(Math.random() * OB_JOKES.length)]);
 
@@ -170,13 +169,10 @@ function ObieWalkOn() {
     const enter = () => {
       setJoke(OB_JOKES[Math.floor(Math.random() * OB_JOKES.length)]);
       setRevealed(false);
-      setFlipped(false);
       setVisible(true);
-      push(() => setRevealed(true), 4000);                      // punchline lands after 4s
-      push(() => setFlipped(true), OBIE_SHOW_MS / 2);           // flip halfway through…
-      push(() => setFlipped(false), OBIE_SHOW_MS / 2 + 1500);   // …for 1.5s, then flip back
+      push(() => setRevealed(true), 4000);   // punchline lands after 4s
       push(() => {
-        setVisible(false);
+        setVisible(false);                   // one flip: he turns as he leaves (tied to `visible`)
         push(enter, OBIE_HIDE_MS);
       }, OBIE_SHOW_MS);
     };
@@ -200,7 +196,7 @@ function ObieWalkOn() {
           </p>
         )}
       </div>
-      <img src={obBot} alt="OB the Ops-Base Bot" className={`obie-jokebot ${flipped ? 'obie-jokebot-in' : 'obie-jokebot-out'} w-[10.5rem] h-auto drop-shadow-xl`} />
+      <img src={obBot} alt="OB the Ops-Base Bot" className={`obie-jokebot ${visible ? 'obie-jokebot-out' : 'obie-jokebot-in'} w-[10.5rem] h-auto drop-shadow-xl`} />
     </div>
   );
 }
