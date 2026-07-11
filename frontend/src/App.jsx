@@ -8,8 +8,8 @@ import themeShip from './assets/theme-ship.webp';
 import themeHelp from './assets/theme-help.webp';
 import './index.css';
 
-// Version "<days touched>.<est hours>.<commits>", injected at build by vite.config.js.
-const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.0.0';
+import versionData from './version.json'; // committed; regenerate with `node gen-version.mjs`
+const APP_VERSION = versionData.version;
 
 // Proof-of-concept block for phones/tablets (soft — can be bypassed via "desktop site").
 function isMobileDevice() {
@@ -160,6 +160,7 @@ function splitJoke(joke) {
 
 function ObieWalkOn() {
   const [visible, setVisible] = useState(false);
+  const [flipped, setFlipped] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const [joke, setJoke] = useState(() => OB_JOKES[Math.floor(Math.random() * OB_JOKES.length)]);
 
@@ -169,10 +170,12 @@ function ObieWalkOn() {
     const enter = () => {
       setJoke(OB_JOKES[Math.floor(Math.random() * OB_JOKES.length)]);
       setRevealed(false);
+      setFlipped(false);                                 // enters facing into the screen
       setVisible(true);
-      push(() => setRevealed(true), 4000);   // punchline lands after 4s
+      push(() => setRevealed(true), 4000);               // punchline lands after 4s
+      push(() => setFlipped(true), OBIE_SHOW_MS / 2);    // one flip at the midpoint — then he stays turned
       push(() => {
-        setVisible(false);                   // one flip: he turns as he leaves (tied to `visible`)
+        setVisible(false);                               // leaves facing the screen edge
         push(enter, OBIE_HIDE_MS);
       }, OBIE_SHOW_MS);
     };
@@ -196,7 +199,7 @@ function ObieWalkOn() {
           </p>
         )}
       </div>
-      <img src={obBot} alt="OB the Ops-Base Bot" className={`obie-jokebot ${visible ? 'obie-jokebot-out' : 'obie-jokebot-in'} w-[10.5rem] h-auto drop-shadow-xl`} />
+      <img src={obBot} alt="OB the Ops-Base Bot" className={`obie-jokebot ${flipped ? 'obie-jokebot-in' : 'obie-jokebot-out'} w-[10.5rem] h-auto drop-shadow-xl`} />
     </div>
   );
 }
