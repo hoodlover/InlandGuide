@@ -8,8 +8,8 @@ import themeShip from './assets/theme-ship.webp';
 import themeHelp from './assets/theme-help.webp';
 import './index.css';
 
-// Version = total git commit count, injected at build time by vite.config.js.
-const APP_VERSION = `0.0.${typeof __COMMIT_COUNT__ !== 'undefined' ? __COMMIT_COUNT__ : '0'}`;
+// Version "<days touched>.<est hours>.<commits>", injected at build by vite.config.js.
+const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.0.0';
 
 // Proof-of-concept block for phones/tablets (soft — can be bypassed via "desktop site").
 function isMobileDevice() {
@@ -543,7 +543,7 @@ export default function App() {
       <ObieWalkOn />
 
       <div className="w-full max-w-[70rem] mx-auto px-4 mt-8 text-right">
-        <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">V {APP_VERSION}</span>
+        <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500" title="days touched · est hours by Lance · commits">v {APP_VERSION}</span>
       </div>
       <div className="w-full max-w-[70rem] mx-auto px-4 mt-1 mb-4">
         <img
