@@ -424,8 +424,8 @@ export default function App() {
       <main className="max-w-5xl mx-auto px-5 py-6 w-full flex-1">
         <div className="flex gap-2 mb-5">
           {[
-            { id: 'calculator', label: 'Rail Cutoff Calculator' },
-            { id: 'cpkc', label: 'Port Cut-Off Schedule' }
+            { id: 'calculator', label: 'US Rail Ramp Cuts' },
+            { id: 'cpkc', label: 'Canada Rail Ramp Cuts' }
           ].map(t => (
             <button
               key={t.id}

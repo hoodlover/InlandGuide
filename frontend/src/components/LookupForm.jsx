@@ -293,7 +293,7 @@ export default function LookupForm() {
   return (
     <div className="grid md:grid-cols-2 gap-6">
       <div className="bg-[#EB6608] rounded-lg border border-[#EB6608] shadow-sm p-6">
-        <h2 className="text-xl font-extrabold tracking-wide uppercase mb-4 pb-2 border-b-2 border-white/60 text-white txt-shadow-heavy">Rail Cutoff Lookup</h2>
+        <h2 className="text-xl font-extrabold tracking-wide uppercase mb-4 pb-2 border-b-2 border-white/60 text-white txt-shadow-heavy">Inland Guide Rail Tool</h2>
         
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
