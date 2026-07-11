@@ -117,26 +117,31 @@ export default function PortScheduleLookup() {
     const titleHtml = `${results.city}&nbsp;&nbsp;&nbsp;&nbsp;${railTerminal}`;
     const titleSize = titlePlain.length > 34 ? 15 : (titlePlain.length > 26 ? 17 : 20);
 
-    // Div-based (no <table>) so rich editors like Salesforce don't overlay dashed
-    // cell gridlines. The solid grey row separators are our own border-bottoms.
-    const rowStyle = 'padding:9px 16px;border-bottom:1px solid #e2e8f0;overflow:hidden';
-    const labelStyle = 'float:left;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;color:#000000';
-    const valStyle = 'float:right;font-family:Arial,sans-serif;font-size:15px;font-weight:bold;color:#000000';
-    const row = (label, value) => `<div style="${rowStyle}"><span style="${labelStyle}">${label}</span><span style="${valStyle}">${value}</span></div>`;
+    // Tables (Outlook Online strips float/background from divs) with an explicit
+    // border on every cell — three sides match the cell background (invisible),
+    // the bottom is grey. Full borders stop Salesforce's dashed cell "guides"
+    // while leaving only the grey horizontal separators visible. bgcolor attrs
+    // keep the orange/white in Outlook.
+    const cell = 'padding:9px 16px;border:1px solid #ffffff;border-bottom:1px solid #e2e8f0';
+    const rowLabel = `${cell};font-family:Arial,sans-serif;font-size:13px;font-weight:bold;color:#000000;text-align:left`;
+    const rowVal = `${cell};font-family:Arial,sans-serif;font-size:15px;font-weight:bold;color:#000000;text-align:right`;
+    const row = (label, value) => `<tr><td bgcolor="#ffffff" style="${rowLabel}">${label}</td><td bgcolor="#ffffff" style="${rowVal}">${value}</td></tr>`;
 
     const html =
-      `<div style="background:#EB6608;border:5px solid #002D72;border-radius:12px;max-width:470px;padding:22px;font-family:Arial,sans-serif">` +
-        `<div style="color:#ffffff;font-size:${titleSize}px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;text-shadow:0 2px 5px rgba(0,0,0,0.45);border-bottom:2px solid #ffffff;padding-bottom:8px;margin-bottom:16px">${titleHtml}</div>` +
-        `<div style="background:#ffffff;border-radius:8px;overflow:hidden">` +
-          row('Vessel', results.vessel) +
-          row('Inland Cut-Off (LRD)', results.cutoff) +
-          (results.cutTime ? row('Cut-Off Time', results.cutTime) : '') +
-          row('Earliest Receiving (ERD)', results.erd) +
-          (results.comments ? row('Note', results.comments) : '') +
-        `</div>` +
-        `<div style="color:#ffffff;font-size:11px;margin-top:10px">${info.name} — as published ${info.runDate}</div>` +
-        `<div style="text-align:right;margin-top:8px"><img src="${hlLogo}" width="150" alt="Hapag-Lloyd" style="display:inline-block;width:150px;height:auto" /></div>` +
-      `</div>`;
+      `<table role="presentation" cellpadding="0" cellspacing="0" bgcolor="#EB6608" style="border-collapse:separate;background-color:#EB6608;border:5px solid #002D72;border-radius:12px;max-width:470px">` +
+        `<tr><td bgcolor="#EB6608" style="background-color:#EB6608;padding:22px;border:1px solid #EB6608">` +
+          `<div style="font-family:Arial,sans-serif;color:#ffffff;font-size:${titleSize}px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;text-shadow:0 2px 5px rgba(0,0,0,0.45);border-bottom:2px solid #ffffff;padding-bottom:8px;margin-bottom:16px">${titleHtml}</div>` +
+          `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff" style="border-collapse:separate;background-color:#ffffff;border-radius:8px">` +
+            row('Vessel', results.vessel) +
+            row('Inland Cut-Off (LRD)', results.cutoff) +
+            (results.cutTime ? row('Cut-Off Time', results.cutTime) : '') +
+            row('Earliest Receiving (ERD)', results.erd) +
+            (results.comments ? row('Note', results.comments) : '') +
+          `</table>` +
+          `<div style="font-family:Arial,sans-serif;color:#ffffff;font-size:11px;margin-top:10px">${info.name} — as published ${info.runDate}</div>` +
+          `<div style="text-align:right;margin-top:8px"><img src="${hlLogo}" width="150" alt="Hapag-Lloyd" style="display:inline-block;width:150px;height:auto" /></div>` +
+        `</td></tr>` +
+      `</table>`;
 
     const text = [
       titlePlain,
