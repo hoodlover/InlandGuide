@@ -2,7 +2,7 @@
 // The app builds to a single self-contained index.html, so the "app shell"
 // is essentially just that one document plus the PWA icons/manifest.
 // Bump CACHE_VERSION whenever a new build should invalidate the offline cache.
-const CACHE_VERSION = 'icg-v5';
+const CACHE_VERSION = 'icg-v6';
 const APP_SHELL = [
   './',
   './index.html',

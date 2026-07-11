@@ -8,6 +8,8 @@ import themeShip from './assets/theme-ship.webp';
 import themeHelp from './assets/theme-help.webp';
 import './index.css';
 
+const APP_VERSION = '1.0.0';
+
 // Proof-of-concept block for phones/tablets (soft — can be bypassed via "desktop site").
 function isMobileDevice() {
   const ua = navigator.userAgent || '';
@@ -134,12 +136,25 @@ const OBIE_FIRST_MS = 15_000;   // first appearance shortly after load
 const OBIE_SHOW_MS = 30_000;    // stays on screen 30s
 const OBIE_HIDE_MS = 600_000;   // hidden 10 min between visits
 
-// Split a Q&A joke into the setup (question) and the punchline. Statement jokes
-// (no "? ") come back whole with an empty punchline.
+// Split a joke into the setup and the punchline at the first sentence break —
+// a "?", "!", "." followed by a space, or a spaced dash ("—"/"–"/"-"). One-liners
+// with no such break come back whole (empty punchline).
 function splitJoke(joke) {
-  const i = joke.indexOf('? ');
-  if (i === -1) return { q: joke, a: '' };
-  return { q: joke.slice(0, i + 1), a: joke.slice(i + 2) };
+  const sentence = joke.match(/[?!.]\s+/);          // "…? " / "…. " / "…! "
+  const dash = joke.match(/\s+[—–-]\s+/);            // "… — …"
+  let end, next;
+  if (sentence && (!dash || sentence.index <= dash.index)) {
+    end = sentence.index + 1;                        // keep the . ? !
+    next = sentence.index + sentence[0].length;
+  } else if (dash) {
+    end = dash.index;                                // drop the dash + spaces
+    next = dash.index + dash[0].length;
+  } else {
+    return { q: joke, a: '' };
+  }
+  const q = joke.slice(0, end).trim();
+  const a = joke.slice(next).trim();
+  return a ? { q, a } : { q: joke, a: '' };
 }
 
 function ObieWalkOn() {
@@ -526,7 +541,10 @@ export default function App() {
       <WebappReminder />
       <ObieWalkOn />
 
-      <div className="w-full max-w-[70rem] mx-auto px-4 mt-8 mb-4">
+      <div className="w-full max-w-[70rem] mx-auto px-4 mt-8 text-right">
+        <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">V {APP_VERSION}</span>
+      </div>
+      <div className="w-full max-w-[70rem] mx-auto px-4 mt-1 mb-4">
         <img
           src={bannerBottom}
           alt="Hapag-Lloyd IDT Ops Base"
