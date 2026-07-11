@@ -8,7 +8,8 @@ import themeShip from './assets/theme-ship.webp';
 import themeHelp from './assets/theme-help.webp';
 import './index.css';
 
-const APP_VERSION = '1.0.0';
+// Version = total git commit count, injected at build time by vite.config.js.
+const APP_VERSION = `0.0.${typeof __COMMIT_COUNT__ !== 'undefined' ? __COMMIT_COUNT__ : '0'}`;
 
 // Proof-of-concept block for phones/tablets (soft — can be bypassed via "desktop site").
 function isMobileDevice() {
