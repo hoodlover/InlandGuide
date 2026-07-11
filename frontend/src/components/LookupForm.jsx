@@ -145,6 +145,8 @@ export default function LookupForm() {
     // Ramp Cuts (ERD/LRD) come first — they're the important part — then the port info.
     // Two trailing blank lines leave the cursor ready to type a goodbye.
     const text = [
+      'Here are the ramp cuts you requested:',
+      '',
       topPlain,
       divider,
       'Ramp Cuts:',
@@ -163,6 +165,8 @@ export default function LookupForm() {
     // <br> so line breaks survive rich editors, and bolds the city, rail name, and
     // the ERD/LRD dates. Two trailing <br> for the goodbye line.
     const html = `<div style="font-family:'Times New Roman',Times,serif">` + [
+      'Here are the ramp cuts you requested:',
+      '',
       topHtml,
       divider,
       'Ramp Cuts:',
@@ -221,6 +225,7 @@ export default function LookupForm() {
     // HL-orange box, thick HL-blue border, city/rail title, and the Hapag-Lloyd
     // logo tucked in the lower-right on the transparent orange background.
     const html =
+      `Here are the ramp cuts you requested:<br><br>` +
       `<div style="background:#EB6608;border:5px solid #002D72;border-radius:12px;max-width:470px;padding:22px;font-family:Arial,sans-serif">` +
         `<div style="color:#ffffff;font-size:${titleSize}px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;text-shadow:0 2px 5px rgba(0,0,0,0.45);border-bottom:2px solid #ffffff;padding-bottom:8px;margin-bottom:16px">${titleHtml}</div>` +
         `<div style="background:#ffffff;border-radius:8px;overflow:hidden">` +
@@ -229,10 +234,13 @@ export default function LookupForm() {
           row('Ramp Cut Time', results.rampCutTime, rowStyleLast) +
         `</div>` +
         `<div style="text-align:right;margin-top:14px"><img src="${hlLogo}" width="150" alt="Hapag-Lloyd" style="display:inline-block;width:150px;height:auto" /></div>` +
-      `</div>`;
+      `</div>` +
+      `<br><br>`;
 
     // Plain-text fallback mirrors the box (for plain editors / Notepad).
     const text = [
+      'Here are the ramp cuts you requested:',
+      '',
       titlePlain,
       `Earliest Return Date (ERD): ${results.erd}`,
       `Latest Return Date (LRD): ${results.lrd}`,

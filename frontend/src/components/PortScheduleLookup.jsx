@@ -77,6 +77,8 @@ export default function PortScheduleLookup() {
     const top = `${results.city}    ${railTerminal}`;
     const divider = '─'.repeat(Math.max(24, top.length));
     const text = [
+      'Here are the ramp cuts you requested:',
+      '',
       top,
       divider,
       `Vessel: ${results.vessel}`,
@@ -92,6 +94,8 @@ export default function PortScheduleLookup() {
     ].filter(v => v !== null).join('\n');
 
     const html = `<div style="font-family:'Times New Roman',Times,serif">` + [
+      'Here are the ramp cuts you requested:',
+      '',
       `<b>${results.city}</b>&nbsp;&nbsp;&nbsp;&nbsp;<b>${railTerminal}</b>`,
       divider,
       `Vessel: <b>${results.vessel}</b>`,
@@ -125,6 +129,7 @@ export default function PortScheduleLookup() {
     const row = (label, value) => `<div style="${rowStyle}"><span style="${labelStyle}">${label}</span><span style="${valStyle}">${value}</span></div>`;
 
     const html =
+      `Here are the ramp cuts you requested:<br><br>` +
       `<div style="background:#EB6608;border:5px solid #002D72;border-radius:12px;max-width:470px;padding:22px;font-family:Arial,sans-serif">` +
         `<div style="color:#ffffff;font-size:${titleSize}px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;text-shadow:0 2px 5px rgba(0,0,0,0.45);border-bottom:2px solid #ffffff;padding-bottom:8px;margin-bottom:16px">${titleHtml}</div>` +
         `<div style="background:#ffffff;border-radius:8px;overflow:hidden">` +
@@ -136,9 +141,12 @@ export default function PortScheduleLookup() {
         `</div>` +
         `<div style="color:#ffffff;font-size:11px;margin-top:10px">${info.name} — as published ${info.runDate}</div>` +
         `<div style="text-align:right;margin-top:8px"><img src="${hlLogo}" width="150" alt="Hapag-Lloyd" style="display:inline-block;width:150px;height:auto" /></div>` +
-      `</div>`;
+      `</div>` +
+      `<br><br>`;
 
     const text = [
+      'Here are the ramp cuts you requested:',
+      '',
       titlePlain,
       `Vessel: ${results.vessel}`,
       `Earliest Receiving (ERD): ${results.erd}`,
