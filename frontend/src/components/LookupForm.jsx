@@ -209,27 +209,28 @@ export default function LookupForm() {
     // Long labels get a smaller title so the box never overflows.
     const titleSize = titlePlain.length > 34 ? 15 : (titlePlain.length > 26 ? 17 : 20);
 
-    const rowLabel = 'padding:9px 16px;border-bottom:1px solid #e2e8f0;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;color:#000000;text-align:left';
-    const rowVal = 'padding:9px 16px;border-bottom:1px solid #e2e8f0;font-family:Arial,sans-serif;font-size:15px;font-weight:bold;color:#000000;text-align:right';
-    const row = (label, value, valStyle = rowVal) =>
-      `<tr><td style="${rowLabel}">${label}</td><td style="${valStyle}">${value}</td></tr>`;
+    // Div-based (no <table>) so rich editors like Salesforce don't overlay dashed
+    // cell gridlines. The solid grey row separators are our own border-bottoms.
+    const rowStyle = 'padding:9px 16px;border-bottom:1px solid #e2e8f0;overflow:hidden';
+    const rowStyleLast = 'padding:9px 16px;overflow:hidden';
+    const labelStyle = 'float:left;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;color:#000000';
+    const valStyle = 'float:right;font-family:Arial,sans-serif;font-size:15px;font-weight:bold;color:#000000';
+    const row = (label, value, rs = rowStyle) =>
+      `<div style="${rs}"><span style="${labelStyle}">${label}</span><span style="${valStyle}">${value}</span></div>`;
 
     // HL-orange box, thick HL-blue border, "Ramp Cut in <City>" title, and the
     // Hapag-Lloyd logo tucked in the lower-right on a transparent background.
     const html =
-      `<table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:separate;background:#EB6608;border:5px solid #002D72;border-radius:12px;max-width:470px">` +
-        `<tr><td style="padding:22px">` +
-          `<div style="font-family:Arial,sans-serif;color:#ffffff;font-size:${titleSize}px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;text-shadow:0 2px 5px rgba(0,0,0,0.45);border-bottom:2px solid #ffffff;padding-bottom:8px;margin-bottom:16px">${titleHtml}</div>` +
-          `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:separate;background:#ffffff;border-radius:8px">` +
-            row('Earliest Return Date (ERD)', results.erd) +
-            row('Latest Return Date (LRD)', results.lrd) +
-            row('Ramp Cut Time', results.rampCutTime) +
-            row('Rail', `<span style="color:#002D72;font-weight:800;font-size:16px;font-variant:small-caps">${rail}</span>`,
-              'padding:9px 16px;font-family:Arial,sans-serif;text-align:right') +
-          `</table>` +
-          `<div style="text-align:right;margin-top:14px"><img src="${hlLogo}" width="150" alt="Hapag-Lloyd" style="display:inline-block;width:150px;height:auto" /></div>` +
-        `</td></tr>` +
-      `</table>`;
+      `<div style="background:#EB6608;border:5px solid #002D72;border-radius:12px;max-width:470px;padding:22px;font-family:Arial,sans-serif">` +
+        `<div style="color:#ffffff;font-size:${titleSize}px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;text-shadow:0 2px 5px rgba(0,0,0,0.45);border-bottom:2px solid #ffffff;padding-bottom:8px;margin-bottom:16px">${titleHtml}</div>` +
+        `<div style="background:#ffffff;border-radius:8px;overflow:hidden">` +
+          row('Earliest Return Date (ERD)', results.erd) +
+          row('Latest Return Date (LRD)', results.lrd) +
+          row('Ramp Cut Time', results.rampCutTime) +
+          row('Rail', `<span style="color:#002D72;font-weight:800;font-size:16px;font-variant:small-caps">${rail}</span>`, rowStyleLast) +
+        `</div>` +
+        `<div style="text-align:right;margin-top:14px"><img src="${hlLogo}" width="150" alt="Hapag-Lloyd" style="display:inline-block;width:150px;height:auto" /></div>` +
+      `</div>`;
 
     // Plain-text fallback mirrors the box (for plain editors / Notepad).
     const text = [

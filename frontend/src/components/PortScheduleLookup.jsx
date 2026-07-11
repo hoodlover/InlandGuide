@@ -117,25 +117,26 @@ export default function PortScheduleLookup() {
     const titleHtml = `${results.city}&nbsp;&nbsp;&nbsp;&nbsp;${railTerminal}`;
     const titleSize = titlePlain.length > 34 ? 15 : (titlePlain.length > 26 ? 17 : 20);
 
-    const rowLabel = 'padding:9px 16px;border-bottom:1px solid #e2e8f0;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;color:#000000;text-align:left';
-    const rowVal = 'padding:9px 16px;border-bottom:1px solid #e2e8f0;font-family:Arial,sans-serif;font-size:15px;font-weight:bold;color:#000000;text-align:right';
-    const row = (label, value) => `<tr><td style="${rowLabel}">${label}</td><td style="${rowVal}">${value}</td></tr>`;
+    // Div-based (no <table>) so rich editors like Salesforce don't overlay dashed
+    // cell gridlines. The solid grey row separators are our own border-bottoms.
+    const rowStyle = 'padding:9px 16px;border-bottom:1px solid #e2e8f0;overflow:hidden';
+    const labelStyle = 'float:left;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;color:#000000';
+    const valStyle = 'float:right;font-family:Arial,sans-serif;font-size:15px;font-weight:bold;color:#000000';
+    const row = (label, value) => `<div style="${rowStyle}"><span style="${labelStyle}">${label}</span><span style="${valStyle}">${value}</span></div>`;
 
     const html =
-      `<table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:separate;background:#EB6608;border:5px solid #002D72;border-radius:12px;max-width:470px">` +
-        `<tr><td style="padding:22px">` +
-          `<div style="font-family:Arial,sans-serif;color:#ffffff;font-size:${titleSize}px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;text-shadow:0 2px 5px rgba(0,0,0,0.45);border-bottom:2px solid #ffffff;padding-bottom:8px;margin-bottom:16px">${titleHtml}</div>` +
-          `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:separate;background:#ffffff;border-radius:8px">` +
-            row('Vessel', results.vessel) +
-            row('Inland Cut-Off (LRD)', results.cutoff) +
-            (results.cutTime ? row('Cut-Off Time', results.cutTime) : '') +
-            row('Earliest Receiving (ERD)', results.erd) +
-            (results.comments ? row('Note', results.comments) : '') +
-          `</table>` +
-          `<div style="font-family:Arial,sans-serif;color:#ffffff;font-size:11px;margin-top:10px">${info.name} — as published ${info.runDate}</div>` +
-          `<div style="text-align:right;margin-top:8px"><img src="${hlLogo}" width="150" alt="Hapag-Lloyd" style="display:inline-block;width:150px;height:auto" /></div>` +
-        `</td></tr>` +
-      `</table>`;
+      `<div style="background:#EB6608;border:5px solid #002D72;border-radius:12px;max-width:470px;padding:22px;font-family:Arial,sans-serif">` +
+        `<div style="color:#ffffff;font-size:${titleSize}px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;text-shadow:0 2px 5px rgba(0,0,0,0.45);border-bottom:2px solid #ffffff;padding-bottom:8px;margin-bottom:16px">${titleHtml}</div>` +
+        `<div style="background:#ffffff;border-radius:8px;overflow:hidden">` +
+          row('Vessel', results.vessel) +
+          row('Inland Cut-Off (LRD)', results.cutoff) +
+          (results.cutTime ? row('Cut-Off Time', results.cutTime) : '') +
+          row('Earliest Receiving (ERD)', results.erd) +
+          (results.comments ? row('Note', results.comments) : '') +
+        `</div>` +
+        `<div style="color:#ffffff;font-size:11px;margin-top:10px">${info.name} — as published ${info.runDate}</div>` +
+        `<div style="text-align:right;margin-top:8px"><img src="${hlLogo}" width="150" alt="Hapag-Lloyd" style="display:inline-block;width:150px;height:auto" /></div>` +
+      `</div>`;
 
     const text = [
       titlePlain,
