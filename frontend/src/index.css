@@ -110,7 +110,45 @@ textarea {
 
 /* ---- Obie jokester exit: spin-up then rocket off + wheelie + billowing smoke ---- */
 /* Linear timing; the keyframe stops (barely moves) early, then accelerates away. */
-.obie-leaving { animation: obie-slide-out 2.2s linear forwards; pointer-events: none; }
+.obie-leaving { pointer-events: none; }
+
+/* Random exits (see EXIT_VARIANTS). */
+.obie-exit-wheelie { animation: obie-slide-out 2.2s linear forwards; }
+.obie-exit-rocket  { animation: obie-rocket 2.2s cubic-bezier(.4, 0, .9, .2) forwards; }
+.obie-exit-spin    { animation: obie-spinout 2s ease-in forwards; }
+.obie-exit-beam    { animation: obie-beam 1.5s ease-in forwards; }
+.obie-exit-tumble  { animation: obie-tumble 2s cubic-bezier(.3, 0, .7, 1) forwards; }
+
+/* 2) Rocket launch — crouch, then blast up and off the top. */
+@keyframes obie-rocket {
+  0%   { transform: translateY(0) scaleY(1); opacity: 1; }
+  18%  { transform: translateY(10px) scaleY(.86); }
+  30%  { transform: translateY(-6px) scaleY(1.06); }
+  100% { transform: translate(-40px, -135vh) scale(.7); opacity: 0; }
+}
+/* 3) Spin-out — dizzy whirl off to the left. */
+@keyframes obie-spinout {
+  0%   { transform: translateX(0) rotate(0) scale(1); opacity: 1; }
+  100% { transform: translateX(-150%) rotate(-900deg) scale(.4); opacity: 0; }
+}
+/* 4) Beam out — squish to a bright vertical line, then zip away. */
+@keyframes obie-beam {
+  0%   { transform: scaleX(1) scaleY(1); opacity: 1; filter: brightness(1); }
+  35%  { transform: scaleX(1.2) scaleY(.9); filter: brightness(1.7); }
+  65%  { transform: scaleX(.06) scaleY(1.15); opacity: 1; filter: brightness(2.6); }
+  100% { transform: scaleX(.06) scaleY(0); opacity: 0; filter: brightness(3.2); }
+}
+/* 5) Tumble — barrel-roll off the left edge. */
+@keyframes obie-tumble {
+  0%   { transform: translate(0, 0) rotate(0); opacity: 1; }
+  25%  { transform: translate(-25%, -22px) rotate(-95deg); }
+  40%  { transform: translate(-42%, 0) rotate(-180deg); }
+  60%  { transform: translate(-70%, -18px) rotate(-275deg); }
+  80%  { transform: translate(-105%, 0) rotate(-360deg); }
+  100% { transform: translate(-165%, 0) rotate(-450deg); opacity: 0; }
+}
+
+/* 1) Wheelie burnout — spin-up then rocket off left. */
 @keyframes obie-slide-out {
   0%   { transform: translateX(0); opacity: 1; }
   15%  { transform: translateX(-2%); }                 /* revving, tires spinning */

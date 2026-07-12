@@ -158,12 +158,15 @@ function splitJoke(joke) {
   return a ? { q, a } : { q: joke, a: '' };
 }
 
-const OBIE_EXIT_MS = 2200;       // slow, showy exit (spin-up then rocket off)
+const OBIE_EXIT_MS = 2400;       // long enough for the showiest exit to finish
+// Random send-offs. 'wheelie' and 'rocket' kick up smoke.
+const EXIT_VARIANTS = ['wheelie', 'rocket', 'spin', 'beam', 'tumble'];
 
 function ObieWalkOn() {
   const [visible, setVisible] = useState(false);
   const [flipped, setFlipped] = useState(false);
   const [leaving, setLeaving] = useState(false);
+  const [exit, setExit] = useState('wheelie');
   const [revealed, setRevealed] = useState(false);
   const [joke, setJoke] = useState(() => OB_JOKES[Math.floor(Math.random() * OB_JOKES.length)]);
 
@@ -178,7 +181,10 @@ function ObieWalkOn() {
       setVisible(true);
       push(() => setRevealed(true), 4000);               // punchline lands after 4s
       push(() => setFlipped(true), OBIE_SHOW_MS / 2);    // one flip at the midpoint
-      push(() => setLeaving(true), OBIE_SHOW_MS);        // exit: wheelie + smoke + slow slide off left
+      push(() => {
+        setExit(EXIT_VARIANTS[Math.floor(Math.random() * EXIT_VARIANTS.length)]);
+        setLeaving(true);                                // pick a random showy exit
+      }, OBIE_SHOW_MS);
       push(() => {
         setVisible(false);
         setLeaving(false);
@@ -192,7 +198,7 @@ function ObieWalkOn() {
   const { q, a } = splitJoke(joke);
 
   return (
-    <div className={`obie-walkon ${leaving ? 'obie-leaving' : visible ? 'obie-in' : 'obie-out'}`} aria-hidden={!visible}>
+    <div className={`obie-walkon ${leaving ? `obie-leaving obie-exit-${exit}` : visible ? 'obie-in' : 'obie-out'}`} aria-hidden={!visible}>
       <div className="relative max-w-[300px] bg-white border-2 border-[#002D72] rounded-2xl px-5 py-4 shadow-xl">
         <p className="text-[11px] uppercase tracking-widest text-[#EB6608] font-bold mb-1">OB says…</p>
         <p className="text-base font-semibold text-slate-800 leading-snug">{q}</p>
@@ -206,12 +212,12 @@ function ObieWalkOn() {
         )}
       </div>
       <div className="relative">
-        {leaving && (
+        {leaving && (exit === 'wheelie' || exit === 'rocket') && (
           <span className="obie-smoke" aria-hidden="true">
             <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
           </span>
         )}
-        <img src={obBot} alt="OB the Ops-Base Bot" className={`obie-jokebot ${leaving ? 'obie-jokebot-leaving' : flipped ? 'obie-jokebot-in' : 'obie-jokebot-out'} w-[10.5rem] h-auto drop-shadow-xl`} />
+        <img src={obBot} alt="OB the Ops-Base Bot" className={`obie-jokebot ${leaving && exit === 'wheelie' ? 'obie-jokebot-leaving' : flipped ? 'obie-jokebot-in' : 'obie-jokebot-out'} w-[10.5rem] h-auto drop-shadow-xl`} />
       </div>
     </div>
   );
