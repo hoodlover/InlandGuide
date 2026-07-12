@@ -481,7 +481,7 @@ function TopControls() {
           <img src={dark ? lightModeBadge : darkModeBadge} alt="" className="w-full h-full object-cover" />
         </button>
         <a
-          href="#site-preview"
+          href="#vintage-ERD-tool"
           className={circleBtn}
           aria-label="The old school ERD Tool"
           title="The old school ERD Tool"
@@ -518,7 +518,7 @@ export default function App() {
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
-  if (hash === '#site-preview') {
+  if (hash === '#vintage-ERD-tool') {
     return <HlMockup />;
   }
   if (isMobileDevice()) {
