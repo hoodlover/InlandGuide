@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Combobox from './Combobox';
-import { getPorts, getVessels, getCities, getVesselMeta, getCutoff, getERD, getPortInfo, getCutTime, formatDate, pulledAt } from '../lib/cpkc';
+import { getPorts, getVessels, getCities, getVesselMeta, getCutoff, getERD, getPortInfo, getCutTime, formatDate, pulledAt, refreshNeeded } from '../lib/cpkc';
 import { hlLogo } from '../assets/hlLogo';
 import { hlLogoOrange } from '../assets/hlLogoOrange';
 import { SalesforceIcon, OutlookIcon, TeamsIcon, TextIcon } from './BrandIcons';
@@ -253,6 +253,12 @@ export default function PortScheduleLookup({ onUpdateRamps }) {
             >
               🔄 Update Ramp Dates
             </button>
+            {refreshNeeded() && (
+              <span className="relative inline-flex h-2.5 w-2.5 ml-0.5" aria-hidden="true">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75 animate-ping"></span>
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.95)]"></span>
+              </span>
+            )}
             {pulledAt && (
               <span className="text-[11px] text-white/85 txt-shadow-soft ml-1">last pulled: <span className="font-semibold">{formatPulled(pulledAt)}</span></span>
             )}

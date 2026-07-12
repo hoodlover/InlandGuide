@@ -26,7 +26,21 @@ export function getPortInfo(slug) {
   const p = port(slug);
   if (!p) return null;
   const ref = p.generatedAt || generatedAt;
-  return { name: p.name, rail: p.rail || '', runDate: formatDate(p.runDate || '', ref), generatedAt: ref, notes: p.notes || [] };
+  return { name: p.name, rail: p.rail || '', runDate: formatDate(p.runDate || '', ref), generatedAt: ref, notes: p.notes || [], parseError: p.parseError || '' };
+}
+
+// True when leadership should try "Update Ramp Dates": a port failed its last
+// refresh (parseError), or the whole snapshot has gone stale (bot hasn't run in
+// over a week). Drives the subtle pulsing status light.
+const STALE_MS = 8 * 24 * 60 * 60 * 1000;
+export function refreshNeeded() {
+  const ports = schedules.ports || {};
+  if (Object.values(ports).some(p => p.parseError)) return true;
+  if (pulledAt) {
+    const age = Date.now() - new Date(pulledAt).getTime();
+    if (isFinite(age) && age > STALE_MS) return true;
+  }
+  return false;
 }
 
 // Published per-destination cut-off time (CN schedules), e.g. "2300 hrs". Empty if none.

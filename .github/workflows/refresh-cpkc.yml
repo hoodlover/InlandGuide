@@ -1,12 +1,16 @@
 name: Refresh CPKC port schedules
 
-# Downloads the CPKC port-schedule PDFs, parses them into
-# frontend/src/data/cpkc-schedules.json, and commits when the data changed.
-# A push to main triggers Vercel's existing auto-deploy.
+# Twice a week: download the CPKC/CN port-schedule PDFs, parse them into
+# frontend/src/data/cpkc-schedules.json, rebuild the single-file offline app,
+# and commit. A push to main triggers Vercel's auto-deploy.
+#
+# Resilience: a port that fails to parse keeps its last-good data and gets a
+# `parseError` flag — the app shows a subtle pulsing "needs a pull" light rather
+# than sending any alert. No notifications are sent from here.
 
 on:
-  # CPKC publishes ~twice a week. Run Tue & Fri mornings (13:00 UTC ≈ 08:00 ET)
-  # a bit after the typical publish time. Adjust the cron if the cadence shifts.
+  # CPKC publishes ~twice a week. Tue & Fri, 13:00 UTC (~08:00 ET), just after
+  # the typical publish time. Adjust the cron if the cadence shifts.
   schedule:
     - cron: '0 13 * * 2'
     - cron: '0 13 * * 5'
@@ -24,6 +28,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history so gen-version.mjs counts correctly
 
       - uses: actions/setup-node@v4
         with:
@@ -33,18 +39,29 @@ jobs:
         working-directory: scripts/refresh-cpkc
         run: npm ci
 
-      - name: Parse CPKC PDFs
+      # Exits non-zero only if EVERY port fails with no previous data to keep.
+      # Partial failures still write the file (good ports updated, failed ports
+      # kept + flagged) so the app can show the pulsing light.
+      - name: Parse CPKC/CN PDFs
         working-directory: scripts/refresh-cpkc
         run: node refresh.mjs
 
-      - name: Commit updated schedule (if changed)
+      - name: Rebuild single-file offline app
+        working-directory: frontend
+        run: |
+          npm install --legacy-peer-deps
+          node gen-version.mjs
+          npm run build
+          cp dist/index.html ../InlandCutoffGuide.html
+
+      - name: Commit refreshed schedules + rebuilt app
         run: |
           git config user.name "cpkc-refresh-bot"
           git config user.email "actions@github.com"
-          if git diff --quiet -- frontend/src/data/cpkc-schedules.json; then
-            echo "No schedule changes."
+          git add frontend/src/data/cpkc-schedules.json frontend/src/version.json InlandCutoffGuide.html
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
           else
-            git add frontend/src/data/cpkc-schedules.json
-            git commit -m "Refresh CPKC port schedules"
+            git commit -m "Auto-refresh schedules + rebuild offline app"
             git push
           fi

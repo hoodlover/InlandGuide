@@ -346,19 +346,46 @@ async function fetchPdf(port) {
 }
 
 async function main() {
+  // Load the previous snapshot so a port that fails today keeps its last-good data
+  // (partial-update resilience) — one broken PDF can't wipe or stall the others.
+  let prevPorts = {};
+  try { prevPorts = (JSON.parse(readFileSync(OUT_PATH, 'utf8')).ports) || {}; } catch { prevPorts = {}; }
+
   const out = { generatedAt: '', pulledAt: new Date().toISOString(), ports: {} };
+  const failures = [];
+
   for (const port of ports) {
-    const data = await fetchPdf(port);
-    const pages = await loadPages(data);
-    const parser = PARSERS[port.parser || 'cpkc'];
-    if (!parser) throw new Error(`[${port.slug}] unknown parser "${port.parser}"`);
-    const parsed = parser(pages, port);
-    out.ports[port.slug] = parsed;
-    if (parsed.generatedAt && parsed.generatedAt > out.generatedAt) out.generatedAt = parsed.generatedAt;
-    console.log(`[${port.slug}] OK — ${parsed.vessels.length} vessels, ${parsed.cities.length} cities, run ${parsed.runDate}`);
+    try {
+      const data = await fetchPdf(port);
+      const pages = await loadPages(data);
+      const parser = PARSERS[port.parser || 'cpkc'];
+      if (!parser) throw new Error(`unknown parser "${port.parser}"`);
+      const parsed = parser(pages, port);
+      out.ports[port.slug] = parsed;   // fresh — no parseError
+      console.log(`[${port.slug}] OK — ${parsed.vessels.length} vessels, ${parsed.cities.length} cities, run ${parsed.runDate}`);
+    } catch (err) {
+      const msg = (err && err.message) || String(err);
+      failures.push(`${port.slug}: ${msg}`);
+      console.error(`[${port.slug}] FAILED — ${msg}`);
+      if (prevPorts[port.slug]) {
+        // Keep the last-good data, flagged so the app can show the "needs a pull" light.
+        out.ports[port.slug] = { ...prevPorts[port.slug], parseError: msg, notUpdatedAt: out.pulledAt };
+        console.error(`[${port.slug}] keeping last-good data (published ${prevPorts[port.slug].runDate})`);
+      }
+    }
   }
+
+  for (const p of Object.values(out.ports)) {
+    if (p.generatedAt && p.generatedAt > out.generatedAt) out.generatedAt = p.generatedAt;
+  }
+
+  if (Object.keys(out.ports).length === 0) {
+    throw new Error('every port failed and there is no previous data to fall back on');
+  }
+
   writeFileSync(OUT_PATH, JSON.stringify(out, null, 2) + '\n');
   console.log(`Wrote ${OUT_PATH}`);
+  if (failures.length) console.error(`\n⚠ ${failures.length} port(s) failed:\n  ${failures.join('\n  ')}`);
 }
 
 main().catch(err => { console.error(err.message || err); process.exit(1); });
