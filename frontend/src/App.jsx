@@ -7,6 +7,7 @@ import heroTop from './assets/hero-top.webp';
 import themeSunset from './assets/theme-sunset.webp';
 import themeShip from './assets/theme-ship.webp';
 import themeHelp from './assets/theme-help.webp';
+import erdTool from './assets/erd-tool.webp';
 import './index.css';
 
 import versionData from './version.json'; // committed; regenerate with `node gen-version.mjs`
@@ -481,11 +482,11 @@ function TopControls() {
         </button>
         <a
           href="#site-preview"
-          className={`${circleBtn} flex items-center justify-center bg-gradient-to-br from-[#002D72] to-[#01245c] text-white`}
+          className={circleBtn}
           aria-label="Website mock-up preview"
           title="Website mock-up (management preview)"
         >
-          <span className="text-2xl leading-none" aria-hidden="true">🖥️</span>
+          <img src={erdTool} alt="ERD Tool" className="w-full h-full object-cover" />
         </a>
       </div>
       {helpOpen && <HelpModal onClose={() => setHelpOpen(false)} />}
