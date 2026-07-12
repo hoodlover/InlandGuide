@@ -310,7 +310,7 @@ function ModalShell({ title, onClose, children }) {
       aria-label={title}
     >
       <div
-        className="w-full max-w-md max-h-[85vh] overflow-y-auto bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 text-left"
+        className="w-full max-w-[38rem] max-h-[85vh] overflow-y-auto bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 text-left"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
