@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getPortGroups, getCities, getSSY, calculateERDLRD, cityLabel, getRailTerminal, getRail } from '../lib/cutoff';
+import { getPorts as schedPorts, getVessels as schedVessels, getCities as schedCities, getCutoff as schedCutoff, getERD as schedERD, getCutTime as schedCutTime, getPortInfo as schedInfo, formatDate as schedFormat, pulledAt } from '../lib/cpkc';
 import { hlLogo } from '../assets/hlLogo';
 
 // Non-functional site chrome to match hapag-lloyd.com for a management mockup.
@@ -43,11 +44,20 @@ const fmtShort = (iso) => {
   const [y, m, d] = iso.split('-');
   return `${Number(m)}/${Number(d)}/${y}`;
 };
+const fmtPulled = (iso) => {
+  const d = new Date(iso);
+  return isNaN(d) ? iso : d.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+};
 
 export default function HlMockup() {
-  const portGroups = getPortGroups();
-  const [pol, setPol] = useState('');
+  // US ports drive the calculator (compute ERD/LRD); Canada ports drive the
+  // published rail schedule (vessel + rail city -> printed cut-off).
+  const usPorts = (getPortGroups().find(g => g.label === 'United States') || { ports: [] }).ports;
+  const caPorts = schedPorts();
+
+  const [pol, setPol] = useState('');          // "calc:USNYC" or "sched:montreal"
   const [startCity, setStartCity] = useState('');
+  const [vessel, setVessel] = useState('');
   const [ssy, setSsy] = useState('');
   const [date, setDate] = useState('');
   const [office, setOffice] = useState('');
@@ -55,23 +65,53 @@ export default function HlMockup() {
   const [result, setResult] = useState(null);
   const [copied, setCopied] = useState(false);
 
-  const cities = pol ? getCities(pol) : [];
-  const ssyList = (pol && startCity) ? getSSY(pol, startCity) : [];
+  const mode = pol.startsWith('sched:') ? 'schedule' : pol.startsWith('calc:') ? 'calc' : '';
+  const code = pol.includes(':') ? pol.slice(pol.indexOf(':') + 1) : '';
+
+  const calcCities = mode === 'calc' ? getCities(code) : [];
+  const ssyList = (mode === 'calc' && startCity) ? getSSY(code, startCity) : [];
   const showSSY = ssyList.length > 1;
+  const vessels = mode === 'schedule' ? schedVessels(code) : [];
+  const railCities = mode === 'schedule' ? schedCities(code) : [];
+  const info = mode === 'schedule' ? schedInfo(code) : null;
 
   useEffect(() => {
-    const list = (pol && startCity) ? getSSY(pol, startCity) : [];
+    const list = (mode === 'calc' && startCity) ? getSSY(code, startCity) : [];
     setSsy(list.length === 1 ? list[0] : '');
   }, [pol, startCity]);
+
+  const changePort = (v) => { setPol(v); setStartCity(''); setVessel(''); setSsy(''); setDate(''); setError(''); };
 
   const submit = (e) => {
     e.preventDefault();
     setError('');
-    if (!pol || !startCity || !date) {
+
+    if (mode === 'schedule') {
+      if (!vessel || !startCity) { setError('Please choose a Vessel and a Rail City.'); return; }
+      const cutoff = schedCutoff(code, vessel, startCity);
+      if (!cutoff) { setError(`${vessel} has no published cut-off for ${startCity}.`); return; }
+      const cutTime = schedCutTime(code, startCity);
+      const text = [
+        `${startCity}  —  ${info.name}`,
+        `Vessel: ${vessel}`,
+        `Earliest Receiving (ERD): ${schedERD(code, vessel, startCity)}`,
+        `Inland Cut-Off (LRD): ${schedFormat(cutoff, info && info.generatedAt)}`,
+        cutTime ? `Cut-Off Time: ${cutTime}` : null,
+        '',
+        `Schedule published: ${info.runDate}`,
+        `Data pulled: ${fmtPulled(pulledAt)}`,
+      ].filter(v => v !== null).join('\n');
+      setResult({ text });
+      setCopied(false);
+      return;
+    }
+
+    // US calculator
+    if (!code || !startCity || !date) {
       setError('Please choose a Port of Loading, Start City, and Port Cut Date.');
       return;
     }
-    const res = calculateERDLRD(pol, startCity, ssy || ssyList[0] || 'ALL', date, 'N');
+    const res = calculateERDLRD(code, startCity, ssy || ssyList[0] || 'ALL', date, 'N');
     if (res.error) { setError(res.error); return; }
     const rail = getRail(res.rampMC, startCity);
     const railTerminal = getRailTerminal(res.rampMC, startCity);
@@ -82,7 +122,7 @@ export default function HlMockup() {
       `Ramp Cut Time: ${res.rampCutTime}`,
       `Rail: ${rail}`,
       '',
-      `Port of Loading: ${pol}`,
+      `Port of Loading: ${code}`,
       `Port Cut Date: ${fmtShort(date)}`,
     ].join('\n');
     setResult({ text });
@@ -155,38 +195,75 @@ export default function HlMockup() {
               {/* Tool inputs replace the Shipment No. line */}
               <div className="mb-6">
                 <label className="block text-sm font-bold text-slate-700 mb-1"><span className="text-red-600">*</span> Port of Loading</label>
-                <select className={field} value={pol} onChange={(e) => { setPol(e.target.value); setStartCity(''); }}>
+                <select className={field} value={pol} onChange={(e) => changePort(e.target.value)}>
                   <option value="">— Select a port —</option>
-                  {portGroups.map(g => (
-                    <optgroup key={g.label} label={g.label}>
-                      {g.ports.map(p => <option key={p} value={p}>{p}</option>)}
-                    </optgroup>
-                  ))}
+                  <optgroup label="United States">
+                    {usPorts.map(p => <option key={p} value={`calc:${p}`}>{p}</option>)}
+                  </optgroup>
+                  <optgroup label="Canada">
+                    {caPorts.map(p => <option key={p.slug} value={`sched:${p.slug}`}>{p.name}</option>)}
+                  </optgroup>
                 </select>
               </div>
 
-              <div className="mb-6">
-                <label className="block text-sm font-bold text-slate-700 mb-1"><span className="text-red-600">*</span> Start City (Rail Ramp)</label>
-                <select className={field} value={startCity} onChange={(e) => setStartCity(e.target.value)} disabled={!pol}>
-                  <option value="">{pol ? '— Select a city —' : 'Select a port first'}</option>
-                  {cities.map(c => <option key={c} value={c}>{cityLabel(c)}</option>)}
-                </select>
-              </div>
-
-              {showSSY && (
-                <div className="mb-6">
-                  <label className="block text-sm font-bold text-slate-700 mb-1"><span className="text-red-600">*</span> SSY (Service Code)</label>
-                  <select className={field} value={ssy} onChange={(e) => setSsy(e.target.value)}>
-                    <option value="">— Select SSY —</option>
-                    {ssyList.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
+              {/* Nothing chosen yet */}
+              {!mode && (
+                <div className="mb-8">
+                  <label className="block text-sm font-bold text-slate-700 mb-1"><span className="text-red-600">*</span> Start City / Vessel</label>
+                  <select className={field} disabled><option>Select a port first</option></select>
                 </div>
               )}
 
-              <div className="mb-8">
-                <label className="block text-sm font-bold text-slate-700 mb-1"><span className="text-red-600">*</span> Port Cut Date</label>
-                <input type="date" className={field} value={date} onChange={(e) => setDate(e.target.value)} />
-              </div>
+              {/* Canada: published rail schedule — vessel + rail city, no date */}
+              {mode === 'schedule' && (
+                <>
+                  {info && (
+                    <p className="text-xs text-slate-500 mb-5 -mt-2">
+                      Schedule published <b>{info.runDate}</b> &nbsp;·&nbsp; data pulled <b>{fmtPulled(pulledAt)}</b>
+                    </p>
+                  )}
+                  <div className="mb-6">
+                    <label className="block text-sm font-bold text-slate-700 mb-1"><span className="text-red-600">*</span> Vessel</label>
+                    <select className={field} value={vessel} onChange={(e) => { setVessel(e.target.value); setStartCity(''); }}>
+                      <option value="">— Select a vessel —</option>
+                      {vessels.map(v => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                  </div>
+                  <div className="mb-8">
+                    <label className="block text-sm font-bold text-slate-700 mb-1"><span className="text-red-600">*</span> Rail City</label>
+                    <select className={field} value={startCity} onChange={(e) => setStartCity(e.target.value)} disabled={!vessel}>
+                      <option value="">{vessel ? '— Select a city —' : 'Select a vessel first'}</option>
+                      {railCities.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                </>
+              )}
+
+              {/* USA: calculator — start city + SSY + port cut date */}
+              {mode === 'calc' && (
+                <>
+                  <div className="mb-6">
+                    <label className="block text-sm font-bold text-slate-700 mb-1"><span className="text-red-600">*</span> Start City (Rail Ramp)</label>
+                    <select className={field} value={startCity} onChange={(e) => setStartCity(e.target.value)}>
+                      <option value="">— Select a city —</option>
+                      {calcCities.map(c => <option key={c} value={c}>{cityLabel(c)}</option>)}
+                    </select>
+                  </div>
+                  {showSSY && (
+                    <div className="mb-6">
+                      <label className="block text-sm font-bold text-slate-700 mb-1"><span className="text-red-600">*</span> SSY (Service Code)</label>
+                      <select className={field} value={ssy} onChange={(e) => setSsy(e.target.value)}>
+                        <option value="">— Select SSY —</option>
+                        {ssyList.map(s => <option key={s} value={s}>{s}</option>)}
+                      </select>
+                    </div>
+                  )}
+                  <div className="mb-8">
+                    <label className="block text-sm font-bold text-slate-700 mb-1"><span className="text-red-600">*</span> Port Cut Date</label>
+                    <input type="date" className={field} value={date} onChange={(e) => setDate(e.target.value)} />
+                  </div>
+                </>
+              )}
 
               {/* Office radios — decorative, matches the real form */}
               <div className="mb-8">
