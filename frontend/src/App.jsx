@@ -4,10 +4,10 @@ import PortScheduleLookup from './components/PortScheduleLookup';
 import HlMockup from './components/HlMockup';
 import { bannerBottom, obBot } from './assets/banners';
 import heroTop from './assets/hero-top.webp';
-import themeSunset from './assets/theme-sunset.webp';
-import themeShip from './assets/theme-ship.webp';
+import darkModeBadge from './assets/dark-mode.webp';
+import lightModeBadge from './assets/light-mode.webp';
 import themeHelp from './assets/theme-help.webp';
-import erdTool from './assets/erd-tool.webp';
+import vintageErd from './assets/vintage-erd.webp';
 import './index.css';
 
 import versionData from './version.json'; // committed; regenerate with `node gen-version.mjs`
@@ -478,15 +478,15 @@ function TopControls() {
           aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
           title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
         >
-          <img src={dark ? themeShip : themeSunset} alt="" className="w-full h-full object-cover" />
+          <img src={dark ? lightModeBadge : darkModeBadge} alt="" className="w-full h-full object-cover" />
         </button>
         <a
           href="#site-preview"
           className={circleBtn}
-          aria-label="Website mock-up preview"
-          title="Website mock-up (management preview)"
+          aria-label="The old school ERD Tool"
+          title="The old school ERD Tool"
         >
-          <img src={erdTool} alt="ERD Tool" className="w-full h-full object-cover" />
+          <img src={vintageErd} alt="Vintage ERD Tool" className="w-full h-full object-cover" />
         </a>
       </div>
       {helpOpen && <HelpModal onClose={() => setHelpOpen(false)} />}

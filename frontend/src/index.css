@@ -123,9 +123,9 @@ textarea {
 @keyframes obie-rocket {
   0%   { transform: translate(0, 0) rotate(0deg) scaleY(1); opacity: 1; }
   20%  { transform: translate(0, 12px) rotate(0deg) scaleY(.84); }         /* crouch */
-  45%  { transform: translate(0, -4px) rotate(-90deg) scaleY(1.05); }      /* pivot nose-up */
-  55%  { transform: translate(0, -4px) rotate(-90deg) scaleY(1); }         /* aim */
-  100% { transform: translate(-10px, -135vh) rotate(-90deg) scale(.72); opacity: 0; }  /* liftoff */
+  45%  { transform: translate(0, -4px) rotate(90deg) scaleY(1.05); }      /* pivot nose-up */
+  55%  { transform: translate(0, -4px) rotate(90deg) scaleY(1); }         /* aim */
+  100% { transform: translate(-10px, -135vh) rotate(90deg) scale(.72); opacity: 0; }  /* liftoff */
 }
 /* 3) Spin-out — dizzy whirl off to the left. */
 @keyframes obie-spinout {
