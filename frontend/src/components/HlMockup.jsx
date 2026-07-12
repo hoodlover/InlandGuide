@@ -36,7 +36,7 @@ function MenuIcon({ name }) {
   };
   return <svg {...svg} aria-hidden="true">{paths[name] || paths.pin}</svg>;
 }
-const SUB_TABS = ['USA', 'Export', 'Import', 'Vendor', 'Local News'];
+const SUB_TABS = ['USA & Canada', 'Export', 'Import', 'Vendor', 'Local News'];
 
 const fmtShort = (iso) => {
   if (!iso) return '';
@@ -148,7 +148,7 @@ export default function HlMockup() {
               Disclaimer: ERD/LRD and cut off times provided via this application are valid at time of request and are subject to change without notice.
             </p>
             <p className="text-sm text-[#EB6608] mb-8">
-              This tool is intended for bookings with an export rail move within USA. For cross-border and other bookings no data will populate in the result.
+              This tool is intended for bookings with an export rail move within USA &amp; Canada. For other bookings no data will populate in the result.
             </p>
 
             <form onSubmit={submit} className="max-w-2xl">
