@@ -158,9 +158,12 @@ function splitJoke(joke) {
   return a ? { q, a } : { q: joke, a: '' };
 }
 
+const OBIE_EXIT_MS = 1800;       // slow, showy exit
+
 function ObieWalkOn() {
   const [visible, setVisible] = useState(false);
   const [flipped, setFlipped] = useState(false);
+  const [leaving, setLeaving] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const [joke, setJoke] = useState(() => OB_JOKES[Math.floor(Math.random() * OB_JOKES.length)]);
 
@@ -171,13 +174,16 @@ function ObieWalkOn() {
       setJoke(OB_JOKES[Math.floor(Math.random() * OB_JOKES.length)]);
       setRevealed(false);
       setFlipped(false);                                 // enters facing into the screen
+      setLeaving(false);
       setVisible(true);
       push(() => setRevealed(true), 4000);               // punchline lands after 4s
-      push(() => setFlipped(true), OBIE_SHOW_MS / 2);    // one flip at the midpoint — then he stays turned
+      push(() => setFlipped(true), OBIE_SHOW_MS / 2);    // one flip at the midpoint
+      push(() => setLeaving(true), OBIE_SHOW_MS);        // exit: wheelie + smoke + slow slide off left
       push(() => {
-        setVisible(false);                               // leaves facing the screen edge
+        setVisible(false);
+        setLeaving(false);
         push(enter, OBIE_HIDE_MS);
-      }, OBIE_SHOW_MS);
+      }, OBIE_SHOW_MS + OBIE_EXIT_MS);
     };
     push(enter, OBIE_FIRST_MS);
     return () => timers.forEach(clearTimeout);
@@ -186,7 +192,7 @@ function ObieWalkOn() {
   const { q, a } = splitJoke(joke);
 
   return (
-    <div className={`obie-walkon ${visible ? 'obie-in' : 'obie-out'}`} aria-hidden={!visible}>
+    <div className={`obie-walkon ${leaving ? 'obie-leaving' : visible ? 'obie-in' : 'obie-out'}`} aria-hidden={!visible}>
       <div className="relative max-w-[300px] bg-white border-2 border-[#002D72] rounded-2xl px-5 py-4 shadow-xl">
         <p className="text-[11px] uppercase tracking-widest text-[#EB6608] font-bold mb-1">OB says…</p>
         <p className="text-base font-semibold text-slate-800 leading-snug">{q}</p>
@@ -199,7 +205,14 @@ function ObieWalkOn() {
           </p>
         )}
       </div>
-      <img src={obBot} alt="OB the Ops-Base Bot" className={`obie-jokebot ${flipped ? 'obie-jokebot-in' : 'obie-jokebot-out'} w-[10.5rem] h-auto drop-shadow-xl`} />
+      <div className="relative">
+        {leaving && (
+          <span className="obie-smoke" aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i><i></i>
+          </span>
+        )}
+        <img src={obBot} alt="OB the Ops-Base Bot" className={`obie-jokebot ${leaving ? 'obie-jokebot-leaving' : flipped ? 'obie-jokebot-in' : 'obie-jokebot-out'} w-[10.5rem] h-auto drop-shadow-xl`} />
+      </div>
     </div>
   );
 }
