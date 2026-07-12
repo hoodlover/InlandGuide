@@ -346,7 +346,7 @@ async function fetchPdf(port) {
 }
 
 async function main() {
-  const out = { generatedAt: '', ports: {} };
+  const out = { generatedAt: '', pulledAt: new Date().toISOString(), ports: {} };
   for (const port of ports) {
     const data = await fetchPdf(port);
     const pages = await loadPages(data);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Combobox from './Combobox';
-import { getPorts, getVessels, getCities, getVesselMeta, getCutoff, getERD, getPortInfo, getCutTime, formatDate } from '../lib/cpkc';
+import { getPorts, getVessels, getCities, getVesselMeta, getCutoff, getERD, getPortInfo, getCutTime, formatDate, pulledAt } from '../lib/cpkc';
 import { hlLogo } from '../assets/hlLogo';
 import { hlLogoOrange } from '../assets/hlLogoOrange';
 import { SalesforceIcon, OutlookIcon, TeamsIcon, TextIcon } from './BrandIcons';
@@ -8,7 +8,14 @@ import ObieThinking from './ObieThinking';
 
 const EMPTY = { port: '', vessel: '', city: '' };
 
-export default function PortScheduleLookup() {
+// ISO timestamp -> "Jul 12, 2026, 3:04 PM"
+function formatPulled(iso) {
+  const d = new Date(iso);
+  if (isNaN(d)) return iso;
+  return d.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+}
+
+export default function PortScheduleLookup({ onUpdateRamps }) {
   const ports = getPorts();
   // Auto-select when there's only one port (today: Montreal).
   const [sel, setSel] = useState({ ...EMPTY, port: ports.length === 1 ? ports[0].slug : '' });
@@ -188,6 +195,9 @@ export default function PortScheduleLookup() {
     <div className="grid md:grid-cols-2 gap-6">
       <div className="bg-[#EB6608] rounded-lg border border-[#EB6608] shadow-sm p-6">
         <h2 className="text-xl font-extrabold tracking-wide uppercase mb-1 pb-2 border-b-2 border-white/60 text-white txt-shadow-heavy">Rail Cut-Off Schedule</h2>
+        {pulledAt && (
+          <p className="text-[11px] text-white/80 txt-shadow-soft">Ramp dates last pulled: <span className="font-semibold">{formatPulled(pulledAt)}</span></p>
+        )}
         {info && (
           <p className="text-xs text-white/90 mb-4 txt-shadow-soft">Schedule as published: <span className="font-semibold">{info.runDate}</span></p>
         )}
@@ -230,13 +240,21 @@ export default function PortScheduleLookup() {
             />
           </div>
 
-          <div className="mt-4">
+          <div className="mt-4 flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={handleReset}
               className="px-4 py-1 text-sm bg-white/10 border border-white/50 text-white rounded-full hover:bg-white/20 transition font-semibold shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
             >
               Reset
+            </button>
+            <button
+              type="button"
+              onClick={onUpdateRamps}
+              title="Requires a passphrase"
+              className="inline-flex items-center gap-1.5 px-4 py-1 text-sm bg-[#002D72] text-white rounded-full hover:bg-[#01245c] transition font-semibold shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
+            >
+              🔄 Update Ramp Dates
             </button>
           </div>
 

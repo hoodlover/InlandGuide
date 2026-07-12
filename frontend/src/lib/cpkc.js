@@ -11,6 +11,7 @@ const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 export const generatedAt = schedules.generatedAt || '';
+export const pulledAt = schedules.pulledAt || '';
 
 // [{ slug, name, rail }] for the port picker.
 export function getPorts() {

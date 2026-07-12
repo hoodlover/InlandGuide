@@ -592,7 +592,7 @@ export default function App() {
             </button>
           ))}
         </div>
-        {tab === 'calculator' ? <LookupForm /> : <PortScheduleLookup />}
+        {tab === 'calculator' ? <LookupForm /> : <PortScheduleLookup onUpdateRamps={() => setRefreshOpen(true)} />}
       </main>
 
       {installOpen && <InstallModal onClose={() => setInstallOpen(false)} />}
