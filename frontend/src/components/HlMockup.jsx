@@ -5,18 +5,37 @@ import { hlLogo } from '../assets/hlLogo';
 // Non-functional site chrome to match hapag-lloyd.com for a management mockup.
 const TOP_NAV = ['Home', 'Services & Information', 'Our Company', 'Online Business Suite'];
 const SIDE_MENU = [
-  ['📰', 'NEWS Portal'],
-  ['📍', 'Offices & Local Info', true],
-  ['🧭', 'Routes & Trades', true],
-  ['🔗', 'Gemini Cooperation'],
-  ['🏭', 'Cargo & Fleet', true],
-  ['🚂', 'Inland', true],
-  ['📱', 'Mobile App'],
-  ['📶', 'API, EDI & Portals', true],
-  ['🛡️', 'Security Information', true],
-  ['⚙️', 'Operational Updates'],
-  ['🤝', 'Procurement & Supplier', true],
+  ['news', 'NEWS Portal'],
+  ['pin', 'Offices & Local Info', true],
+  ['route', 'Routes & Trades', true],
+  ['links', 'Gemini Cooperation'],
+  ['cargo', 'Cargo & Fleet', true],
+  ['truck', 'Inland', true],
+  ['mobile', 'Mobile App'],
+  ['signal', 'API, EDI & Portals', true],
+  ['shield', 'Security Information', true],
+  ['globe', 'Operational Updates'],
+  ['people', 'Procurement & Supplier', true],
 ];
+
+// Clean line-style menu icons (inherit color via currentColor), matching hapag-lloyd.com.
+function MenuIcon({ name }) {
+  const svg = { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.6, strokeLinecap: 'round', strokeLinejoin: 'round' };
+  const paths = {
+    news: <><rect x="5" y="3" width="14" height="18" rx="1.5" /><path d="M8 8h8M8 12h8M8 16h5" /></>,
+    pin: <><path d="M12 21c4-5 6-8 6-11a6 6 0 1 0-12 0c0 3 2 6 6 11z" /><circle cx="12" cy="10" r="2.2" /></>,
+    route: <><circle cx="7" cy="6" r="2.2" /><circle cx="17" cy="18" r="2.2" /><path d="M7 8.2v3.8a4 4 0 0 0 4 4h3.8" /></>,
+    links: <><circle cx="9.5" cy="12" r="3.3" /><circle cx="14.5" cy="12" r="3.3" /></>,
+    cargo: <><path d="M4 15h16l-1.8 4H5.8L4 15z" /><path d="M6.5 15V9.5H12l3 3V15" /><path d="M9 9.5V6.5" /></>,
+    truck: <><rect x="3" y="7" width="10" height="8" rx="1" /><path d="M13 10h4l3 3v2h-7z" /><circle cx="7" cy="17" r="1.5" /><circle cx="17" cy="17" r="1.5" /></>,
+    mobile: <><rect x="8" y="3" width="8" height="18" rx="1.6" /><path d="M11 18h2" /></>,
+    signal: <><path d="M5 10a10 10 0 0 1 14 0" /><path d="M7.5 12.8a6 6 0 0 1 9 0" /><circle cx="12" cy="16.5" r="1" /></>,
+    shield: <path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6l7-3z" />,
+    globe: <><circle cx="12" cy="12" r="8" /><path d="M4 12h16" /><path d="M12 4c3 3.2 3 12.8 0 16M12 4c-3 3.2-3 12.8 0 16" /></>,
+    people: <><circle cx="9" cy="8" r="2.5" /><circle cx="16" cy="9" r="2.1" /><path d="M4.5 19c0-2.8 2.2-4.6 4.5-4.6s4.5 1.8 4.5 4.6" /><path d="M14.5 19c0-1.9 1-3.3 3-3.3" /></>,
+  };
+  return <svg {...svg} aria-hidden="true">{paths[name] || paths.pin}</svg>;
+}
 const SUB_TABS = ['USA', 'Export', 'Import', 'Vendor', 'Local News'];
 
 const fmtShort = (iso) => {
@@ -108,7 +127,7 @@ export default function HlMockup() {
         <aside className="w-60 bg-[#26313c] text-white/85 shrink-0 hidden md:block">
           {SIDE_MENU.map(([icon, label, caret], i) => (
             <div key={label} className={`flex items-center justify-between px-4 py-3 text-sm border-l-4 ${i === 1 ? 'border-[#EB6608] bg-white/5 text-white' : 'border-transparent'}`}>
-              <span className="flex items-center gap-3"><span className="opacity-90">{icon}</span>{label}</span>
+              <span className="flex items-center gap-3"><span className={i === 1 ? 'text-[#EB6608]' : 'text-white/70'}><MenuIcon name={icon} /></span>{label}</span>
               {caret && <span className="opacity-60 text-xs">▾</span>}
             </div>
           ))}
