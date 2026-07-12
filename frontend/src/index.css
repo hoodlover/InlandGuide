@@ -119,12 +119,13 @@ textarea {
 .obie-exit-beam    { animation: obie-beam 1.5s ease-in forwards; }
 .obie-exit-tumble  { animation: obie-tumble 2s cubic-bezier(.3, 0, .7, 1) forwards; }
 
-/* 2) Rocket launch — crouch, then blast up and off the top. */
+/* 2) Rocket launch — crouch, pivot 90° (nose up), then blast off the top. */
 @keyframes obie-rocket {
-  0%   { transform: translateY(0) scaleY(1); opacity: 1; }
-  18%  { transform: translateY(10px) scaleY(.86); }
-  30%  { transform: translateY(-6px) scaleY(1.06); }
-  100% { transform: translate(-40px, -135vh) scale(.7); opacity: 0; }
+  0%   { transform: translate(0, 0) rotate(0deg) scaleY(1); opacity: 1; }
+  20%  { transform: translate(0, 12px) rotate(0deg) scaleY(.84); }         /* crouch */
+  45%  { transform: translate(0, -4px) rotate(-90deg) scaleY(1.05); }      /* pivot nose-up */
+  55%  { transform: translate(0, -4px) rotate(-90deg) scaleY(1); }         /* aim */
+  100% { transform: translate(-10px, -135vh) rotate(-90deg) scale(.72); opacity: 0; }  /* liftoff */
 }
 /* 3) Spin-out — dizzy whirl off to the left. */
 @keyframes obie-spinout {

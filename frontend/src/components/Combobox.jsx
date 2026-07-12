@@ -58,7 +58,7 @@ export default function Combobox({ value, onSelect, options, placeholder, disabl
           else if (e.key === 'Enter' && open && filtered[activeIdx]) { e.preventDefault(); choose(filtered[activeIdx]); }
           else if (e.key === 'Escape') { setOpen(false); setQuery(selectedLabel); }
         }}
-        className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-slate-400 bg-white disabled:bg-slate-100"
+        className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-slate-400 bg-white disabled:bg-slate-400 disabled:border-slate-500 disabled:text-slate-600 disabled:placeholder-slate-600 disabled:cursor-not-allowed"
       />
       {open && !disabled && (
         <ul className="absolute z-30 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-slate-200 bg-white shadow-lg text-left">
