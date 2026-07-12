@@ -6,7 +6,7 @@ import { bannerBottom, obBot } from './assets/banners';
 import heroTop from './assets/hero-top.webp';
 import darkModeBadge from './assets/dark-mode.webp';
 import lightModeBadge from './assets/light-mode.webp';
-import themeHelp from './assets/theme-help.webp';
+import guideMe from './assets/guide-me.webp';
 import vintageErd from './assets/vintage-erd.webp';
 import './index.css';
 
@@ -470,7 +470,7 @@ function TopControls() {
           aria-label="Help"
           title="Help"
         >
-          <img src={themeHelp} alt="Help" className="w-full h-full object-cover" />
+          <img src={guideMe} alt="Guide Me" className="w-full h-full object-cover" />
         </button>
         <button
           className={circleBtn}
