@@ -379,6 +379,18 @@ function HelpModal({ onClose }) {
     'Click Calculate, then Copy to Clipboard to paste into your email.',
   ];
 
+  const [joker, setJoker] = useState(() => {
+    try { return localStorage.getItem('icg_joker') !== 'off'; } catch { return true; }
+  });
+  const toggleJoker = () => {
+    setJoker(prev => {
+      const next = !prev;
+      try { localStorage.setItem('icg_joker', next ? 'on' : 'off'); } catch { /* ignore */ }
+      window.dispatchEvent(new Event('icg-joker'));
+      return next;
+    });
+  };
+
   return (
     <ModalShell title="How to use it" onClose={onClose}>
       <ol className="list-decimal list-inside space-y-2 text-slate-700 dark:text-slate-200 text-sm">
@@ -387,6 +399,14 @@ function HelpModal({ onClose }) {
       <p className="mt-4 text-xs text-slate-400 dark:text-slate-500">
         Tip: the copied result drops straight into a reply — dates and all.
       </p>
+      <div className="mt-4">
+        <button
+          onClick={toggleJoker}
+          className="inline-flex items-center gap-2 px-4 py-1.5 text-sm font-bold rounded-full bg-[#EB6608] text-white hover:bg-[#cf5a07] transition shadow-[0_6px_14px_rgba(0,0,0,0.35)]"
+        >
+          🤖 Joker Obie: {joker ? 'On' : 'Off'}
+        </button>
+      </div>
       <hr className="my-5 border-slate-200 dark:border-slate-600" />
       <h3 className="text-base font-extrabold text-[#002D72] dark:text-white smallcaps mb-2">Install as an app</h3>
       <PwaInstallInfo />
@@ -530,6 +550,16 @@ export default function App() {
     if (c.n >= 5) { c.n = 0; setRefreshOpen(true); }
   };
 
+  // Joker Obie on/off (toggled in the Help modal, persisted in localStorage).
+  const [jokerOn, setJokerOn] = useState(() => {
+    try { return localStorage.getItem('icg_joker') !== 'off'; } catch { return true; }
+  });
+  useEffect(() => {
+    const sync = () => { try { setJokerOn(localStorage.getItem('icg_joker') !== 'off'); } catch { /* ignore */ } };
+    window.addEventListener('icg-joker', sync);
+    return () => window.removeEventListener('icg-joker', sync);
+  }, []);
+
   // Simple hash route to the Hapag-Lloyd website mock-up.
   const [hash, setHash] = useState(() => (typeof window !== 'undefined' ? window.location.hash : ''));
   useEffect(() => {
@@ -599,7 +629,7 @@ export default function App() {
       {refreshOpen && <RefreshModal onClose={() => setRefreshOpen(false)} />}
 
       <WebappReminder />
-      <ObieWalkOn />
+      {jokerOn && <ObieWalkOn />}
 
       <div className="w-full max-w-[70rem] mx-auto px-4 mt-8 text-right">
         <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">v {APP_VERSION}</span>
