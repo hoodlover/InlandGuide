@@ -269,7 +269,8 @@ export default function PortScheduleLookup() {
               {results.comments && <Row label="Note" value={results.comments} />}
             </div>
 
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-2.5">
+            <p className="mt-4 text-center text-xs text-white/70">Click where you're pasting — copies ready for Ctrl+V.</p>
+            <div className="mt-2 flex flex-wrap items-center justify-center gap-2.5">
               <button
                 onClick={handleCopySalesforce}
                 className="inline-flex items-center gap-2 px-4 py-1.5 text-sm bg-white text-slate-800 rounded-full hover:bg-slate-100 transition font-semibold shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
