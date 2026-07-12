@@ -195,9 +195,6 @@ export default function PortScheduleLookup({ onUpdateRamps }) {
     <div className="grid md:grid-cols-2 gap-6">
       <div className="bg-[#EB6608] rounded-lg border border-[#EB6608] shadow-sm p-6">
         <h2 className="text-xl font-extrabold tracking-wide uppercase mb-1 pb-2 border-b-2 border-white/60 text-white txt-shadow-heavy">Rail Cut-Off Schedule</h2>
-        {pulledAt && (
-          <p className="text-[11px] text-white/80 txt-shadow-soft">Ramp dates last pulled: <span className="font-semibold">{formatPulled(pulledAt)}</span></p>
-        )}
         {info && (
           <p className="text-xs text-white/90 mb-4 txt-shadow-soft">Schedule as published: <span className="font-semibold">{info.runDate}</span></p>
         )}
@@ -256,6 +253,9 @@ export default function PortScheduleLookup({ onUpdateRamps }) {
             >
               🔄 Update Ramp Dates
             </button>
+            {pulledAt && (
+              <span className="text-[11px] text-white/85 txt-shadow-soft ml-1">last pulled: <span className="font-semibold">{formatPulled(pulledAt)}</span></span>
+            )}
           </div>
 
           {info?.notes?.length > 0 && (
