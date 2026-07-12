@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import LookupForm from './components/LookupForm';
 import PortScheduleLookup from './components/PortScheduleLookup';
+import HlMockup from './components/HlMockup';
 import { bannerBottom, obBot } from './assets/banners';
 import heroTop from './assets/hero-top.webp';
 import themeSunset from './assets/theme-sunset.webp';
@@ -478,6 +479,14 @@ function TopControls() {
         >
           <img src={dark ? themeShip : themeSunset} alt="" className="w-full h-full object-cover" />
         </button>
+        <a
+          href="#site-preview"
+          className={`${circleBtn} flex items-center justify-center bg-gradient-to-br from-[#002D72] to-[#01245c] text-white`}
+          aria-label="Website mock-up preview"
+          title="Website mock-up (management preview)"
+        >
+          <span className="text-2xl leading-none" aria-hidden="true">🖥️</span>
+        </a>
       </div>
       {helpOpen && <HelpModal onClose={() => setHelpOpen(false)} />}
     </>
@@ -500,6 +509,17 @@ export default function App() {
     if (c.n >= 5) { c.n = 0; setRefreshOpen(true); }
   };
 
+  // Simple hash route to the Hapag-Lloyd website mock-up.
+  const [hash, setHash] = useState(() => (typeof window !== 'undefined' ? window.location.hash : ''));
+  useEffect(() => {
+    const onHash = () => setHash(window.location.hash);
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
+  if (hash === '#site-preview') {
+    return <HlMockup />;
+  }
   if (isMobileDevice()) {
     return <MobileBlock />;
   }
