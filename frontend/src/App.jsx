@@ -158,7 +158,7 @@ function splitJoke(joke) {
   return a ? { q, a } : { q: joke, a: '' };
 }
 
-const OBIE_EXIT_MS = 1800;       // slow, showy exit
+const OBIE_EXIT_MS = 2200;       // slow, showy exit (spin-up then rocket off)
 
 function ObieWalkOn() {
   const [visible, setVisible] = useState(false);
@@ -208,7 +208,7 @@ function ObieWalkOn() {
       <div className="relative">
         {leaving && (
           <span className="obie-smoke" aria-hidden="true">
-            <i></i><i></i><i></i><i></i><i></i><i></i>
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
           </span>
         )}
         <img src={obBot} alt="OB the Ops-Base Bot" className={`obie-jokebot ${leaving ? 'obie-jokebot-leaving' : flipped ? 'obie-jokebot-in' : 'obie-jokebot-out'} w-[10.5rem] h-auto drop-shadow-xl`} />
