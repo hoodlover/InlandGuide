@@ -164,19 +164,39 @@ const OBIE_EXIT_MS = 2400;       // long enough for the showiest exit to finish
 // Random send-offs. 'wheelie' and 'rocket' kick up smoke.
 const EXIT_VARIANTS = ['wheelie', 'rocket', 'spin', 'beam', 'tumble'];
 
+// Shuffle-bag: draw jokes at random but never repeat one until every joke has
+// been used, then reshuffle. (Persists for the page session.)
+let jokeBag = [];
+let lastJoke = null;
+function nextJoke() {
+  if (jokeBag.length === 0) {
+    jokeBag = [...OB_JOKES];
+    for (let i = jokeBag.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [jokeBag[i], jokeBag[j]] = [jokeBag[j], jokeBag[i]];
+    }
+    // Don't let the last of one bag equal the first of the next.
+    if (jokeBag.length > 1 && jokeBag[jokeBag.length - 1] === lastJoke) {
+      [jokeBag[jokeBag.length - 1], jokeBag[0]] = [jokeBag[0], jokeBag[jokeBag.length - 1]];
+    }
+  }
+  lastJoke = jokeBag.pop();
+  return lastJoke;
+}
+
 function ObieWalkOn() {
   const [visible, setVisible] = useState(false);
   const [flipped, setFlipped] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [exit, setExit] = useState('wheelie');
   const [revealed, setRevealed] = useState(false);
-  const [joke, setJoke] = useState(() => OB_JOKES[Math.floor(Math.random() * OB_JOKES.length)]);
+  const [joke, setJoke] = useState(() => nextJoke());
 
   useEffect(() => {
     let timers = [];
     const push = (fn, ms) => timers.push(setTimeout(fn, ms));
     const enter = () => {
-      setJoke(OB_JOKES[Math.floor(Math.random() * OB_JOKES.length)]);
+      setJoke(nextJoke());
       setRevealed(false);
       setFlipped(false);                                 // enters facing into the screen
       setLeaving(false);
