@@ -58,6 +58,8 @@ export default function HlMockup() {
   // published rail schedule (vessel + rail city -> printed cut-off).
   const usPorts = (getPortGroups().find(g => g.label === 'United States') || { ports: [] }).ports;
   const caPorts = schedPorts();
+  // Canada ports show only their locode in the picker (schedule slug -> locode).
+  const CA_LOCODE = { montreal: 'CAMTR', 'metro-vancouver': 'CAVAN', 'saint-john': 'CASJB', 'prince-rupert': 'CAPRR' };
 
   const [pol, setPol] = useState('');          // "calc:USNYC" or "sched:montreal"
   const [startCity, setStartCity] = useState('');
@@ -204,7 +206,7 @@ export default function HlMockup() {
                   <option value="">— Select a port —</option>
                   {usPorts.map(p => <option key={p} value={`calc:${p}`}>{p}</option>)}
                   <optgroup label="Canada Ports">
-                    {caPorts.map(p => <option key={p.slug} value={`sched:${p.slug}`}>{p.name}</option>)}
+                    {caPorts.map(p => <option key={p.slug} value={`sched:${p.slug}`}>{CA_LOCODE[p.slug] || p.name}</option>)}
                   </optgroup>
                 </select>
               </div>
