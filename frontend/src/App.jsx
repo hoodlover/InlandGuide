@@ -622,7 +622,7 @@ export default function App() {
         </header>
       </div>
 
-      <main className={`max-w-5xl mx-auto w-full flex-1 ${compact ? 'px-4 py-3' : 'px-5 py-6'}`}>
+      <main className={`max-w-5xl mx-auto w-full ${compact ? 'px-4 py-3' : 'flex-1 px-5 py-6'}`}>
         <div className={`flex items-center gap-2 ${compact ? 'mb-3' : 'mb-5'}`}>
           {[
             { id: 'calculator', label: 'US Rail Ramp Cuts' },
@@ -650,15 +650,15 @@ export default function App() {
           </button>
         </div>
         {tab === 'calculator'
-          ? <LookupForm onCanadaPort={goCanada} />
-          : <PortScheduleLookup onUpdateRamps={() => setRefreshOpen(true)} initialPort={canadaPort} />}
+          ? <LookupForm onCanadaPort={goCanada} compact={compact} />
+          : <PortScheduleLookup onUpdateRamps={() => setRefreshOpen(true)} initialPort={canadaPort} compact={compact} />}
       </main>
 
       {installOpen && <InstallModal onClose={() => setInstallOpen(false)} />}
       {refreshOpen && <RefreshModal onClose={() => setRefreshOpen(false)} />}
 
       <WebappReminder />
-      {jokerOn && <ObieWalkOn />}
+      {jokerOn && !compact && <ObieWalkOn />}
 
       <div className={`w-full max-w-[70rem] mx-auto px-4 text-right ${compact ? 'mt-3' : 'mt-8'}`}>
         <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">v {APP_VERSION}</span>

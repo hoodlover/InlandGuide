@@ -15,7 +15,7 @@ function formatPulled(iso) {
   return d.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
 }
 
-export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
+export default function PortScheduleLookup({ onUpdateRamps, initialPort, compact }) {
   const ports = getPorts();
   // Preselect the port handed off from the US tab; else auto-select when there's
   // only one port.
@@ -328,9 +328,9 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
             <p className="text-white/80 text-sm mt-1">{sel.vessel} has no listed cut-off for {sel.city} on this schedule — try another rail city.</p>
           </div>
         ) : (
-          <div className="rounded-lg p-6 h-full flex flex-col items-center justify-center min-h-[32rem]">
-            <ObieThinking />
-            <p className="text-slate-500 dark:text-slate-300 text-sm mt-6 text-center">Pick a vessel and rail city to see the cut-off</p>
+          <div className={`rounded-lg p-6 h-full flex flex-col items-center justify-center ${compact ? 'min-h-0 py-4' : 'min-h-[32rem]'}`}>
+            {!compact && <ObieThinking />}
+            <p className={`text-slate-500 dark:text-slate-300 text-sm text-center ${compact ? '' : 'mt-6'}`}>Pick a vessel and rail city to see the cut-off</p>
           </div>
         )}
       </div>
