@@ -48,6 +48,10 @@ const fmtPulled = (iso) => {
   const d = new Date(iso);
   return isNaN(d) ? iso : d.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
 };
+const todayISO = () => {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+};
 
 export default function HlMockup() {
   // US ports drive the calculator (compute ERD/LRD); Canada ports drive the
@@ -60,7 +64,7 @@ export default function HlMockup() {
   const [vessel, setVessel] = useState('');
   const [ssy, setSsy] = useState('');
   const [extraDays, setExtraDays] = useState('5');
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState(() => todayISO());
   const [office, setOffice] = useState('atl');
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
@@ -81,7 +85,7 @@ export default function HlMockup() {
     setSsy(list.length === 1 ? list[0] : '');
   }, [pol, startCity]);
 
-  const changePort = (v) => { setPol(v); setStartCity(''); setVessel(''); setSsy(''); setDate(''); setError(''); };
+  const changePort = (v) => { setPol(v); setStartCity(''); setVessel(''); setSsy(''); setDate(todayISO()); setError(''); };
 
   const submit = (e) => {
     e.preventDefault();

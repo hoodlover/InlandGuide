@@ -41,11 +41,18 @@ function formatShortDate(iso) {
 
 const EMPTY_FORM = { pol: '', startCity: '', ssy: '', portCutDate: '', reefer: 'N', extraDays: '5' };
 
-export default function LookupForm() {
-  const [formData, setFormData] = useState({ ...EMPTY_FORM });
+// Today, as { iso: 'YYYY-MM-DD', mdy: 'M/D/YYYY' } — used to prefill Port Cut Date.
+function today() {
+  const d = new Date();
+  const iso = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  return { iso, mdy: `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}` };
+}
 
-  // Raw text the user types for the date; starts empty on load.
-  const [dateInput, setDateInput] = useState('');
+export default function LookupForm() {
+  const [formData, setFormData] = useState(() => ({ ...EMPTY_FORM, portCutDate: today().iso }));
+
+  // Date box prefilled to today so users can just tweak the day.
+  const [dateInput, setDateInput] = useState(() => today().mdy);
   const resolvedDate = parseFlexibleDate(dateInput);
 
   const [results, setResults] = useState(null);
@@ -102,8 +109,8 @@ export default function LookupForm() {
   };
 
   const handleReset = () => {
-    setFormData({ ...EMPTY_FORM });
-    setDateInput('');
+    setFormData({ ...EMPTY_FORM, portCutDate: today().iso });
+    setDateInput(today().mdy);
     setResults(null);
     setError('');
     setCopyMessage('');
