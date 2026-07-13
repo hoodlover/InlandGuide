@@ -4,6 +4,7 @@ import rawLanes from '../data/lanes.json';
 import holidays from '../data/holidays.json';
 import terminals from '../data/terminals.json';
 import portTerminals from '../data/portmc.json';
+import terminalInfo from '../data/terminal-info.json';
 
 // Drop the spreadsheet header row and any blank rows.
 const lanes = rawLanes.filter(
@@ -170,70 +171,84 @@ export function getRail(rampMC, city) {
 }
 
 // Loading-terminal (POL matchcode) differentiator, from the workbook's PORTMC
-// sheet (generated into portmc.json). For ports with 2+ terminals we let the
-// user pick the *terminal* instead of the raw SSY service code. Two modes:
-//   'functional' — the port has two published transit sets; the terminal picks
-//                  which lane (different ERD/LRD). e.g. JAX (SSA vs TraPac),
-//                  NYC (Maher vs APM).
-//   'info'       — one transit set (lanes are "ALL"); the terminal is recorded
-//                  and shown but doesn't change the dates. e.g. HOU, MXLZC.
-// Ports whose lanes don't map cleanly to terminals (e.g. LGB) are omitted from
-// portmc.json and keep the SSY picker.
+// sheet (generated into portmc.json) plus repo-side overrides in terminal-info.json.
+// Ports with 2+ terminals in 'terminal' mode show a terminal picker; 'ssy' ports
+// (LGB, plus LAX unless overridden) keep the SSY dropdown. Whether the terminal
+// also changes the dates is automatic from the lanes.
 
-// Friendly names for terminal matchcodes; unknown codes fall back to the code.
-// Shown as "Name (CODE)" so reps see both.
-const TERMINAL_NAMES = {
-  'SSAATL 001': 'SSA',
-  'TRAPAC 009': 'TraPac',
-  'MAHER 008': 'Maher Terminal',
-  'MAERSK 174': 'APM Terminal',
-  'BARBOU 003': 'Barbours Cut',
-  'BAYPOR 007': 'Bayport',
-  'APM 080': 'APM Terminals, LZC',
-  'LCTERM 002': 'LC Terminal T2, LZC',
-};
+// Merge portmc.json with terminal-info.json overrides (mode + added terminals).
+function portInfo(pol) {
+  const base = portTerminals[pol];
+  const extra = (terminalInfo.addTerminals || {})[pol] || [];
+  if (!base && !extra.length) return null;
+  const terminals = [
+    ...(base ? base.terminals : []),
+    ...extra.map(t => ({ code: t.code, ssys: t.ssys || [] })),
+  ];
+  const mode = (terminalInfo.modes || {})[pol] || (base ? base.mode : 'ssy');
+  return { mode, terminals };
+}
+
+// Friendly names for terminal matchcodes come from terminal-info.json (names +
+// any added terminals); unknown codes fall back to the raw matchcode. Shown as
+// "Name (CODE)" so reps see both.
+const TERMINAL_NAMES = { ...(terminalInfo.names || {}) };
+for (const list of Object.values(terminalInfo.addTerminals || {})) {
+  for (const t of list) if (t.name) TERMINAL_NAMES[t.code] = t.name;
+}
 export function terminalLabel(code) {
   const name = TERMINAL_NAMES[code];
   return name ? `${name} (${code})` : code;
 }
 
-// Terminal options for a POL — only for 'functional' ports (JAX, NYC), where the
-// terminal actually selects the transit lane. Everything else ('ssy' ports) uses
-// the SSY picker below. Returns { mode, terminals: [{ code, label, ssys }] } or null.
+// A caveat note to show in the result for this POL, or '' (from terminal-info.json).
+export function getPortNote(pol) {
+  return (terminalInfo.notes || {})[pol] || '';
+}
+
+// Terminal options for a POL in 'terminal' mode (else null) — drives the picker.
 export function getTerminals(pol) {
-  const d = portTerminals[pol];
-  if (!d || d.mode !== 'functional') return null;
+  const d = portInfo(pol);
+  if (!d || d.mode !== 'terminal') return null;
   return { mode: d.mode, terminals: d.terminals.map(t => ({ code: t.code, label: terminalLabel(t.code), ssys: t.ssys })) };
 }
 
-// Union of a port's PORTMC service codes — used to offer an SSY dropdown for
-// ports whose lanes are only "ALL" (HOU, MXLZC, ORF, SEA, TIW, and the ALL-only
-// cities of LAX/LGB), so reps can still record the sailing's SSY.
+// Combobox options for the terminal picker: name label + a muted SSY sub-line
+// (also matched by the type-to-filter, so typing an SSY finds its terminal).
+export function getTerminalOptions(pol) {
+  const d = getTerminals(pol);
+  return d ? d.terminals.map(t => ({ value: t.code, label: t.label, sub: t.ssys.join(' · ') })) : [];
+}
+
+// Union of a port's service codes — used to offer an SSY dropdown for ssy-mode
+// ports/cities whose lanes are only "ALL", so reps can still record the SSY.
 function portServiceCodes(pol) {
-  const d = portTerminals[pol];
+  const d = portInfo(pol);
   return d ? [...new Set(d.terminals.flatMap(t => t.ssys))] : [];
 }
 
 // The terminal label a given service code loads through (for the result line), or ''.
 export function terminalForSSY(pol, ssy) {
-  const d = portTerminals[pol];
+  const d = portInfo(pol);
   if (!d || !ssy) return '';
   const t = d.terminals.find(x => x.ssys.includes(ssy));
   return t ? terminalLabel(t.code) : '';
 }
 
-// The SSY to feed calculateERDLRD for a chosen terminal + city. For a
-// 'functional' port it returns a service code from the lane that terminal
-// serves (so the right transit set is matched); for an 'info' port (lanes are
-// "ALL") no lane intersects, so it returns "ALL" and the dates are unchanged.
+// The SSY to feed calculateERDLRD for a chosen terminal + city. Returns a service
+// code from the lane that terminal serves (so a port with two transit sets matches
+// the right lane). When the terminal's codes don't intersect the city's lanes (an
+// all-"ALL" city, or an added terminal like Fenix with no codes) it falls back to
+// the city's first lane SSY — safe because such ports don't vary transit by SSY.
 export function ssyForTerminal(pol, city, terminalCode) {
-  const d = portTerminals[pol];
+  const d = portInfo(pol);
   const t = d && d.terminals.find(x => x.code === terminalCode);
-  if (!t) return 'ALL';
-  const wanted = new Set(t.ssys);
-  const lane = lanes.find(l => l.pol === pol && l.name === city &&
+  const wanted = new Set(t ? t.ssys : []);
+  const match = lanes.find(l => l.pol === pol && l.name === city &&
     String(l.ssy).split(',').some(s => wanted.has(s.trim())));
-  return lane ? String(lane.ssy).split(',')[0].trim() : 'ALL';
+  if (match) return String(match.ssy).split(',')[0].trim();
+  const any = lanes.find(l => l.pol === pol && l.name === city);
+  return any ? String(any.ssy).split(',')[0].trim() : 'ALL';
 }
 
 export function getSSY(pol, city) {

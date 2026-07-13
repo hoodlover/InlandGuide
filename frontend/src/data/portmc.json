@@ -1,6 +1,6 @@
 {
   "CAMTR": {
-    "mode": "ssy",
+    "mode": "terminal",
     "terminals": [
       {
         "code": "RACINE 004",
@@ -24,7 +24,7 @@
     ]
   },
   "CAVAN": {
-    "mode": "ssy",
+    "mode": "terminal",
     "terminals": [
       {
         "code": "FRASER 037",
@@ -46,7 +46,7 @@
     ]
   },
   "MXLZC": {
-    "mode": "ssy",
+    "mode": "terminal",
     "terminals": [
       {
         "code": "APM 080",
@@ -66,7 +66,7 @@
     ]
   },
   "USHOU": {
-    "mode": "ssy",
+    "mode": "terminal",
     "terminals": [
       {
         "code": "BARBOU 003",
@@ -88,7 +88,7 @@
     ]
   },
   "USJAX": {
-    "mode": "functional",
+    "mode": "terminal",
     "terminals": [
       {
         "code": "SSAATL 001",
@@ -145,7 +145,7 @@
     ]
   },
   "USNYC": {
-    "mode": "functional",
+    "mode": "terminal",
     "terminals": [
       {
         "code": "MAHER 008",
@@ -173,7 +173,7 @@
     ]
   },
   "USORF": {
-    "mode": "ssy",
+    "mode": "terminal",
     "terminals": [
       {
         "code": "NORFOL 008",
@@ -203,7 +203,7 @@
     ]
   },
   "USSEA": {
-    "mode": "ssy",
+    "mode": "terminal",
     "terminals": [
       {
         "code": "HUSKYT 002 or WASHIN 125",
@@ -234,7 +234,7 @@
     ]
   },
   "USTIW": {
-    "mode": "ssy",
+    "mode": "terminal",
     "terminals": [
       {
         "code": "WASHIN 125",

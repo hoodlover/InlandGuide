@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getPortGroups, getCities, getSSY, calculateERDLRD, cityLabel, getRailTerminal, getRail, cityNeedsExtraDays, defaultExtraDays, getTerminals, ssyForTerminal, terminalLabel, terminalForSSY } from '../lib/cutoff';
+import { getPortGroups, getCities, getSSY, calculateERDLRD, cityLabel, getRailTerminal, getRail, cityNeedsExtraDays, defaultExtraDays, getTerminals, getTerminalOptions, ssyForTerminal, terminalLabel, terminalForSSY, getPortNote } from '../lib/cutoff';
 import { hlLogo } from '../assets/hlLogo';
 import { hlLogoOrange } from '../assets/hlLogoOrange';
 import Combobox from './Combobox';
@@ -394,18 +394,13 @@ export default function LookupForm({ onCanadaPort }) {
           {terminals && (
             <div>
               <label className="block text-xs font-semibold text-white mb-1 txt-shadow-soft">Terminal (POL) *</label>
-              <select
-                name="terminal"
+              <Combobox
                 value={formData.terminal}
-                onChange={handleChange}
+                onSelect={(value) => handleChange({ target: { name: 'terminal', value } })}
+                options={getTerminalOptions(formData.pol)}
+                placeholder="Type your SSY or the terminal…"
                 required
-                className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-slate-400 bg-white"
-              >
-                <option value="">-- Select Terminal --</option>
-                {terminals.terminals.map(t => (
-                  <option key={t.code} value={t.code}>{t.label}</option>
-                ))}
-              </select>
+              />
             </div>
           )}
 
@@ -517,6 +512,10 @@ export default function LookupForm({ onCanadaPort }) {
               <RailCard railroad={getRail(results.rampMC, formData.startCity)} rampMC={results.rampMC} />
               {selTerminalLabel && <ResultCard label="POL Terminal" value={selTerminalLabel} />}
             </div>
+
+            {getPortNote(formData.pol) && (
+              <p className="mt-3 text-xs italic text-amber-200/90 leading-snug">⚠ {getPortNote(formData.pol)}</p>
+            )}
 
             <p className="mt-4 text-center text-xs text-white/70">Click where you're pasting — copies ready for Ctrl+V.</p>
             <div className="mt-2 flex flex-wrap items-center justify-center gap-2.5">

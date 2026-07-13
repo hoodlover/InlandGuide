@@ -1,0 +1,26 @@
+{
+  "_comment": "Repo-side overrides for the terminal picker, maintained by hand (no master-DB edit needed). 'names' map a PORTMC terminal matchcode to a friendly label. 'modes' force a port's picker mode (terminal|ssy) over the auto value in portmc.json. 'addTerminals' append terminals not in the master PORTMC. 'notes' show a caveat line in the result for that POL.",
+  "names": {
+    "MAHER 008": "Maher Terminal",
+    "MAERSK 174": "APM Terminal",
+    "SSAATL 001": "SSA",
+    "TRAPAC 009": "TraPac",
+    "APMTER 009": "APMT",
+    "YUSENT 002": "Yusen",
+    "BARBOU 003": "Barbours Cut",
+    "BAYPOR 007": "Bayport",
+    "APM 080": "APM Terminals, LZC",
+    "LCTERM 002": "LC Terminal T2, LZC"
+  },
+  "modes": {
+    "USLAX": "terminal"
+  },
+  "addTerminals": {
+    "USLAX": [
+      { "code": "FENIX", "name": "Fenix", "ssys": [] }
+    ]
+  },
+  "notes": {
+    "USLAX": "ICTF timing varies (on-dock vs off-dock) and isn't differentiated yet — verify with the desk. Off-dock ICTF routes technically as USLGB (UNIONP 090)."
+  }
+}

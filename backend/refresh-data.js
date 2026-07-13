@@ -56,13 +56,13 @@ console.log('  Holidays: wrote ' + Object.entries(holidays).map(([c, a]) => c + 
 // 1c) Export the PORTMC sheet -> frontend/src/data/portmc.json.
 // PORTMC maps each POL's SSY service codes to its loading terminal (matchcode).
 // For ports with 2+ terminals we tag a mode:
-//   'functional' — the port has two published transit sets AND every lane maps
-//                  cleanly to one terminal, so the terminal picks the lane and
-//                  changes ERD/LRD (e.g. JAX, NYC).
-//   'ssy'        — everything else with 2+ terminals (HOU, MXLZC, LAX, LGB, ORF,
-//                  SEA, TIW, CAMTR, CAVAN). These keep the SSY picker; the service
-//                  codes double as the SSY options for cities whose lanes are just
-//                  "ALL", and each code still maps to a terminal for display.
+//   'terminal' — every non-"ALL" DATABASE SSY token maps to a terminal, so the
+//                terminal picker can represent the port cleanly (JAX, NYC, HOU,
+//                MXLZC, ORF, SEA, TIW, CAMTR, CAVAN). Whether the terminal also
+//                changes the dates is automatic from the lanes.
+//   'ssy'      — the port has SSY codes that don't all belong to a terminal
+//                (LAX, LGB), so it keeps the SSY picker. (terminal-info.json can
+//                override a port to 'terminal' — e.g. LAX.)
 const mcRows = XLSX.utils.sheet_to_json(wb.Sheets['PORTMC'], { header: 1 });
 const mc = {}; // pol -> Map(terminalCode -> Set(ssys)), preserving first-seen order
 for (const r of mcRows) {
@@ -80,18 +80,15 @@ for (const pol of Object.keys(mc).sort()) {
   if (m.size < 2) continue;                                   // single terminal → no picker
   const ls = lanes.filter(l => l.pol === pol);
   if (!ls.length) continue;
-  const cities = [...new Set(ls.map(l => l.name))];
-  const varies = cities.some(c => new Set(ls.filter(l => l.name === c).map(l => l.transit)).size > 1);
-  const clean = ls.every(l => {
-    const codes = new Set(String(l.ssy).split(',').map(s => termOfSSY(pol, s.trim())));
-    return codes.size === 1 && !codes.has(null);
-  });
-  const mode = (varies && clean) ? 'functional' : 'ssy';
+  // 'terminal' when every non-"ALL" DATABASE token maps to a terminal; else 'ssy'.
+  const tokens = new Set();
+  ls.forEach(l => String(l.ssy).split(',').forEach(s => { const t = s.trim(); if (t && t !== 'ALL') tokens.add(t); }));
+  const mode = [...tokens].every(t => termOfSSY(pol, t) !== null) ? 'terminal' : 'ssy';
   portmc[pol] = { mode, terminals: [...m].map(([code, set]) => ({ code, ssys: [...set] })) };
 }
 fs.writeFileSync(path.join(dataDir, 'portmc.json'), JSON.stringify(portmc, null, 2) + '\n');
 console.log('  PORTMC: wrote ' + Object.keys(portmc).length + ' multi-terminal ports (' +
-  Object.entries(portmc).filter(([, v]) => v.mode === 'functional').map(([p]) => p).join(', ') + ' functional)');
+  Object.entries(portmc).filter(([, v]) => v.mode === 'terminal').map(([p]) => p).join(', ') + ' terminal-mode)');
 
 // 2) Convert the current banners (from /public) to WebP and embed as data URIs.
 const publicDir = path.join(ROOT, 'public');

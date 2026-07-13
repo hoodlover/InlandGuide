@@ -19,13 +19,17 @@ export default function Combobox({ value, onSelect, options, placeholder, disabl
   // Keep the box showing the current selection unless the user is actively typing.
   useEffect(() => { setQuery(selectedLabel); }, [selectedLabel]);
 
-  // Match on any substring of the label — so "nyc" finds "USNYC" and "york" finds
-  // "NEW YORK, NY - USNYC" — every space-separated term must appear. Keep a header
-  // only when its section still has a visible item under it.
+  // Searchable text for an option: label + its optional sub-line (SSY codes), so
+  // typing an SSY like "US2" finds the terminal whose sub-line lists it.
+  const searchText = (o) => `${o.label} ${o.sub || ''}`.toLowerCase();
+
+  // Match on any substring of the label/sub — so "nyc" finds "USNYC" and "york"
+  // finds "NEW YORK, NY - USNYC" — every space-separated term must appear. Keep a
+  // header only when its section still has a visible item under it.
   const computeFiltered = (q) => {
     const terms = q.trim().toLowerCase().split(/\s+/).filter(Boolean);
     if (q === selectedLabel || !terms.length) return options;
-    const matches = new Set(options.filter(o => !isHeader(o) && terms.every(t => o.label.toLowerCase().includes(t))));
+    const matches = new Set(options.filter(o => !isHeader(o) && terms.every(t => searchText(o).includes(t))));
     const out = [];
     for (let i = 0; i < options.length; i++) {
       const o = options[i];
@@ -112,7 +116,8 @@ export default function Combobox({ value, onSelect, options, placeholder, disabl
                 onMouseDown={(e) => { e.preventDefault(); choose(o); }}
                 className={`px-3 py-2 text-sm cursor-pointer ${i === activeIdx ? 'bg-slate-100' : ''} ${o.value === value ? 'font-semibold text-[#002D72]' : 'text-slate-800'}`}
               >
-                {o.label}
+                <div>{o.label}</div>
+                {o.sub && <div className="text-[11px] text-slate-400 leading-tight mt-0.5">{o.sub}</div>}
               </li>
             )
           ))}
