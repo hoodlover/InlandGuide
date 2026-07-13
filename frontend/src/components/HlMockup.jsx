@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getPortGroups, getCities, getSSY, calculateERDLRD, cityLabel, getRailTerminal, getRail, cityNeedsExtraDays } from '../lib/cutoff';
+import { getPortGroups, getCities, getSSY, calculateERDLRD, cityLabel, getRailTerminal, getRail, cityNeedsExtraDays, defaultExtraDays } from '../lib/cutoff';
 import { getPorts as schedPorts, getVessels as schedVessels, getCities as schedCities, getCutoff as schedCutoff, getERD as schedERD, getCutTime as schedCutTime, getPortInfo as schedInfo, formatDate as schedFormat, pulledAt } from '../lib/cpkc';
 import { hlLogo } from '../assets/hlLogo';
 
@@ -245,7 +245,7 @@ export default function HlMockup() {
                 <>
                   <div className="mb-6">
                     <label className="block text-sm font-bold text-slate-700 mb-1"><span className="text-red-600">*</span> Start City (Rail Ramp)</label>
-                    <select className={field} value={startCity} onChange={(e) => setStartCity(e.target.value)}>
+                    <select className={field} value={startCity} onChange={(e) => { setStartCity(e.target.value); setExtraDays(defaultExtraDays(e.target.value)); }}>
                       <option value="">— Select a city —</option>
                       {calcCities.map(c => <option key={c} value={c}>{cityLabel(c)}</option>)}
                     </select>

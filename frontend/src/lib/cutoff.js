@@ -187,6 +187,12 @@ export function cityNeedsExtraDays(name) {
   const n = String(name || '').toUpperCase();
   return EXTRA_DAY_CITIES.some(c => n.includes(c));
 }
+// Per-city default for the extra-days picker (Minneapolis 3, Council Bluffs 5).
+export function defaultExtraDays(name) {
+  const n = String(name || '').toUpperCase();
+  if (n.includes('MINNEAPOLIS')) return '3';
+  return '5';
+}
 
 export function calculateERDLRD(pol, startCity, ssy, portCutDate, reefer = 'N', extraDays = 0) {
   const matched = lanes.filter(l =>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getPortGroups, getCities, getSSY, calculateERDLRD, cityLabel, getRailTerminal, getRail, cityNeedsExtraDays } from '../lib/cutoff';
+import { getPortGroups, getCities, getSSY, calculateERDLRD, cityLabel, getRailTerminal, getRail, cityNeedsExtraDays, defaultExtraDays } from '../lib/cutoff';
 import { hlLogo } from '../assets/hlLogo';
 import { hlLogoOrange } from '../assets/hlLogoOrange';
 import Combobox from './Combobox';
@@ -71,7 +71,7 @@ export default function LookupForm() {
       const next = { ...prev, [name]: value };
       // Reset downstream picks when an upstream selection changes.
       if (name === 'pol') { next.startCity = ''; next.ssy = ''; }
-      if (name === 'startCity') { next.ssy = ''; }
+      if (name === 'startCity') { next.ssy = ''; next.extraDays = defaultExtraDays(value); }
       return next;
     });
   };
