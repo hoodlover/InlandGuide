@@ -60,7 +60,7 @@ function today() {
   return { iso, mdy: `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}` };
 }
 
-export default function LookupForm({ onCanadaPort, compact }) {
+export default function LookupForm({ onCanadaPort }) {
   const [formData, setFormData] = useState(() => ({ ...EMPTY_FORM, portCutDate: today().iso }));
 
   // Date box prefilled to today so users can just tweak the day.
@@ -514,9 +514,9 @@ export default function LookupForm({ onCanadaPort, compact }) {
             )}
           </div>
         ) : (
-          <div className={`rounded-lg p-6 h-full flex flex-col items-center justify-center ${compact ? 'min-h-0 py-4' : 'min-h-[32rem]'}`}>
-            {!compact && <ObieThinking />}
-            <p className={`text-slate-500 dark:text-slate-300 text-sm text-center ${compact ? '' : 'mt-6'}`}>Fill in the form and click Calculate to see results</p>
+          <div className="rounded-lg p-6 h-full flex flex-col items-center justify-center min-h-[32rem]">
+            <ObieThinking />
+            <p className="text-slate-500 dark:text-slate-300 text-sm mt-6 text-center">Fill in the form and click Calculate to see results</p>
           </div>
         )}
       </div>

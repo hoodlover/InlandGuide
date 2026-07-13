@@ -650,8 +650,8 @@ export default function App() {
           </button>
         </div>
         {tab === 'calculator'
-          ? <LookupForm onCanadaPort={goCanada} compact={compact} />
-          : <PortScheduleLookup onUpdateRamps={() => setRefreshOpen(true)} initialPort={canadaPort} compact={compact} />}
+          ? <LookupForm onCanadaPort={goCanada} />
+          : <PortScheduleLookup onUpdateRamps={() => setRefreshOpen(true)} initialPort={canadaPort} />}
       </main>
 
       {installOpen && <InstallModal onClose={() => setInstallOpen(false)} />}
