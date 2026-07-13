@@ -496,10 +496,10 @@ function RefreshModal({ onClose }) {
 
 // Help + light/dark toggle, both as round photo buttons. The theme toggle shows
 // the mode you'll switch TO: sunset (evening) in light mode, daylit ship in dark.
-function TopControls() {
+function TopControls({ compact }) {
   const [dark, toggle] = useTheme();
   const [helpOpen, setHelpOpen] = useState(false);
-  const circleBtn = 'w-20 h-20 rounded-full overflow-hidden shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition';
+  const circleBtn = `${compact ? 'w-11 h-11' : 'w-20 h-20'} rounded-full overflow-hidden shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition`;
 
   return (
     <>
@@ -543,6 +543,17 @@ export default function App() {
   const [canadaPort, setCanadaPort] = useState('');
   const goCanada = (slug) => { setCanadaPort(slug); setTab('cpkc'); };
 
+  // Compact view — strips the PWA chrome (hero/bottom banners, extra padding,
+  // large badges) for a tight installed-app layout. Persisted across launches.
+  const [compact, setCompact] = useState(() => {
+    try { return localStorage.getItem('icg-compact') === '1'; } catch { return false; }
+  });
+  const toggleCompact = () => setCompact(prev => {
+    const next = !prev;
+    try { localStorage.setItem('icg-compact', next ? '1' : '0'); } catch { /* ignore */ }
+    return next;
+  });
+
   // Secret gesture: tap the title 5× within ~1.2s each to open the manual refresh.
   const tapRef = useRef({ n: 0, t: 0 });
   const secretTap = () => {
@@ -582,33 +593,37 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#EDE6D6] dark:bg-slate-900 flex flex-col">
       {/* Banner constrained to just past the content edges (~5% wider each side). */}
-      <div className="w-full max-w-[70rem] mx-auto px-4 pt-4">
-        <img
-          src={heroTop}
-          alt="IDT Inland Cutoff Rail Guide"
-          className="w-full h-auto block rounded-xl"
-        />
-      </div>
+      {!compact && (
+        <div className="w-full max-w-[70rem] mx-auto px-4 pt-4">
+          <img
+            src={heroTop}
+            alt="IDT Inland Cutoff Rail Guide"
+            className="w-full h-auto block rounded-xl"
+          />
+        </div>
+      )}
 
       {/* Header constrained to the hero width so it no longer draws a full-width line. */}
-      <div className="w-full max-w-[70rem] mx-auto px-4 mt-3">
-        <header className="bg-[#F8F3EA] dark:bg-slate-800 border border-[#E0D8C5] dark:border-slate-700 rounded-xl px-5 py-3 flex items-center justify-between gap-3">
+      <div className={`w-full max-w-[70rem] mx-auto px-4 ${compact ? 'pt-3' : 'mt-3'}`}>
+        <header className={`bg-[#F8F3EA] dark:bg-slate-800 border border-[#E0D8C5] dark:border-slate-700 rounded-xl flex items-center justify-between gap-3 ${compact ? 'px-4 py-2' : 'px-5 py-3'}`}>
           <div>
-            <h1 onClick={secretTap} className="text-[1.5rem] font-bold text-[#002D72] dark:text-white smallcaps txt-shadow-heavy select-none">Inland Cutoff Rail Guide</h1>
-            <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Rail cutoff &amp; delivery date calculator</p>
-            <button
-              onClick={() => setInstallOpen(true)}
-              className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-full bg-[#002D72] text-white hover:bg-[#01245c] transition shadow-[0_6px_14px_rgba(0,0,0,0.35)]"
-            >
-              ⬇ Install as an App
-            </button>
+            <h1 onClick={secretTap} className={`${compact ? 'text-[1.15rem]' : 'text-[1.5rem]'} font-bold text-[#002D72] dark:text-white smallcaps txt-shadow-heavy select-none`}>Inland Cutoff Rail Guide</h1>
+            {!compact && <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Rail cutoff &amp; delivery date calculator</p>}
+            {!compact && (
+              <button
+                onClick={() => setInstallOpen(true)}
+                className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-full bg-[#002D72] text-white hover:bg-[#01245c] transition shadow-[0_6px_14px_rgba(0,0,0,0.35)]"
+              >
+                ⬇ Install as an App
+              </button>
+            )}
           </div>
-          <TopControls />
+          <TopControls compact={compact} />
         </header>
       </div>
 
-      <main className="max-w-5xl mx-auto px-5 py-6 w-full flex-1">
-        <div className="flex gap-2 mb-5">
+      <main className={`max-w-5xl mx-auto w-full flex-1 ${compact ? 'px-4 py-3' : 'px-5 py-6'}`}>
+        <div className={`flex items-center gap-2 ${compact ? 'mb-3' : 'mb-5'}`}>
           {[
             { id: 'calculator', label: 'US Rail Ramp Cuts' },
             { id: 'cpkc', label: 'Canada Rail Ramp Cuts' }
@@ -625,6 +640,14 @@ export default function App() {
               {t.label}
             </button>
           ))}
+          <button
+            onClick={toggleCompact}
+            title={compact ? 'Switch to full view' : 'Switch to compact view'}
+            aria-label={compact ? 'Switch to full view' : 'Switch to compact view'}
+            className="ml-auto px-3 py-2 text-sm font-bold rounded-lg transition shadow-[0_4px_10px_rgba(0,0,0,0.25)] bg-[#F8F3EA] dark:bg-slate-800 text-[#002D72] dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700"
+          >
+            {compact ? '⤢ Full view' : '⤡ Compact'}
+          </button>
         </div>
         {tab === 'calculator'
           ? <LookupForm onCanadaPort={goCanada} />
@@ -637,9 +660,10 @@ export default function App() {
       <WebappReminder />
       {jokerOn && <ObieWalkOn />}
 
-      <div className="w-full max-w-[70rem] mx-auto px-4 mt-8 text-right">
+      <div className={`w-full max-w-[70rem] mx-auto px-4 text-right ${compact ? 'mt-3' : 'mt-8'}`}>
         <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">v {APP_VERSION}</span>
       </div>
+      {!compact && (
       <div className="w-full max-w-[70rem] mx-auto px-4 mt-1 mb-4">
         <img
           src={bannerBottom}
@@ -647,6 +671,7 @@ export default function App() {
           className="w-full h-auto block rounded-xl"
         />
       </div>
+      )}
     </div>
   );
 }
