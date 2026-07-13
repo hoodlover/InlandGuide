@@ -202,10 +202,8 @@ export default function HlMockup() {
                 <label className="block text-sm font-bold text-slate-700 mb-1"><span className="text-red-600">*</span> Port of Loading</label>
                 <select className={field} value={pol} onChange={(e) => changePort(e.target.value)}>
                   <option value="">— Select a port —</option>
-                  <optgroup label="United States">
-                    {usPorts.map(p => <option key={p} value={`calc:${p}`}>{p}</option>)}
-                  </optgroup>
-                  <optgroup label="Canada">
+                  {usPorts.map(p => <option key={p} value={`calc:${p}`}>{p}</option>)}
+                  <optgroup label="Canada Ports">
                     {caPorts.map(p => <option key={p.slug} value={`sched:${p.slug}`}>{p.name}</option>)}
                   </optgroup>
                 </select>

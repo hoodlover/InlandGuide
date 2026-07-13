@@ -310,7 +310,11 @@ export default function LookupForm() {
             <Combobox
               value={formData.pol}
               onSelect={(value) => handleChange({ target: { name: 'pol', value } })}
-              options={portGroups.flatMap(g => g.ports.map(p => ({ value: p, label: p })))}
+              options={portGroups.flatMap(g => (
+                g.label === 'United States'
+                  ? g.ports.map(p => ({ value: p, label: p }))
+                  : [{ header: `${g.label} Ports` }, ...g.ports.map(p => ({ value: p, label: p }))]
+              ))}
               placeholder="Type or select a port…"
               required
             />
