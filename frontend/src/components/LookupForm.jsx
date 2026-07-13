@@ -337,6 +337,7 @@ export default function LookupForm() {
                 onChange={handleChange}
                 className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-slate-400 bg-white"
               >
+                <option value="0">None</option>
                 {[3, 4, 5, 6, 7].map(n => <option key={n} value={n}>{n}</option>)}
               </select>
             </div>

@@ -258,6 +258,7 @@ export default function HlMockup() {
                     <div className="mb-6">
                       <label className="block text-sm font-bold text-slate-700 mb-1"><span className="text-red-600">*</span> Extra Transit Days</label>
                       <select className={field} value={extraDays} onChange={(e) => setExtraDays(e.target.value)}>
+                        <option value="0">None</option>
                         {[3, 4, 5, 6, 7].map(n => <option key={n} value={n}>{n}</option>)}
                       </select>
                     </div>
