@@ -168,6 +168,34 @@ export function getRail(rampMC, city) {
   return i >= 0 ? label.slice(0, i).trim() : (railroadFromCode(rampMC) || label);
 }
 
+// Origin (POL-side) terminal map, from the workbook's PORTMC / PORTSERVICES
+// sheets. It links a port's SSY service codes to the loading terminal at that
+// port — "for info only" per the sheet: it does NOT change the inland ERD/LRD
+// math (those lanes carry SSY="ALL" with a zero ssy-adjustment). Used to (1)
+// offer the service-code dropdown for ports whose lanes don't split by SSY and
+// (2) show the matching origin terminal in the result. Keyed by POL; each entry
+// lists the SSYs that route through that terminal.
+const POL_TERMINALS = {
+  MXLZC: [
+    { ssys: ['CCM', 'CCE'], code: 'APM 080', name: 'APM Terminals, LZC' },
+    { ssys: ['AN1', 'AN2', 'TPM'], code: 'LCTERM 002', name: 'LC Terminal T2, LZC' },
+  ],
+};
+
+// The published service codes for a POL (union across its terminals), or [].
+export function getPolSSYs(pol) {
+  const groups = POL_TERMINALS[pol];
+  return groups ? [...new Set(groups.flatMap(g => g.ssys))] : [];
+}
+
+// The origin terminal a given POL+SSY loads through, or null. { code, name }.
+export function getPolTerminal(pol, ssy) {
+  const groups = POL_TERMINALS[pol];
+  if (!groups || !ssy) return null;
+  const hit = groups.find(g => g.ssys.includes(ssy));
+  return hit ? { code: hit.code, name: hit.name } : null;
+}
+
 export function getSSY(pol, city) {
   const tokens = new Set();
   lanes
@@ -178,6 +206,12 @@ export function getSSY(pol, city) {
         if (t) tokens.add(t);
       });
     });
+  // Ports whose lanes don't split by SSY (only "ALL") but that publish an
+  // SSY→origin-terminal map offer those service codes instead, so the user can
+  // still record the sailing's SSY (and see its loading terminal).
+  if ((tokens.size === 0 || (tokens.size === 1 && tokens.has('ALL'))) && POL_TERMINALS[pol]) {
+    return getPolSSYs(pol).sort();
+  }
   return [...tokens].sort();
 }
 
