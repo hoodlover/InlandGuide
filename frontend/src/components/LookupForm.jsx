@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getPortGroups, getCities, getSSY, calculateERDLRD, cityLabel, getRailTerminal, getRail } from '../lib/cutoff';
+import { getPortGroups, getCities, getSSY, calculateERDLRD, cityLabel, getRailTerminal, getRail, cityNeedsExtraDays } from '../lib/cutoff';
 import { hlLogo } from '../assets/hlLogo';
 import { hlLogoOrange } from '../assets/hlLogoOrange';
 import Combobox from './Combobox';
@@ -39,7 +39,7 @@ function formatShortDate(iso) {
   return `${m}/${d}`;
 }
 
-const EMPTY_FORM = { pol: '', startCity: '', ssy: '', portCutDate: '', reefer: 'N' };
+const EMPTY_FORM = { pol: '', startCity: '', ssy: '', portCutDate: '', reefer: 'N', extraDays: '5' };
 
 export default function LookupForm() {
   const [formData, setFormData] = useState({ ...EMPTY_FORM });
@@ -123,7 +123,8 @@ export default function LookupForm() {
     if (resolvedDate) setDateInput(resolvedDate.mdy);
 
     const res = calculateERDLRD(
-      formData.pol, formData.startCity, formData.ssy, formData.portCutDate, formData.reefer
+      formData.pol, formData.startCity, formData.ssy, formData.portCutDate, formData.reefer,
+      cityNeedsExtraDays(formData.startCity) ? formData.extraDays : 0
     );
     if (res.error) {
       setError(res.error);
@@ -319,6 +320,20 @@ export default function LookupForm() {
               required
             />
           </div>
+
+          {cityNeedsExtraDays(formData.startCity) && (
+            <div>
+              <label className="block text-xs font-semibold text-white mb-1 txt-shadow-soft">Extra Transit Days *</label>
+              <select
+                name="extraDays"
+                value={formData.extraDays}
+                onChange={handleChange}
+                className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-slate-400 bg-white"
+              >
+                {[3, 4, 5, 6, 7].map(n => <option key={n} value={n}>{n}</option>)}
+              </select>
+            </div>
+          )}
 
           {showSSYField && (
             <div>

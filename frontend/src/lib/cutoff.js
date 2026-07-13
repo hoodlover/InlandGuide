@@ -181,7 +181,14 @@ export function getSSY(pol, city) {
   return [...tokens].sort();
 }
 
-export function calculateERDLRD(pol, startCity, ssy, portCutDate, reefer = 'N') {
+// A few inland ramps need extra transit days added by the user (a 3–7 day picker).
+const EXTRA_DAY_CITIES = ['COUNCIL BLUFFS', 'MINNEAPOLIS'];
+export function cityNeedsExtraDays(name) {
+  const n = String(name || '').toUpperCase();
+  return EXTRA_DAY_CITIES.some(c => n.includes(c));
+}
+
+export function calculateERDLRD(pol, startCity, ssy, portCutDate, reefer = 'N', extraDays = 0) {
   const matched = lanes.filter(l =>
     l.pol === pol &&
     l.name === startCity &&
@@ -193,7 +200,7 @@ export function calculateERDLRD(pol, startCity, ssy, portCutDate, reefer = 'N') 
   }
 
   const lane = matched[0];
-  let transit = lane.transit + lane.ssyAdjustment;
+  let transit = lane.transit + lane.ssyAdjustment + (Number(extraDays) || 0);
   let reeferAdj = 0;
   if (reefer === 'Y' && lane.reefer !== 'N') {
     reeferAdj = lane.windowReefer;

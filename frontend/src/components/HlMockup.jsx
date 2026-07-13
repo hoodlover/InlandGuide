@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getPortGroups, getCities, getSSY, calculateERDLRD, cityLabel, getRailTerminal, getRail } from '../lib/cutoff';
+import { getPortGroups, getCities, getSSY, calculateERDLRD, cityLabel, getRailTerminal, getRail, cityNeedsExtraDays } from '../lib/cutoff';
 import { getPorts as schedPorts, getVessels as schedVessels, getCities as schedCities, getCutoff as schedCutoff, getERD as schedERD, getCutTime as schedCutTime, getPortInfo as schedInfo, formatDate as schedFormat, pulledAt } from '../lib/cpkc';
 import { hlLogo } from '../assets/hlLogo';
 
@@ -59,6 +59,7 @@ export default function HlMockup() {
   const [startCity, setStartCity] = useState('');
   const [vessel, setVessel] = useState('');
   const [ssy, setSsy] = useState('');
+  const [extraDays, setExtraDays] = useState('5');
   const [date, setDate] = useState('');
   const [office, setOffice] = useState('atl');
   const [error, setError] = useState('');
@@ -111,7 +112,7 @@ export default function HlMockup() {
       setError('Please choose a Port of Loading, Start City, and Port Cut Date.');
       return;
     }
-    const res = calculateERDLRD(code, startCity, ssy || ssyList[0] || 'ALL', date, 'N');
+    const res = calculateERDLRD(code, startCity, ssy || ssyList[0] || 'ALL', date, 'N', cityNeedsExtraDays(startCity) ? extraDays : 0);
     if (res.error) { setError(res.error); return; }
     const rail = getRail(res.rampMC, startCity);
     const railTerminal = getRailTerminal(res.rampMC, startCity);
@@ -249,6 +250,14 @@ export default function HlMockup() {
                       {calcCities.map(c => <option key={c} value={c}>{cityLabel(c)}</option>)}
                     </select>
                   </div>
+                  {cityNeedsExtraDays(startCity) && (
+                    <div className="mb-6">
+                      <label className="block text-sm font-bold text-slate-700 mb-1"><span className="text-red-600">*</span> Extra Transit Days</label>
+                      <select className={field} value={extraDays} onChange={(e) => setExtraDays(e.target.value)}>
+                        {[3, 4, 5, 6, 7].map(n => <option key={n} value={n}>{n}</option>)}
+                      </select>
+                    </div>
+                  )}
                   {showSSY && (
                     <div className="mb-6">
                       <label className="block text-sm font-bold text-slate-700 mb-1"><span className="text-red-600">*</span> SSY (Service Code)</label>
