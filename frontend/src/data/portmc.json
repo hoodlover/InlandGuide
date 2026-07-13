@@ -1,6 +1,6 @@
 {
   "CAMTR": {
-    "mode": "info",
+    "mode": "ssy",
     "terminals": [
       {
         "code": "RACINE 004",
@@ -24,7 +24,7 @@
     ]
   },
   "CAVAN": {
-    "mode": "info",
+    "mode": "ssy",
     "terminals": [
       {
         "code": "FRASER 037",
@@ -46,7 +46,7 @@
     ]
   },
   "MXLZC": {
-    "mode": "info",
+    "mode": "ssy",
     "terminals": [
       {
         "code": "APM 080",
@@ -66,7 +66,7 @@
     ]
   },
   "USHOU": {
-    "mode": "info",
+    "mode": "ssy",
     "terminals": [
       {
         "code": "BARBOU 003",
@@ -106,6 +106,44 @@
       }
     ]
   },
+  "USLAX": {
+    "mode": "ssy",
+    "terminals": [
+      {
+        "code": "APMTER 009",
+        "ssys": [
+          "WC1",
+          "WC2",
+          "WC5",
+          "US2"
+        ]
+      },
+      {
+        "code": "YUSENT 002",
+        "ssys": [
+          "CCE"
+        ]
+      }
+    ]
+  },
+  "USLGB": {
+    "mode": "ssy",
+    "terminals": [
+      {
+        "code": "YUSENT 002",
+        "ssys": [
+          "CCE"
+        ]
+      },
+      {
+        "code": "LONGBE 005",
+        "ssys": [
+          "WSN",
+          "WC6"
+        ]
+      }
+    ]
+  },
   "USNYC": {
     "mode": "functional",
     "terminals": [
@@ -135,7 +173,7 @@
     ]
   },
   "USORF": {
-    "mode": "info",
+    "mode": "ssy",
     "terminals": [
       {
         "code": "NORFOL 008",
@@ -165,7 +203,7 @@
     ]
   },
   "USSEA": {
-    "mode": "info",
+    "mode": "ssy",
     "terminals": [
       {
         "code": "HUSKYT 002 or WASHIN 125",
@@ -196,7 +234,7 @@
     ]
   },
   "USTIW": {
-    "mode": "info",
+    "mode": "ssy",
     "terminals": [
       {
         "code": "WASHIN 125",

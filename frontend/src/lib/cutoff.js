@@ -197,12 +197,29 @@ export function terminalLabel(code) {
   return name ? `${name} (${code})` : code;
 }
 
-// Terminal options for a POL, or null when the port uses the plain SSY picker.
-// Returns { mode, terminals: [{ code, label, ssys }] }.
+// Terminal options for a POL — only for 'functional' ports (JAX, NYC), where the
+// terminal actually selects the transit lane. Everything else ('ssy' ports) uses
+// the SSY picker below. Returns { mode, terminals: [{ code, label, ssys }] } or null.
 export function getTerminals(pol) {
   const d = portTerminals[pol];
-  if (!d) return null;
+  if (!d || d.mode !== 'functional') return null;
   return { mode: d.mode, terminals: d.terminals.map(t => ({ code: t.code, label: terminalLabel(t.code), ssys: t.ssys })) };
+}
+
+// Union of a port's PORTMC service codes — used to offer an SSY dropdown for
+// ports whose lanes are only "ALL" (HOU, MXLZC, ORF, SEA, TIW, and the ALL-only
+// cities of LAX/LGB), so reps can still record the sailing's SSY.
+function portServiceCodes(pol) {
+  const d = portTerminals[pol];
+  return d ? [...new Set(d.terminals.flatMap(t => t.ssys))] : [];
+}
+
+// The terminal label a given service code loads through (for the result line), or ''.
+export function terminalForSSY(pol, ssy) {
+  const d = portTerminals[pol];
+  if (!d || !ssy) return '';
+  const t = d.terminals.find(x => x.ssys.includes(ssy));
+  return t ? terminalLabel(t.code) : '';
 }
 
 // The SSY to feed calculateERDLRD for a chosen terminal + city. For a
@@ -229,6 +246,12 @@ export function getSSY(pol, city) {
         if (t) tokens.add(t);
       });
     });
+  // When this port+city only carries "ALL" but the port publishes PORTMC service
+  // codes, offer those codes so reps can pick/record the SSY (info-only — the
+  // dates don't change since the lane is "ALL").
+  if ((tokens.size === 0 || (tokens.size === 1 && tokens.has('ALL'))) && portServiceCodes(pol).length) {
+    return portServiceCodes(pol).sort();
+  }
   return [...tokens].sort();
 }
 

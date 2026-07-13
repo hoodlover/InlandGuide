@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getPortGroups, getCities, getSSY, calculateERDLRD, cityLabel, getRailTerminal, getRail, cityNeedsExtraDays, defaultExtraDays, getTerminals, ssyForTerminal, terminalLabel } from '../lib/cutoff';
+import { getPortGroups, getCities, getSSY, calculateERDLRD, cityLabel, getRailTerminal, getRail, cityNeedsExtraDays, defaultExtraDays, getTerminals, ssyForTerminal, terminalLabel, terminalForSSY } from '../lib/cutoff';
 import { hlLogo } from '../assets/hlLogo';
 import { hlLogoOrange } from '../assets/hlLogoOrange';
 import Combobox from './Combobox';
@@ -75,14 +75,17 @@ export default function LookupForm({ onCanadaPort }) {
   const portGroups = getPortGroups();
   const cities = formData.pol ? getCities(formData.pol) : [];
   const ssyList = (formData.pol && formData.startCity) ? getSSY(formData.pol, formData.startCity) : [];
-  // Multi-terminal ports (JAX, NYC, HOU, MXLZC…) let the user pick the loading
-  // terminal instead of the raw SSY. When present it replaces the SSY picker.
+  // 'functional' ports (JAX, NYC) let the user pick the loading terminal, which
+  // selects the transit lane. Everything else uses the SSY picker.
   const terminals = formData.pol ? getTerminals(formData.pol) : null;
   // Only prompt for an SSY when the port+city offers more than one AND the port
   // isn't using the terminal picker.
   const showSSYField = !terminals && ssyList.length > 1;
-  // Selected terminal label ("Name (CODE)") for the result + copies.
-  const selTerminalLabel = (terminals && formData.terminal) ? terminalLabel(formData.terminal) : '';
+  // Loading terminal to show in the result: for terminal ports it's the chosen
+  // terminal; for SSY ports it's the terminal the chosen service code maps to.
+  const selTerminalLabel = terminals
+    ? (formData.terminal ? terminalLabel(formData.terminal) : '')
+    : terminalForSSY(formData.pol, formData.ssy);
 
   // Auto-select when there's nothing to choose (e.g. only "ALL"); otherwise make the user pick.
   useEffect(() => {

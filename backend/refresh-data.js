@@ -55,11 +55,14 @@ console.log('  Holidays: wrote ' + Object.entries(holidays).map(([c, a]) => c + 
 
 // 1c) Export the PORTMC sheet -> frontend/src/data/portmc.json.
 // PORTMC maps each POL's SSY service codes to its loading terminal (matchcode).
-// For ports with 2+ terminals we let reps pick the terminal instead of the SSY.
-// 'functional' = the port has two transit sets and the terminal selects the lane
-// (e.g. JAX, NYC); 'info' = one transit set (lanes are "ALL"), terminal is shown
-// but doesn't change dates (e.g. HOU, MXLZC). Ports whose lanes don't map cleanly
-// to a single terminal (e.g. LGB) are omitted and keep the SSY picker.
+// For ports with 2+ terminals we tag a mode:
+//   'functional' — the port has two published transit sets AND every lane maps
+//                  cleanly to one terminal, so the terminal picks the lane and
+//                  changes ERD/LRD (e.g. JAX, NYC).
+//   'ssy'        — everything else with 2+ terminals (HOU, MXLZC, LAX, LGB, ORF,
+//                  SEA, TIW, CAMTR, CAVAN). These keep the SSY picker; the service
+//                  codes double as the SSY options for cities whose lanes are just
+//                  "ALL", and each code still maps to a terminal for display.
 const mcRows = XLSX.utils.sheet_to_json(wb.Sheets['PORTMC'], { header: 1 });
 const mc = {}; // pol -> Map(terminalCode -> Set(ssys)), preserving first-seen order
 for (const r of mcRows) {
@@ -77,16 +80,13 @@ for (const pol of Object.keys(mc).sort()) {
   if (m.size < 2) continue;                                   // single terminal → no picker
   const ls = lanes.filter(l => l.pol === pol);
   if (!ls.length) continue;
-  const allAll = ls.every(l => String(l.ssy).trim() === 'ALL');
-  let mode;
-  if (allAll) mode = 'info';
-  else {
-    const clean = ls.every(l => {
-      const codes = new Set(String(l.ssy).split(',').map(s => termOfSSY(pol, s.trim())));
-      return codes.size === 1 && !codes.has(null);
-    });
-    if (clean) mode = 'functional'; else continue;            // messy (e.g. LGB) → skip
-  }
+  const cities = [...new Set(ls.map(l => l.name))];
+  const varies = cities.some(c => new Set(ls.filter(l => l.name === c).map(l => l.transit)).size > 1);
+  const clean = ls.every(l => {
+    const codes = new Set(String(l.ssy).split(',').map(s => termOfSSY(pol, s.trim())));
+    return codes.size === 1 && !codes.has(null);
+  });
+  const mode = (varies && clean) ? 'functional' : 'ssy';
   portmc[pol] = { mode, terminals: [...m].map(([code, set]) => ({ code, ssys: [...set] })) };
 }
 fs.writeFileSync(path.join(dataDir, 'portmc.json'), JSON.stringify(portmc, null, 2) + '\n');
