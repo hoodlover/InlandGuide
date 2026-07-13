@@ -538,6 +538,10 @@ export default function App() {
   const [installOpen, setInstallOpen] = useState(false);
   const [refreshOpen, setRefreshOpen] = useState(false);
   const [tab, setTab] = useState('calculator');
+  // Picking a Canadian port in the US calculator hands off to the Canada Rail
+  // Ramp tab, preselecting that port in the published-schedule tool.
+  const [canadaPort, setCanadaPort] = useState('');
+  const goCanada = (slug) => { setCanadaPort(slug); setTab('cpkc'); };
 
   // Secret gesture: tap the title 5× within ~1.2s each to open the manual refresh.
   const tapRef = useRef({ n: 0, t: 0 });
@@ -611,7 +615,7 @@ export default function App() {
           ].map(t => (
             <button
               key={t.id}
-              onClick={() => setTab(t.id)}
+              onClick={() => { setCanadaPort(''); setTab(t.id); }}
               className={`px-4 py-2 text-sm font-bold rounded-lg transition shadow-[0_4px_10px_rgba(0,0,0,0.25)] ${
                 tab === t.id
                   ? 'bg-[#002D72] text-white'
@@ -622,7 +626,9 @@ export default function App() {
             </button>
           ))}
         </div>
-        {tab === 'calculator' ? <LookupForm /> : <PortScheduleLookup onUpdateRamps={() => setRefreshOpen(true)} />}
+        {tab === 'calculator'
+          ? <LookupForm onCanadaPort={goCanada} />
+          : <PortScheduleLookup onUpdateRamps={() => setRefreshOpen(true)} initialPort={canadaPort} />}
       </main>
 
       {installOpen && <InstallModal onClose={() => setInstallOpen(false)} />}

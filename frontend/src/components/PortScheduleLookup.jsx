@@ -15,10 +15,11 @@ function formatPulled(iso) {
   return d.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
 }
 
-export default function PortScheduleLookup({ onUpdateRamps }) {
+export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
   const ports = getPorts();
-  // Auto-select when there's only one port (today: Montreal).
-  const [sel, setSel] = useState({ ...EMPTY, port: ports.length === 1 ? ports[0].slug : '' });
+  // Preselect the port handed off from the US tab; else auto-select when there's
+  // only one port.
+  const [sel, setSel] = useState({ ...EMPTY, port: initialPort || (ports.length === 1 ? ports[0].slug : '') });
   const [copyMessage, setCopyMessage] = useState('');
 
   const vessels = sel.port ? getVessels(sel.port) : [];

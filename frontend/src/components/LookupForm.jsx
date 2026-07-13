@@ -41,6 +41,18 @@ function formatShortDate(iso) {
 
 const EMPTY_FORM = { pol: '', startCity: '', ssy: '', portCutDate: '', reefer: 'N', extraDays: '5' };
 
+// Canadian ports are served by the separate published-schedule tool (the Canada
+// Rail Ramp Cuts tab), not the US calculator. Listing all four here lets a user
+// pick one from the US port dropdown and get handed off to the right tool with
+// the port preselected. Codes map to the CPKC/CN schedule slugs.
+const CANADA_PORTS = [
+  { code: 'CAMTR', slug: 'montreal' },
+  { code: 'CAVAN', slug: 'metro-vancouver' },
+  { code: 'CAPRR', slug: 'prince-rupert' },
+  { code: 'CASJB', slug: 'saint-john' },
+];
+const CANADA_SLUG = Object.fromEntries(CANADA_PORTS.map(p => [p.code, p.slug]));
+
 // Today, as { iso: 'YYYY-MM-DD', mdy: 'M/D/YYYY' } — used to prefill Port Cut Date.
 function today() {
   const d = new Date();
@@ -48,7 +60,7 @@ function today() {
   return { iso, mdy: `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}` };
 }
 
-export default function LookupForm() {
+export default function LookupForm({ onCanadaPort }) {
   const [formData, setFormData] = useState(() => ({ ...EMPTY_FORM, portCutDate: today().iso }));
 
   // Date box prefilled to today so users can just tweak the day.
@@ -74,6 +86,8 @@ export default function LookupForm() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    // Canadian port picked here → hand off to the Canada Rail Ramp tab.
+    if (name === 'pol' && CANADA_SLUG[value]) { onCanadaPort(CANADA_SLUG[value]); return; }
     setFormData(prev => {
       const next = { ...prev, [name]: value };
       // Reset downstream picks when an upstream selection changes.
@@ -310,11 +324,16 @@ export default function LookupForm() {
             <Combobox
               value={formData.pol}
               onSelect={(value) => handleChange({ target: { name: 'pol', value } })}
-              options={portGroups.flatMap(g => (
-                g.label === 'United States'
-                  ? g.ports.map(p => ({ value: p, label: p }))
-                  : [{ header: `${g.label} Ports` }, ...g.ports.map(p => ({ value: p, label: p }))]
-              ))}
+              options={[
+                // US ports first (no header), then all four Canada ports (which
+                // route to the Canada tab), then any remaining groups (Mexico…).
+                ...(portGroups.find(g => g.label === 'United States')?.ports || []).map(p => ({ value: p, label: p })),
+                { header: 'Canada Ports' },
+                ...CANADA_PORTS.map(p => ({ value: p.code, label: p.code })),
+                ...portGroups
+                  .filter(g => g.label !== 'United States' && g.label !== 'Canada')
+                  .flatMap(g => [{ header: `${g.label} Ports` }, ...g.ports.map(p => ({ value: p, label: p }))]),
+              ]}
               placeholder="Type or select a port…"
               required
             />
