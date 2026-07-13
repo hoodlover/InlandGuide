@@ -1,0 +1,223 @@
+{
+  "CAMTR": {
+    "mode": "info",
+    "terminals": [
+      {
+        "code": "RACINE 004",
+        "ssys": [
+          "MCA",
+          "AT1"
+        ]
+      },
+      {
+        "code": "TERMON 006",
+        "ssys": [
+          "AT1"
+        ]
+      },
+      {
+        "code": "CASTTE 002",
+        "ssys": [
+          "AT2"
+        ]
+      }
+    ]
+  },
+  "CAVAN": {
+    "mode": "info",
+    "terminals": [
+      {
+        "code": "FRASER 037",
+        "ssys": [
+          "AL5",
+          "MPS",
+          "WSN"
+        ]
+      },
+      {
+        "code": "GCTCAN 003",
+        "ssys": [
+          "PN1",
+          "PN2",
+          "PN3",
+          "PN4"
+        ]
+      }
+    ]
+  },
+  "MXLZC": {
+    "mode": "info",
+    "terminals": [
+      {
+        "code": "APM 080",
+        "ssys": [
+          "CCM",
+          "CCE"
+        ]
+      },
+      {
+        "code": "LCTERM 002",
+        "ssys": [
+          "AN1",
+          "AN2",
+          "TPM"
+        ]
+      }
+    ]
+  },
+  "USHOU": {
+    "mode": "info",
+    "terminals": [
+      {
+        "code": "BARBOU 003",
+        "ssys": [
+          "AL2",
+          "MGX",
+          "GS1",
+          "CAR",
+          "SAX",
+          "SCS"
+        ]
+      },
+      {
+        "code": "BAYPOR 007",
+        "ssys": [
+          "US3"
+        ]
+      }
+    ]
+  },
+  "USJAX": {
+    "mode": "functional",
+    "terminals": [
+      {
+        "code": "SSAATL 001",
+        "ssys": [
+          "EC1",
+          "EC5",
+          "FLS"
+        ]
+      },
+      {
+        "code": "TRAPAC 009",
+        "ssys": [
+          "SEC"
+        ]
+      }
+    ]
+  },
+  "USNYC": {
+    "mode": "functional",
+    "terminals": [
+      {
+        "code": "MAHER 008",
+        "ssys": [
+          "AL7",
+          "TPI",
+          "IRN",
+          "MUS"
+        ]
+      },
+      {
+        "code": "MAERSK 174",
+        "ssys": [
+          "SEC",
+          "AA7",
+          "US1",
+          "US2",
+          "AL1",
+          "AL6",
+          "TEX",
+          "USW",
+          "US4"
+        ]
+      }
+    ]
+  },
+  "USORF": {
+    "mode": "info",
+    "terminals": [
+      {
+        "code": "NORFOL 008",
+        "ssys": [
+          "AA7",
+          "AL1",
+          "AL3",
+          "AL6",
+          "AL7",
+          "EC2",
+          "EC3",
+          "EC5",
+          "SEC",
+          "TNE",
+          "TPI"
+        ]
+      },
+      {
+        "code": "APM 044",
+        "ssys": [
+          "AL2",
+          "US4",
+          "US2",
+          "MUS"
+        ]
+      }
+    ]
+  },
+  "USSEA": {
+    "mode": "info",
+    "terminals": [
+      {
+        "code": "HUSKYT 002 or WASHIN 125",
+        "ssys": [
+          "PN1"
+        ]
+      },
+      {
+        "code": "HUSKYT 002",
+        "ssys": [
+          "PN2",
+          "WC4"
+        ]
+      },
+      {
+        "code": "SEATTL 023",
+        "ssys": [
+          "PN3",
+          "WSN"
+        ]
+      },
+      {
+        "code": "WASHIN 125",
+        "ssys": [
+          "PN4"
+        ]
+      }
+    ]
+  },
+  "USTIW": {
+    "mode": "info",
+    "terminals": [
+      {
+        "code": "WASHIN 125",
+        "ssys": [
+          "PN1",
+          "PN4"
+        ]
+      },
+      {
+        "code": "HUSKYT 002",
+        "ssys": [
+          "PN2",
+          "WC4"
+        ]
+      },
+      {
+        "code": "SEATTL 023",
+        "ssys": [
+          "PN3"
+        ]
+      }
+    ]
+  }
+}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getPortGroups, getCities, getSSY, calculateERDLRD, cityLabel, getRailTerminal, getRail, cityNeedsExtraDays, defaultExtraDays, getPolTerminal } from '../lib/cutoff';
+import { getPortGroups, getCities, getSSY, calculateERDLRD, cityLabel, getRailTerminal, getRail, cityNeedsExtraDays, defaultExtraDays, getTerminals, ssyForTerminal, terminalLabel } from '../lib/cutoff';
 import { hlLogo } from '../assets/hlLogo';
 import { hlLogoOrange } from '../assets/hlLogoOrange';
 import Combobox from './Combobox';
@@ -39,7 +39,7 @@ function formatShortDate(iso) {
   return `${m}/${d}`;
 }
 
-const EMPTY_FORM = { pol: '', startCity: '', ssy: '', portCutDate: '', reefer: 'N', extraDays: '5' };
+const EMPTY_FORM = { pol: '', startCity: '', ssy: '', terminal: '', portCutDate: '', reefer: 'N', extraDays: '5' };
 
 // Canadian ports are served by the separate published-schedule tool (the Canada
 // Rail Ramp Cuts tab), not the US calculator. Listing all four here lets a user
@@ -75,11 +75,14 @@ export default function LookupForm({ onCanadaPort }) {
   const portGroups = getPortGroups();
   const cities = formData.pol ? getCities(formData.pol) : [];
   const ssyList = (formData.pol && formData.startCity) ? getSSY(formData.pol, formData.startCity) : [];
-  // Only prompt for an SSY when the port+city actually offers more than one.
-  const showSSYField = ssyList.length > 1;
-  // Origin (POL-side) loading terminal for the chosen service code, when the
-  // port publishes one (e.g. MXLZC). Info-only — doesn't affect ERD/LRD.
-  const polTerminal = getPolTerminal(formData.pol, formData.ssy);
+  // Multi-terminal ports (JAX, NYC, HOU, MXLZC…) let the user pick the loading
+  // terminal instead of the raw SSY. When present it replaces the SSY picker.
+  const terminals = formData.pol ? getTerminals(formData.pol) : null;
+  // Only prompt for an SSY when the port+city offers more than one AND the port
+  // isn't using the terminal picker.
+  const showSSYField = !terminals && ssyList.length > 1;
+  // Selected terminal label ("Name (CODE)") for the result + copies.
+  const selTerminalLabel = (terminals && formData.terminal) ? terminalLabel(formData.terminal) : '';
 
   // Auto-select when there's nothing to choose (e.g. only "ALL"); otherwise make the user pick.
   useEffect(() => {
@@ -94,7 +97,7 @@ export default function LookupForm({ onCanadaPort }) {
     setFormData(prev => {
       const next = { ...prev, [name]: value };
       // Reset downstream picks when an upstream selection changes.
-      if (name === 'pol') { next.startCity = ''; next.ssy = ''; }
+      if (name === 'pol') { next.startCity = ''; next.ssy = ''; next.terminal = ''; }
       if (name === 'startCity') { next.ssy = ''; next.extraDays = defaultExtraDays(value); }
       return next;
     });
@@ -143,11 +146,20 @@ export default function LookupForm({ onCanadaPort }) {
       setError('Enter a valid Port Cut Date — e.g. 9, or 8/9, or 8/9/2026');
       return;
     }
+    if (terminals && !formData.terminal) {
+      setError('Please choose a Terminal.');
+      return;
+    }
     // Normalize the box to the full date on submit (covers pressing Enter).
     if (resolvedDate) setDateInput(resolvedDate.mdy);
 
+    // Terminal ports resolve the SSY from the chosen terminal (which selects the
+    // right transit lane for functional ports; a no-op for info-only ports).
+    const ssyArg = terminals
+      ? ssyForTerminal(formData.pol, formData.startCity, formData.terminal)
+      : formData.ssy;
     const res = calculateERDLRD(
-      formData.pol, formData.startCity, formData.ssy, formData.portCutDate, formData.reefer,
+      formData.pol, formData.startCity, ssyArg, formData.portCutDate, formData.reefer,
       cityNeedsExtraDays(formData.startCity) ? formData.extraDays : 0
     );
     if (res.error) {
@@ -168,7 +180,7 @@ export default function LookupForm({ onCanadaPort }) {
     const divider = '─'.repeat(Math.max(24, topPlain.length));
     // Port Cut Date shown short (e.g. 8/6) to match the rest of the result.
     const cutDate = formatShortDate(formData.portCutDate);
-    const polTerm = polTerminal ? `${polTerminal.name} (${polTerminal.code})` : '';
+    const polTerm = selTerminalLabel;
 
     // Plain-text version (used when pasting into plain fields like Notepad).
     // Ramp Cuts (ERD/LRD) come first — they're the important part — then the port info.
@@ -257,7 +269,7 @@ export default function LookupForm({ onCanadaPort }) {
     const titlePlain = `${cityST}    ${railTerminal}`;
     const titleHtml = `${cityST}&nbsp;&nbsp;&nbsp;&nbsp;${railTerminal}`;
     const titleSize = titlePlain.length > 34 ? 15 : (titlePlain.length > 26 ? 17 : 20);
-    const polTerm = polTerminal ? `${polTerminal.name} (${polTerminal.code})` : '';
+    const polTerm = selTerminalLabel;
     const text = [
       'Here are the ramp cuts you requested:', '',
       titlePlain,
@@ -376,6 +388,24 @@ export default function LookupForm({ onCanadaPort }) {
             </div>
           )}
 
+          {terminals && (
+            <div>
+              <label className="block text-xs font-semibold text-white mb-1 txt-shadow-soft">Terminal (POL) *</label>
+              <select
+                name="terminal"
+                value={formData.terminal}
+                onChange={handleChange}
+                required
+                className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-slate-400 bg-white"
+              >
+                <option value="">-- Select Terminal --</option>
+                {terminals.terminals.map(t => (
+                  <option key={t.code} value={t.code}>{t.label}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
           {showSSYField && (
             <div>
               <label className="block text-xs font-semibold text-white mb-1 txt-shadow-soft">SSY (Service Code) *</label>
@@ -482,7 +512,7 @@ export default function LookupForm({ onCanadaPort }) {
               <ResultCard label="Latest Return Date (LRD)" value={results.lrd} />
               <ResultCard label="Ramp Cut Time" value={results.rampCutTime} />
               <RailCard railroad={getRail(results.rampMC, formData.startCity)} rampMC={results.rampMC} />
-              {polTerminal && <ResultCard label="POL Terminal" value={`${polTerminal.name} (${polTerminal.code})`} />}
+              {selTerminalLabel && <ResultCard label="POL Terminal" value={selTerminalLabel} />}
             </div>
 
             <p className="mt-4 text-center text-xs text-white/70">Click where you're pasting — copies ready for Ctrl+V.</p>

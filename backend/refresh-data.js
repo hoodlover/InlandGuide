@@ -53,6 +53,46 @@ Object.keys(holidays).forEach(c => holidays[c].sort());
 fs.writeFileSync(path.join(dataDir, 'holidays.json'), JSON.stringify(holidays, null, 2));
 console.log('  Holidays: wrote ' + Object.entries(holidays).map(([c, a]) => c + '=' + a.length).join(', '));
 
+// 1c) Export the PORTMC sheet -> frontend/src/data/portmc.json.
+// PORTMC maps each POL's SSY service codes to its loading terminal (matchcode).
+// For ports with 2+ terminals we let reps pick the terminal instead of the SSY.
+// 'functional' = the port has two transit sets and the terminal selects the lane
+// (e.g. JAX, NYC); 'info' = one transit set (lanes are "ALL"), terminal is shown
+// but doesn't change dates (e.g. HOU, MXLZC). Ports whose lanes don't map cleanly
+// to a single terminal (e.g. LGB) are omitted and keep the SSY picker.
+const mcRows = XLSX.utils.sheet_to_json(wb.Sheets['PORTMC'], { header: 1 });
+const mc = {}; // pol -> Map(terminalCode -> Set(ssys)), preserving first-seen order
+for (const r of mcRows) {
+  const pol = String(r[0] || '').trim();
+  const term = String(r[2] || '').trim();
+  if (!/^(US|CA|MX)[A-Z]{3}$/.test(pol) || !term) continue;
+  if (!mc[pol]) mc[pol] = new Map();
+  if (!mc[pol].has(term)) mc[pol].set(term, new Set());
+  String(r[1] || '').split(',').forEach(s => { const t = s.trim(); if (t) mc[pol].get(term).add(t); });
+}
+const termOfSSY = (pol, ssy) => { const m = mc[pol]; if (m) for (const [code, set] of m) if (set.has(ssy)) return code; return null; };
+const portmc = {};
+for (const pol of Object.keys(mc).sort()) {
+  const m = mc[pol];
+  if (m.size < 2) continue;                                   // single terminal → no picker
+  const ls = lanes.filter(l => l.pol === pol);
+  if (!ls.length) continue;
+  const allAll = ls.every(l => String(l.ssy).trim() === 'ALL');
+  let mode;
+  if (allAll) mode = 'info';
+  else {
+    const clean = ls.every(l => {
+      const codes = new Set(String(l.ssy).split(',').map(s => termOfSSY(pol, s.trim())));
+      return codes.size === 1 && !codes.has(null);
+    });
+    if (clean) mode = 'functional'; else continue;            // messy (e.g. LGB) → skip
+  }
+  portmc[pol] = { mode, terminals: [...m].map(([code, set]) => ({ code, ssys: [...set] })) };
+}
+fs.writeFileSync(path.join(dataDir, 'portmc.json'), JSON.stringify(portmc, null, 2) + '\n');
+console.log('  PORTMC: wrote ' + Object.keys(portmc).length + ' multi-terminal ports (' +
+  Object.entries(portmc).filter(([, v]) => v.mode === 'functional').map(([p]) => p).join(', ') + ' functional)');
+
 // 2) Convert the current banners (from /public) to WebP and embed as data URIs.
 const publicDir = path.join(ROOT, 'public');
 
