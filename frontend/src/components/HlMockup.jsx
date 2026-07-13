@@ -60,7 +60,7 @@ export default function HlMockup() {
   const [vessel, setVessel] = useState('');
   const [ssy, setSsy] = useState('');
   const [date, setDate] = useState('');
-  const [office, setOffice] = useState('');
+  const [office, setOffice] = useState('atl');
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -187,7 +187,7 @@ export default function HlMockup() {
             <p className="text-sm text-slate-600 mb-2">
               Disclaimer: ERD/LRD and cut off times provided via this application are valid at time of request and are subject to change without notice.
             </p>
-            <p className="text-sm text-[#EB6608] mb-8">
+            <p className="text-base font-bold text-[#EB6608] mb-8">
               This tool is intended for bookings with an export rail move within USA &amp; Canada. For other bookings no data will populate in the result.
             </p>
 
