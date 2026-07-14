@@ -22,5 +22,8 @@
   },
   "notes": {
     "USLAX": "ICTF timing varies (on-dock vs off-dock) and isn't differentiated yet — verify with the desk. Off-dock ICTF routes technically as USLGB (UNIONP 090)."
+  },
+  "_todo": {
+    "USLGB": "USLGB's two transit sets ARE the on-dock/off-dock split the boss flagged: e.g. JOLIET is 5 days (11 services: PS3,PS6,FTP,CCE,PS1,PS4,PS5,PS8,AL5,MPS,PS7) vs 7 days (WSN,WC6), same ramp UNIONP 170. In the master PORTMC only WSN/WC6 map to a terminal (LONGBE 005 = off-dock); the on-dock services are unmapped, so LGB stays on the flat SSY picker. FIX: map the on-dock services to a terminal (e.g. YUSENT/on-dock) in the master PORTMC and LGB auto-flips to a clean 2-terminal picker (on-dock vs off-dock) — no code change."
   }
 }
