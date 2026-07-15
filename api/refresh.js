@@ -35,6 +35,14 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // The managers hub verifies access before revealing its options. A verified
+  // session can then reuse the passphrase to dispatch the refresh without
+  // asking the manager to type it a second time.
+  if (body.action === 'verify') {
+    res.status(200).json({ ok: true, verified: true });
+    return;
+  }
+
   try {
     const gh = await fetch(
       `https://api.github.com/repos/${GH_REPO}/actions/workflows/${GH_WORKFLOW}/dispatches`,

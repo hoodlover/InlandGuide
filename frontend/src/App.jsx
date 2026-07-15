@@ -441,19 +441,18 @@ function InstallModal({ onClose }) {
   );
 }
 
-// Hidden manual-refresh modal — revealed by a secret gesture (tap the title 5×).
-// Posts to /api/refresh, which verifies the passphrase server-side and triggers
-// the GitHub Action. Only works on the live web app (needs the serverless function).
+// Hidden managers hub — revealed by a secret gesture (tap the title 5×).
 function RefreshModal({ onClose }) {
+  const [view, setView] = useState('login');
   const [pass, setPass] = useState('');
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState(null);
 
-  const submit = async () => {
+  const verifyAccess = async () => {
     if (!pass || busy) return;
     if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-      setStatus({ ok: false, msg: 'Manual refresh only runs on the live app: inland-guide.vercel.app' });
+      setStatus({ ok: false, msg: 'Manager verification runs on the live app: inland-guide.vercel.app' });
       return;
     }
     setBusy(true); setStatus(null);
@@ -461,10 +460,13 @@ function RefreshModal({ onClose }) {
       const r = await fetch('/api/refresh', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ passphrase: pass }),
+        body: JSON.stringify({ passphrase: pass, action: 'verify' }),
       });
       const data = await r.json().catch(() => ({}));
-      if (r.ok && data.ok) setStatus({ ok: true, msg: '✓ Refresh started — new schedules deploy in a few minutes.' });
+      if (r.ok && data.ok && data.verified) {
+        setStatus(null);
+        setView('menu');
+      }
       else if (r.status === 401) setStatus({ ok: false, msg: 'Wrong passphrase.' });
       else if (r.status === 500) setStatus({ ok: false, msg: 'Not set up yet — add GH_TOKEN & REFRESH_PASSPHRASE in Vercel.' });
       else {
@@ -481,38 +483,150 @@ function RefreshModal({ onClose }) {
     }
   };
 
-  return (
-    <ModalShell title="Manual Refresh" onClose={onClose}>
-      <p className="text-sm text-slate-600 dark:text-slate-300 mb-3">
-        Pull the latest CPKC &amp; CN schedules right now. Enter the passphrase.
-      </p>
-      <div className="relative mb-3">
-        <input
-          type={show ? 'text' : 'password'}
-          value={pass}
-          autoFocus
-          onChange={(e) => setPass(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') submit(); }}
-          placeholder="Passphrase"
-          className="w-full px-3 py-2 pr-11 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400"
-        />
+  const triggerRefresh = async () => {
+    if (busy) return;
+    setView('refresh');
+    setBusy(true);
+    setStatus({ ok: true, msg: 'Starting the rail schedule refresh…' });
+    try {
+      const r = await fetch('/api/refresh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ passphrase: pass }),
+      });
+      const data = await r.json().catch(() => ({}));
+      if (r.ok && data.ok) setStatus({ ok: true, msg: '✓ Refresh started — new schedules deploy in a few minutes.' });
+      else if (r.status === 401) { setStatus({ ok: false, msg: 'Manager session expired. Please sign in again.' }); setView('login'); }
+      else {
+        const detail = data.detail ? ` — ${data.detail}` : '';
+        setStatus({ ok: false, msg: data.error ? `${data.error}${detail}` : `Refresh service returned HTTP ${r.status}.` });
+      }
+    } catch {
+      setStatus({ ok: false, msg: 'Network error — the refresh could not be started.' });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (view === 'login') {
+    return (
+      <ModalShell title="Managers Only" onClose={onClose}>
+        <div className="mb-4 rounded-xl bg-gradient-to-r from-[#002D72] to-[#0a4b9b] px-5 py-4 text-white shadow-md">
+          <p className="text-lg font-extrabold">Hapag-Lloyd Managers</p>
+          <p className="mt-1 text-sm text-white/80">Enter the manager passphrase to continue.</p>
+        </div>
+        <div className="relative mb-3">
+          <input
+            type={show ? 'text' : 'password'}
+            value={pass}
+            autoFocus
+            onChange={(e) => setPass(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') verifyAccess(); }}
+            placeholder="Manager passphrase"
+            className="w-full px-3 py-2 pr-11 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400"
+          />
+          <button
+            type="button"
+            onClick={() => setShow(s => !s)}
+            aria-label={show ? 'Hide passphrase' : 'Show passphrase'}
+            title={show ? 'Hide' : 'Show'}
+            className="absolute inset-y-0 right-0 px-3 flex items-center text-lg text-slate-500 hover:text-slate-700"
+          >
+            {show ? '🙈' : '👁️'}
+          </button>
+        </div>
         <button
           type="button"
-          onClick={() => setShow(s => !s)}
-          aria-label={show ? 'Hide passphrase' : 'Show passphrase'}
-          title={show ? 'Hide' : 'Show'}
-          className="absolute inset-y-0 right-0 px-3 flex items-center text-lg text-slate-500 hover:text-slate-700"
+          onClick={verifyAccess}
+          disabled={busy || !pass}
+          className="w-full px-4 py-2 bg-[#002D72] text-white rounded-lg font-semibold hover:bg-[#01245c] transition disabled:opacity-50"
         >
-          {show ? '🙈' : '👁️'}
+          {busy ? 'Checking…' : 'Enter Managers Hub'}
         </button>
+        {status && (
+          <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{status.msg}</div>
+        )}
+      </ModalShell>
+    );
+  }
+
+  if (view === 'menu') {
+    return (
+      <ModalShell title="Hapag-Lloyd Managers" onClose={onClose}>
+        <div className="rounded-xl bg-gradient-to-r from-[#002D72] to-[#0a4b9b] px-5 py-4 text-white shadow-md">
+          <p className="text-lg font-extrabold">Welcome, Hapag-Lloyd Managers</p>
+          <p className="mt-1 text-sm text-white/80">Your shortcuts for keeping the Inland Guide moving.</p>
+        </div>
+
+        <div className="mt-4 space-y-3">
+          <button
+            type="button"
+            onClick={triggerRefresh}
+            className="group w-full rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#EB6608] hover:shadow-md dark:border-slate-600 dark:bg-slate-700"
+          >
+            <span className="flex items-center gap-3">
+              <span className="text-2xl" aria-hidden="true">🚆</span>
+              <span>
+                <span className="block font-extrabold text-[#002D72] dark:text-white">Update CP Rail &amp; CN Rail ramp cuts</span>
+                <span className="text-sm font-semibold text-[#EB6608] group-hover:underline">Click here →</span>
+              </span>
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setView('lane')}
+            className="group w-full rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#EB6608] hover:shadow-md dark:border-slate-600 dark:bg-slate-700"
+          >
+            <span className="flex items-center gap-3">
+              <span className="text-2xl" aria-hidden="true">🔀</span>
+              <span>
+                <span className="block font-extrabold text-[#002D72] dark:text-white">Turn a lane on or off</span>
+                <span className="text-sm font-semibold text-[#EB6608] group-hover:underline">Click here →</span>
+              </span>
+            </span>
+          </button>
+
+          <a
+            href="https://hlag.sharepoint.com/sites/RegionNorthAmerica/SitePages/RNA-Inland-Delivery-Team-(IDT).aspx"
+            target="_blank"
+            rel="noreferrer"
+            className="group block w-full rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#EB6608] hover:shadow-md dark:border-slate-600 dark:bg-slate-700"
+          >
+            <span className="flex items-center gap-3">
+              <span className="text-2xl" aria-hidden="true">📰</span>
+              <span>
+                <span className="block font-extrabold text-[#002D72] dark:text-white">Read insider information</span>
+                <span className="text-sm font-semibold text-[#EB6608] group-hover:underline">Click here →</span>
+              </span>
+            </span>
+          </a>
+        </div>
+      </ModalShell>
+    );
+  }
+
+  if (view === 'lane') {
+    return (
+      <ModalShell title="Lane Control" onClose={onClose}>
+        <div className="rounded-xl border-2 border-[#EB6608] bg-orange-50 p-6 text-center shadow-inner dark:bg-slate-700">
+          <div className="text-4xl" aria-hidden="true">🛠️</div>
+          <p className="mt-3 text-lg font-extrabold text-[#002D72] dark:text-white">Please open up T9400 and make it happen.</p>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">Lane activation and deactivation remain controlled in the source system.</p>
+        </div>
+        <button type="button" onClick={() => setView('menu')} className="mt-4 text-sm font-bold text-[#002D72] hover:underline dark:text-white">← Back to Managers Hub</button>
+      </ModalShell>
+    );
+  }
+
+  return (
+    <ModalShell title="Update Rail Ramp Cuts" onClose={onClose}>
+      <button type="button" onClick={() => { setStatus(null); setView('menu'); }} className="mb-3 text-sm font-bold text-[#002D72] hover:underline dark:text-white">← Back to Managers Hub</button>
+      <div className="rounded-xl border-2 border-[#002D72] bg-slate-50 p-6 text-center dark:bg-slate-700">
+        <div className="text-4xl" aria-hidden="true">🚆</div>
+        <p className="mt-3 font-extrabold text-[#002D72] dark:text-white">CP Rail &amp; CN Rail ramp cuts</p>
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{busy ? 'Contacting GitHub…' : 'Refresh request submitted.'}</p>
       </div>
-      <button
-        onClick={submit}
-        disabled={busy || !pass}
-        className="w-full px-4 py-2 bg-[#002D72] text-white rounded-lg font-semibold hover:bg-[#01245c] transition disabled:opacity-50"
-      >
-        {busy ? 'Triggering…' : 'Trigger Refresh'}
-      </button>
       {status && (
         <div className={`mt-3 p-3 rounded-lg text-sm border ${status.ok ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
           {status.msg}
@@ -524,7 +638,7 @@ function RefreshModal({ onClose }) {
 
 // Help + light/dark toggle, both as round photo buttons. The theme toggle shows
 // the mode you'll switch TO: sunset (evening) in light mode, daylit ship in dark.
-function TopControls({ compact }) {
+function TopControls({ compact, onManagerAccess }) {
   const [dark, toggle] = useTheme();
   const [helpOpen, setHelpOpen] = useState(false);
   const circleBtn = `${compact ? 'w-11 h-11' : 'w-20 h-20'} rounded-full overflow-hidden shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition`;
@@ -532,6 +646,13 @@ function TopControls({ compact }) {
   return (
     <>
       <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={onManagerAccess}
+          className={`${compact ? 'px-3 py-1.5 text-[11px]' : 'px-4 py-2 text-xs'} rounded-full border-2 border-[#EB6608] bg-[#002D72] font-extrabold uppercase tracking-wide text-white shadow-[0_5px_12px_rgba(0,0,0,0.35)] transition hover:-translate-y-0.5 hover:bg-[#EB6608] active:translate-y-0 whitespace-nowrap`}
+        >
+          Manager Console Access
+        </button>
         <button
           className={circleBtn}
           onClick={() => setHelpOpen(true)}
@@ -582,7 +703,7 @@ export default function App() {
     return next;
   });
 
-  // Secret gesture: tap the title 5× within ~1.2s each to open the manual refresh.
+  // Secret gesture: tap the title 5× within ~1.2s each to open the managers hub.
   const tapRef = useRef({ n: 0, t: 0 });
   const secretTap = () => {
     const now = Date.now();
@@ -646,7 +767,7 @@ export default function App() {
               </button>
             )}
           </div>
-          <TopControls compact={compact} />
+          <TopControls compact={compact} onManagerAccess={() => setRefreshOpen(true)} />
         </header>
       </div>
 

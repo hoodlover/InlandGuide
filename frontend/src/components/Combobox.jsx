@@ -84,6 +84,17 @@ export default function Combobox({ value, onSelect, options, placeholder, disabl
         value={query}
         placeholder={placeholder}
         onFocus={(e) => { setOpen(true); const f = firstSelectable(); setActiveIdx(f < 0 ? 0 : f); e.target.select(); }}
+        // Selecting an option leaves this input focused, so a second click does
+        // not fire onFocus again. Reopen the full list on that repeat click.
+        onClick={(e) => {
+          if (!open) {
+            setQuery(selectedLabel);
+            setOpen(true);
+            const selectedIdx = options.findIndex(o => !isHeader(o) && o.value === value);
+            setActiveIdx(selectedIdx >= 0 ? selectedIdx : Math.max(0, firstSelectable()));
+          }
+          e.target.select();
+        }}
         onBlur={() => { setOpen(false); setQuery(selectedLabel); }}
         onChange={(e) => {
           const v = e.target.value;
