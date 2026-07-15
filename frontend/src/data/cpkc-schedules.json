@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-07-14",
-  "pulledAt": "2026-07-14T14:51:14.478Z",
+  "generatedAt": "2026-07-15",
+  "pulledAt": "2026-07-15T19:33:04.336Z",
   "ports": {
     "montreal": {
       "name": "Port of Montreal",
       "rail": "CPKC",
-      "runDate": "Mon 13-Jul",
-      "generatedAt": "2026-07-13",
+      "runDate": "Tue 14-Jul",
+      "generatedAt": "2026-07-14",
       "cities": [
         "Vancouver",
         "Edmonton",
@@ -62,6 +62,25 @@
             "Minneapolis": "Thu 23-Jul 12:00",
             "Bensenville": "Fri 24-Jul 17:00",
             "Detroit": "Fri 24-Jul 15:00"
+          }
+        },
+        {
+          "vessel": "LIVERPOOL EXPRESS",
+          "terminal": "Cast",
+          "eta": "Tue 4-Aug",
+          "etd": "Thu 6-Aug",
+          "railPortCutoff": "Tue 4-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Vancouver": "Mon 27-Jul 18:30",
+            "Edmonton": "Tue 28-Jul 17:00",
+            "Calgary": "Tue 28-Jul 23:00",
+            "Regina": "Wed 29-Jul 17:00",
+            "Winnipeg": "Wed 29-Jul 15:00",
+            "Vaughan": "Sun 2-Aug 13:00",
+            "Minneapolis": "Thu 30-Jul 12:00",
+            "Bensenville": "Fri 31-Jul 17:00",
+            "Detroit": "Fri 31-Jul 15:00"
           }
         },
         {
@@ -135,7 +154,7 @@
             "Regina": "Tue 7-Jul 17:00",
             "Winnipeg": "Tue 7-Jul 15:00",
             "Vaughan": "Sat 11-Jul 13:00",
-            "Minneapolis": "Fri 3-Jul 12:00",
+            "Minneapolis": "Wed 8-Jul 12:00",
             "Bensenville": "Fri 10-Jul 17:00",
             "Detroit": "Fri 10-Jul 15:00"
           }
@@ -154,7 +173,7 @@
             "Regina": "Mon 13-Jul 17:00",
             "Winnipeg": "Mon 13-Jul 15:00",
             "Vaughan": "Wed 15-Jul 13:00",
-            "Minneapolis": "Sun 5-Jul 12:00",
+            "Minneapolis": "Sun 12-Jul 12:00",
             "Bensenville": "Tue 14-Jul 17:00",
             "Detroit": "Tue 14-Jul 15:00"
           }
@@ -173,7 +192,7 @@
             "Regina": "Fri 17-Jul 17:00",
             "Winnipeg": "Fri 17-Jul 15:00",
             "Vaughan": "Mon 20-Jul 13:00",
-            "Minneapolis": "Wed 8-Jul 12:00",
+            "Minneapolis": "Fri 17-Jul 12:00",
             "Bensenville": "Sun 19-Jul 17:00",
             "Detroit": "Sat 18-Jul 15:00"
           }
@@ -192,7 +211,7 @@
             "Regina": "Mon 20-Jul 00:00",
             "Winnipeg": "Mon 20-Jul 15:00",
             "Vaughan": "Wed 22-Jul 13:00",
-            "Minneapolis": "Sun 12-Jul 12:00",
+            "Minneapolis": "Sun 19-Jul 12:00",
             "Bensenville": "Tue 21-Jul 17:00",
             "Detroit": "Tue 21-Jul 15:00"
           }
@@ -211,7 +230,7 @@
             "Regina": "Mon 27-Jul 18:00",
             "Winnipeg": "Mon 27-Jul 16:00",
             "Vaughan": "Wed 29-Jul 13:00",
-            "Minneapolis": "Fri 17-Jul 12:00",
+            "Minneapolis": "Sun 26-Jul 12:00",
             "Bensenville": "Tue 28-Jul 17:00",
             "Detroit": "Tue 28-Jul 15:00"
           }
@@ -230,7 +249,7 @@
             "Regina": "Sat 25-Jul 18:00",
             "Winnipeg": "Sat 25-Jul 16:00",
             "Vaughan": "Wed 29-Jul 13:00",
-            "Minneapolis": "Sun 19-Jul 12:00",
+            "Minneapolis": "Sun 26-Jul 12:00",
             "Bensenville": "Tue 28-Jul 17:00",
             "Detroit": "Tue 28-Jul 15:00"
           }
@@ -249,7 +268,7 @@
             "Regina": "Sat 11-Jul 17:00",
             "Winnipeg": "Sat 11-Jul 15:00",
             "Vaughan": "Mon 13-Jul 13:00",
-            "Minneapolis": "Sun 5-Jul 12:00",
+            "Minneapolis": "Mon 13-Jul 12:00",
             "Bensenville": "Sun 12-Jul 17:00",
             "Detroit": "Sat 11-Jul 15:00"
           }
@@ -268,7 +287,7 @@
             "Regina": "Sat 18-Jul 17:00",
             "Winnipeg": "Sat 18-Jul 15:00",
             "Vaughan": "Mon 20-Jul 13:00",
-            "Minneapolis": "Sat 11-Jul 12:00",
+            "Minneapolis": "Sat 18-Jul 12:00",
             "Bensenville": "Sun 19-Jul 17:00",
             "Detroit": "Sat 18-Jul 15:00"
           }
@@ -287,7 +306,7 @@
             "Regina": "Sat 25-Jul 17:00",
             "Winnipeg": "Sat 25-Jul 15:00",
             "Vaughan": "Mon 27-Jul 13:00",
-            "Minneapolis": "Sat 18-Jul 12:00",
+            "Minneapolis": "Sat 25-Jul 12:00",
             "Bensenville": "Sun 26-Jul 17:00",
             "Detroit": "Sat 25-Jul 15:00"
           }
@@ -306,7 +325,7 @@
             "Regina": "Sat 1-Aug 17:00",
             "Winnipeg": "Sat 1-Aug 15:00",
             "Vaughan": "Mon 3-Aug 13:00",
-            "Minneapolis": "Sat 25-Jul 12:00",
+            "Minneapolis": "Sat 1-Aug 12:00",
             "Bensenville": "Sun 2-Aug 17:00",
             "Detroit": "Sat 1-Aug 15:00"
           }
@@ -316,8 +335,8 @@
     "metro-vancouver": {
       "name": "Port of Metro Vancouver",
       "rail": "CPKC",
-      "runDate": "Mon 13-Jul",
-      "generatedAt": "2026-07-13",
+      "runDate": "Tue 14-Jul",
+      "generatedAt": "2026-07-14",
       "cities": [
         "Lachine",
         "Vaughan",
@@ -486,27 +505,6 @@
           }
         },
         {
-          "vessel": "HYUNDAI SUPREME",
-          "terminal": "Deltaport",
-          "eta": "Mon 13-Jul",
-          "etd": "",
-          "railPortCutoff": "Sun 12-Jul",
-          "comments": "",
-          "cutoffs": {
-            "Lachine": "Sun 5-Jul 14:45",
-            "Vaughan": "Sun 5-Jul 23:00",
-            "Winnipeg": "Tue 7-Jul 15:00",
-            "Regina": "Tue 7-Jul 17:00",
-            "Calgary": "Thu 9-Jul 08:00",
-            "Edmonton": "Tue 7-Jul 17:00",
-            "Vancouver": "Fri 10-Jul 01:00",
-            "Detroit": "Sat 4-Jul 15:00",
-            "Jeffersonville": "Mon 29-Jun 12:00",
-            "Bensenville": "Mon 6-Jul 20:00",
-            "Minneapolis": "Tue 7-Jul 12:00"
-          }
-        },
-        {
           "vessel": "HYUNDAI FORWARD",
           "terminal": "Deltaport",
           "eta": "Mon 20-Jul",
@@ -514,12 +512,12 @@
           "railPortCutoff": "Sun 19-Jul",
           "comments": "",
           "cutoffs": {
-            "Lachine": "Sun 12-Jul 21:00",
+            "Lachine": "Sun 12-Jul 14:45",
             "Vaughan": "Sun 12-Jul 23:00",
             "Winnipeg": "Tue 14-Jul 15:00",
             "Regina": "Tue 14-Jul 17:00",
             "Calgary": "Thu 16-Jul 08:00",
-            "Edmonton": "Tue 14-Jul 16:00",
+            "Edmonton": "Tue 14-Jul 17:00",
             "Vancouver": "Fri 17-Jul 01:00",
             "Detroit": "Sat 11-Jul 15:00",
             "Jeffersonville": "Tue 7-Jul 12:00",
@@ -1204,8 +1202,8 @@
     "saint-john": {
       "name": "Port of Saint John",
       "rail": "CPKC",
-      "runDate": "Mon 13-Jul",
-      "generatedAt": "2026-07-13",
+      "runDate": "Tue 14-Jul",
+      "generatedAt": "2026-07-14",
       "cities": [
         "Vancouver",
         "Edmonton",
@@ -1390,8 +1388,8 @@
     "prince-rupert": {
       "name": "Prince Rupert",
       "rail": "CN",
-      "runDate": "Tue 14-Jul",
-      "generatedAt": "2026-07-14",
+      "runDate": "Wed 15-Jul",
+      "generatedAt": "2026-07-15",
       "cities": [
         "TORONTO (MALPORT)",
         "MONTREAL",
@@ -1432,50 +1430,6 @@
         "ARCADIA": "1600 hrs"
       },
       "vessels": [
-        {
-          "vessel": "MAERSK STRALSUND",
-          "terminal": "",
-          "eta": "",
-          "etd": "",
-          "railPortCutoff": "13-Jul",
-          "comments": "",
-          "cutoffs": {
-            "TORONTO (MALPORT)": "Sun, Jul-05",
-            "MONTREAL": "Mon, Jul-06",
-            "WINNIPEG": "Mon, Jul-06",
-            "SASKATOON": "Mon, Jul-06",
-            "REGINA": "Sat, Jul-04",
-            "CALGARY": "Tue, Jul-07",
-            "EDMONTON": "Thu, Jul-09",
-            "PRINCE GEORGE": "Thu, Jul-09",
-            "CHIPPEWA FALLS": "Wed, Jul-01",
-            "JOLIET": "Sun, Jul-05",
-            "INDIANAPOLIS": "Thu, Jul-02",
-            "CHICAGO": "Sun, Jul-05",
-            "DETROIT": "Fri, Jul-03",
-            "MEMPHIS": "Thu, Jul-02",
-            "NEW ORLEANS": "Fri, Jul-03",
-            "ARCADIA": "Fri, Jul-03"
-          },
-          "erds": {
-            "TORONTO (MALPORT)": "30-Jun",
-            "MONTREAL": "01-Jul",
-            "WINNIPEG": "01-Jul",
-            "SASKATOON": "01-Jul",
-            "REGINA": "29-Jun",
-            "CALGARY": "02-Jul",
-            "EDMONTON": "04-Jul",
-            "PRINCE GEORGE": "04-Jul",
-            "CHIPPEWA FALLS": "26-Jun",
-            "JOLIET": "30-Jun",
-            "INDIANAPOLIS": "27-Jun",
-            "CHICAGO": "30-Jun",
-            "DETROIT": "28-Jun",
-            "MEMPHIS": "27-Jun",
-            "NEW ORLEANS": "28-Jun",
-            "ARCADIA": "28-Jun"
-          }
-        },
         {
           "vessel": "CSCL SOUTH CHINA SEA",
           "terminal": "",
@@ -1565,7 +1519,7 @@
           }
         },
         {
-          "vessel": "GSL LYDIA",
+          "vessel": "COSCO PIRAEUS",
           "terminal": "",
           "eta": "",
           "etd": "",
@@ -1609,7 +1563,7 @@
           }
         },
         {
-          "vessel": "COSCO PIRAEUS",
+          "vessel": "GSL LYDIA",
           "terminal": "",
           "eta": "",
           "etd": "",
@@ -1785,51 +1739,51 @@
           }
         },
         {
-          "vessel": "GSL ALEXANDRA",
+          "vessel": "EXPRESS ATHENS",
           "terminal": "",
           "eta": "",
           "etd": "",
-          "railPortCutoff": "27-Jul",
+          "railPortCutoff": "26-Jul",
           "comments": "",
           "cutoffs": {
-            "TORONTO (MALPORT)": "Sun, Jul-19",
-            "MONTREAL": "Mon, Jul-20",
-            "WINNIPEG": "Mon, Jul-20",
-            "SASKATOON": "Mon, Jul-20",
+            "TORONTO (MALPORT)": "Fri, Jul-17",
+            "MONTREAL": "Thu, Jul-16",
+            "WINNIPEG": "Fri, Jul-17",
+            "SASKATOON": "Thu, Jul-16",
             "REGINA": "Sat, Jul-18",
-            "CALGARY": "Tue, Jul-21",
-            "EDMONTON": "Thu, Jul-23",
-            "PRINCE GEORGE": "Thu, Jul-23",
-            "CHIPPEWA FALLS": "Wed, Jul-15",
-            "JOLIET": "Sun, Jul-19",
-            "INDIANAPOLIS": "Thu, Jul-16",
-            "CHICAGO": "Sun, Jul-19",
+            "CALGARY": "Sat, Jul-18",
+            "EDMONTON": "Sat, Jul-18",
+            "PRINCE GEORGE": "Wed, Jul-22",
+            "CHIPPEWA FALLS": "Sun, Jul-12",
+            "JOLIET": "Thu, Jul-16",
+            "INDIANAPOLIS": "Wed, Jul-15",
+            "CHICAGO": "Sat, Jul-18",
             "DETROIT": "Fri, Jul-17",
             "MEMPHIS": "Thu, Jul-16",
-            "NEW ORLEANS": "Fri, Jul-17",
+            "NEW ORLEANS": "Thu, Jul-16",
             "ARCADIA": "Fri, Jul-17"
           },
           "erds": {
-            "TORONTO (MALPORT)": "14-Jul",
-            "MONTREAL": "15-Jul",
-            "WINNIPEG": "15-Jul",
-            "SASKATOON": "15-Jul",
+            "TORONTO (MALPORT)": "12-Jul",
+            "MONTREAL": "11-Jul",
+            "WINNIPEG": "12-Jul",
+            "SASKATOON": "11-Jul",
             "REGINA": "13-Jul",
-            "CALGARY": "16-Jul",
-            "EDMONTON": "18-Jul",
-            "PRINCE GEORGE": "18-Jul",
-            "CHIPPEWA FALLS": "10-Jul",
-            "JOLIET": "14-Jul",
-            "INDIANAPOLIS": "11-Jul",
-            "CHICAGO": "14-Jul",
+            "CALGARY": "13-Jul",
+            "EDMONTON": "13-Jul",
+            "PRINCE GEORGE": "17-Jul",
+            "CHIPPEWA FALLS": "07-Jul",
+            "JOLIET": "11-Jul",
+            "INDIANAPOLIS": "10-Jul",
+            "CHICAGO": "13-Jul",
             "DETROIT": "12-Jul",
             "MEMPHIS": "11-Jul",
-            "NEW ORLEANS": "12-Jul",
+            "NEW ORLEANS": "11-Jul",
             "ARCADIA": "12-Jul"
           }
         },
         {
-          "vessel": "EXPRESS ATHENS",
+          "vessel": "GSL ALEXANDRA",
           "terminal": "",
           "eta": "",
           "etd": "",
@@ -2266,6 +2220,50 @@
             "MEMPHIS": "29-Jul",
             "NEW ORLEANS": "26-Jul",
             "ARCADIA": "30-Jul"
+          }
+        },
+        {
+          "vessel": "TAURANGA MAERSK",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "16-Aug",
+          "comments": "",
+          "cutoffs": {
+            "TORONTO (MALPORT)": "Fri, Aug-07",
+            "MONTREAL": "Thu, Aug-06",
+            "WINNIPEG": "Fri, Aug-07",
+            "SASKATOON": "Thu, Aug-06",
+            "REGINA": "Sat, Aug-08",
+            "CALGARY": "Sat, Aug-08",
+            "EDMONTON": "Sat, Aug-08",
+            "PRINCE GEORGE": "Wed, Aug-12",
+            "CHIPPEWA FALLS": "Sun, Aug-02",
+            "JOLIET": "Thu, Aug-06",
+            "INDIANAPOLIS": "Wed, Aug-05",
+            "CHICAGO": "Sat, Aug-08",
+            "DETROIT": "Fri, Aug-07",
+            "MEMPHIS": "Thu, Aug-06",
+            "NEW ORLEANS": "Thu, Aug-06",
+            "ARCADIA": "Fri, Aug-07"
+          },
+          "erds": {
+            "TORONTO (MALPORT)": "02-Aug",
+            "MONTREAL": "01-Aug",
+            "WINNIPEG": "02-Aug",
+            "SASKATOON": "01-Aug",
+            "REGINA": "03-Aug",
+            "CALGARY": "03-Aug",
+            "EDMONTON": "03-Aug",
+            "PRINCE GEORGE": "07-Aug",
+            "CHIPPEWA FALLS": "28-Jul",
+            "JOLIET": "01-Aug",
+            "INDIANAPOLIS": "31-Jul",
+            "CHICAGO": "03-Aug",
+            "DETROIT": "02-Aug",
+            "MEMPHIS": "01-Aug",
+            "NEW ORLEANS": "01-Aug",
+            "ARCADIA": "02-Aug"
           }
         }
       ]
