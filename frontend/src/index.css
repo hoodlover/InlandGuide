@@ -189,3 +189,219 @@ textarea {
   0%   { opacity: 0.9; transform: translate(0, 0) scale(0.35); }
   100% { opacity: 0; transform: translate(90px, -30px) scale(2.1); }
 }
+
+/* Five-click Obie easter egg: Sammie Bot rolls in, greets Obie, then burns out. */
+.sammie-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.sammie-bot {
+  position: absolute;
+  left: 0;
+  bottom: clamp(12px, 3vh, 34px);
+  width: clamp(11rem, 20vw, 18rem);
+  transform: translateX(112vw);
+  transform-origin: 48% 88%;
+  filter: drop-shadow(0 18px 18px rgba(0, 0, 0, .42));
+  will-change: transform;
+}
+
+.sammie-bot > img {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 4px solid #EB6608;
+  border-radius: 28%;
+  background: #002D72;
+  box-shadow: 0 0 0 4px #002D72, 0 12px 30px rgba(0, 45, 114, .45);
+}
+
+.sammie-bot-roll-in { animation: sammie-roll-in 2.4s cubic-bezier(.18, .8, .25, 1) forwards; }
+.sammie-bot-greet,
+.sammie-bot-beep { transform: translateX(22vw); }
+.sammie-bot-wheelie { animation: sammie-wheelie-pop 1.2s cubic-bezier(.22, .8, .35, 1) forwards; }
+.sammie-bot-exit { animation: sammie-burnout-exit 3.3s linear forwards; }
+
+.sammie-bot-wheelie > img,
+.sammie-bot-exit > img { transform: scaleX(-1); }
+
+@keyframes sammie-roll-in {
+  0% { transform: translateX(112vw) rotate(0); }
+  72% { transform: translateX(19vw) rotate(-2deg); }
+  87% { transform: translateX(24vw) rotate(1deg); }
+  100% { transform: translateX(22vw) rotate(0); }
+}
+
+@keyframes sammie-wheelie-pop {
+  0% { transform: translateX(22vw) rotate(0); }
+  28% { transform: translateX(22vw) rotate(-18deg) translateY(-5px); }
+  55% { transform: translateX(22vw) rotate(-10deg); }
+  100% { transform: translateX(21vw) rotate(-15deg) translateY(-3px); }
+}
+
+/* Barely moves at first, then gathers speed and rockets through the left edge. */
+@keyframes sammie-burnout-exit {
+  0% { transform: translateX(21vw) rotate(-15deg) translateY(-3px); }
+  22% { transform: translateX(19vw) rotate(-17deg) translateY(-4px); }
+  43% { transform: translateX(13vw) rotate(-13deg); }
+  68% { transform: translateX(-3vw) rotate(-10deg); }
+  100% { transform: translateX(-36vw) rotate(-7deg); }
+}
+
+.sammie-speech {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: calc(100% + 17px);
+  min-width: max-content;
+  transform: translateX(-50%);
+  padding: .65rem 1.05rem;
+  border: 3px solid #002D72;
+  border-radius: 1rem;
+  background: #fff;
+  color: #002D72;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .25);
+  font-size: clamp(1.15rem, 2.1vw, 1.8rem);
+  font-weight: 900;
+  letter-spacing: .01em;
+  animation: sammie-speech-pop .28s cubic-bezier(.2, 1.35, .45, 1) both;
+}
+
+.sammie-speech::after {
+  content: "";
+  position: absolute;
+  left: 52%;
+  top: 100%;
+  width: 18px;
+  height: 18px;
+  border-right: 3px solid #002D72;
+  border-bottom: 3px solid #002D72;
+  background: #fff;
+  transform: translate(-50%, -9px) rotate(45deg);
+}
+
+@keyframes sammie-speech-pop {
+  from { opacity: 0; transform: translateX(-50%) scale(.6); }
+  to { opacity: 1; transform: translateX(-50%) scale(1); }
+}
+
+.sammie-smoke {
+  position: absolute;
+  z-index: 1;
+  left: 66%;
+  bottom: 10%;
+  width: min(70vw, 900px);
+  height: 40%;
+}
+
+.sammie-smoke i,
+.sammie-offscreen-smoke i {
+  position: absolute;
+  left: calc(var(--smoke-index) * clamp(20px, 3.1vw, 48px));
+  bottom: var(--smoke-y);
+  width: var(--smoke-size);
+  height: var(--smoke-size);
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 35%, #fff 0 22%, rgba(230, 233, 238, .92) 42%, rgba(169, 176, 188, .62) 66%, rgba(120, 128, 142, 0) 76%);
+  filter: blur(1px);
+  animation: sammie-smoke-puff 1.35s ease-out infinite;
+  animation-delay: calc(var(--smoke-index) * -.115s);
+}
+
+@keyframes sammie-smoke-puff {
+  0% { opacity: .92; transform: translate(0, 0) scale(.3); }
+  55% { opacity: .72; }
+  100% { opacity: 0; transform: translate(60px, -55px) scale(2.35); }
+}
+
+.sammie-skid {
+  position: absolute;
+  z-index: 3;
+  left: 68%;
+  bottom: 7%;
+  width: 8rem;
+  height: 4rem;
+}
+.sammie-skid i {
+  position: absolute;
+  left: calc((var(--skid, 0)) * 15px);
+  bottom: 0;
+  width: 3.6rem;
+  height: 5px;
+  border-radius: 99px;
+  background: #f8fafc;
+  box-shadow: 0 0 10px #fff;
+  transform: rotate(-12deg);
+  animation: sammie-skid-flash .34s ease-out infinite alternate;
+}
+.sammie-skid i:nth-child(1) { --skid: 0; }
+.sammie-skid i:nth-child(2) { --skid: 1; bottom: 15px; animation-delay: -.1s; }
+.sammie-skid i:nth-child(3) { --skid: 2; bottom: 30px; animation-delay: -.2s; }
+@keyframes sammie-skid-flash {
+  from { opacity: .15; transform: translateX(0) rotate(-12deg) scaleX(.5); }
+  to { opacity: 1; transform: translateX(22px) rotate(-12deg) scaleX(1); }
+}
+
+.sammie-offscreen-smoke {
+  position: absolute;
+  left: -4rem;
+  bottom: 1vh;
+  width: 85vw;
+  height: 24vh;
+  animation: sammie-smoke-fade 2.1s ease-out forwards;
+}
+.sammie-offscreen-smoke i { animation-duration: 1.75s; }
+@keyframes sammie-smoke-fade {
+  0%, 55% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.sammie-final-line {
+  position: absolute;
+  left: -7px;
+  bottom: clamp(8rem, 25vh, 15rem);
+  padding: .8rem 1.25rem .8rem 1.7rem;
+  border: 3px solid #EB6608;
+  border-left: 0;
+  border-radius: 0 1rem 1rem 0;
+  background: #002D72;
+  color: #fff;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .32);
+  font-size: clamp(1.05rem, 2.2vw, 1.65rem);
+  font-weight: 900;
+  font-style: italic;
+  animation: sammie-final-shout 2.1s ease-out forwards;
+}
+@keyframes sammie-final-shout {
+  0% { opacity: 0; transform: translateX(-100%); }
+  18%, 72% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(-25%); }
+}
+
+@media (max-width: 640px) {
+  .sammie-bot { width: clamp(9rem, 39vw, 13rem); }
+  .sammie-bot-greet,
+  .sammie-bot-beep { transform: translateX(10vw); }
+  @keyframes sammie-roll-in {
+    0% { transform: translateX(112vw); }
+    75% { transform: translateX(7vw) rotate(-2deg); }
+    88% { transform: translateX(13vw) rotate(1deg); }
+    100% { transform: translateX(10vw); }
+  }
+  @keyframes sammie-wheelie-pop {
+    0% { transform: translateX(10vw); }
+    35%, 100% { transform: translateX(9vw) rotate(-15deg) translateY(-3px); }
+  }
+  @keyframes sammie-burnout-exit {
+    0% { transform: translateX(9vw) rotate(-15deg); }
+    24% { transform: translateX(7vw) rotate(-17deg); }
+    48% { transform: translateX(2vw) rotate(-13deg); }
+    100% { transform: translateX(-56vw) rotate(-7deg); }
+  }
+}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { obBot } from '../assets/banners';
 import obieCopilot from '../assets/obie-copilot-robot.png';
 
@@ -41,19 +41,52 @@ const THOUGHTS = [
 
 export default function ObieThinking() {
   const [i, setI] = useState(() => Math.floor(Math.random() * THOUGHTS.length));
-  const [showCopilot, setShowCopilot] = useState(false);
+  const [sammiePhase, setSammiePhase] = useState('idle');
+  const clickCountRef = useRef(0);
+  const lastClickRef = useRef(0);
+  const sammieActiveRef = useRef(false);
+  const sammieTimersRef = useRef([]);
 
   useEffect(() => {
     const id = setInterval(() => setI(n => (n + 1) % THOUGHTS.length), 15000);
     return () => clearInterval(id);
   }, []);
 
-  useEffect(() => {
-    if (!showCopilot) return;
-    const closeOnEscape = (event) => { if (event.key === 'Escape') setShowCopilot(false); };
-    window.addEventListener('keydown', closeOnEscape);
-    return () => window.removeEventListener('keydown', closeOnEscape);
-  }, [showCopilot]);
+  useEffect(() => () => {
+    sammieTimersRef.current.forEach(window.clearTimeout);
+  }, []);
+
+  const startSammieRun = () => {
+    if (sammieActiveRef.current) return;
+    sammieActiveRef.current = true;
+    setSammiePhase('roll-in');
+
+    const phases = [
+      ['greet', 2400],
+      ['beep', 4000],
+      ['wheelie', 5300],
+      ['exit', 6500],
+      ['offscreen', 9800],
+      ['idle', 11900],
+    ];
+
+    sammieTimersRef.current = phases.map(([phase, delay]) => window.setTimeout(() => {
+      setSammiePhase(phase);
+      if (phase === 'idle') sammieActiveRef.current = false;
+    }, delay));
+  };
+
+  const handleObieClick = () => {
+    const now = Date.now();
+    if (now - lastClickRef.current > 1200) clickCountRef.current = 0;
+    lastClickRef.current = now;
+    clickCountRef.current += 1;
+
+    if (clickCountRef.current >= 5) {
+      clickCountRef.current = 0;
+      startSammieRun();
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center select-none">
@@ -62,35 +95,54 @@ export default function ObieThinking() {
       </div>
       <button
         type="button"
-        onClick={() => setShowCopilot(true)}
-        aria-label="Meet Obie's robot co-pilot"
-        title="Click Obie to call in backup"
+        onClick={handleObieClick}
+        aria-label="Obie, the Ops-Base Bot"
+        title="Obie is listening"
         className="rounded-full bg-transparent p-0 transition hover:scale-[1.03] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#EB6608]/70"
       >
         <img src={obBot} alt="OB the Ops-Base Bot" className="obie-float w-[21.5rem] max-w-full h-auto drop-shadow-2xl" />
       </button>
 
-      {showCopilot && (
-        <div
-          className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/75 p-4 backdrop-blur-sm"
-          role="presentation"
-          onMouseDown={(event) => { if (event.target === event.currentTarget) setShowCopilot(false); }}
-        >
-          <section role="dialog" aria-modal="true" aria-label="Obie's robot co-pilot" className="relative w-full max-w-md overflow-hidden rounded-2xl border-4 border-[#EB6608] bg-[#002D72] shadow-2xl">
-            <button
-              type="button"
-              onClick={() => setShowCopilot(false)}
-              aria-label="Close robot co-pilot"
-              className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-slate-950/70 text-xl font-bold text-white shadow-lg transition hover:bg-[#EB6608]"
-            >
-              ×
-            </button>
-            <img src={obieCopilot} alt="Smiling, winking robot co-pilot" className="block aspect-square w-full object-cover" />
-            <div className="border-t-2 border-[#EB6608] px-5 py-4 text-center text-white">
-              <p className="text-lg font-extrabold">Obie called in backup.</p>
-              <p className="mt-1 text-sm text-white/80">Your robot co-pilot is ready for the next cutoff.</p>
+      {sammiePhase !== 'idle' && (
+        <div className={`sammie-stage sammie-stage-${sammiePhase}`} aria-live="polite">
+          {sammiePhase !== 'offscreen' && (
+            <div className={`sammie-bot sammie-bot-${sammiePhase}`}>
+              {(sammiePhase === 'greet' || sammiePhase === 'beep') && (
+                <div className="sammie-speech" role="status">
+                  {sammiePhase === 'greet' ? 'Hi Obie!!' : 'Beep Beep!'}
+                </div>
+              )}
+              {(sammiePhase === 'wheelie' || sammiePhase === 'exit') && (
+                <>
+                  <div className="sammie-smoke" aria-hidden="true">
+                    {Array.from({ length: 14 }, (_, smokeIndex) => (
+                      <i key={smokeIndex} style={{
+                        '--smoke-index': smokeIndex,
+                        '--smoke-size': `${42 + (smokeIndex % 5) * 10}px`,
+                        '--smoke-y': `${(smokeIndex % 4) * 7}px`,
+                      }} />
+                    ))}
+                  </div>
+                  <div className="sammie-skid" aria-hidden="true"><i /><i /><i /></div>
+                </>
+              )}
+              <img src={obieCopilot} alt="Sammie Bot, smiling and winking from his robot body" />
             </div>
-          </section>
+          )}
+          {sammiePhase === 'offscreen' && (
+            <>
+              <div className="sammie-offscreen-smoke" aria-hidden="true">
+                {Array.from({ length: 18 }, (_, smokeIndex) => (
+                  <i key={smokeIndex} style={{
+                    '--smoke-index': smokeIndex,
+                    '--smoke-size': `${48 + (smokeIndex % 5) * 11}px`,
+                    '--smoke-y': `${(smokeIndex % 5) * 8}px`,
+                  }} />
+                ))}
+              </div>
+              <div className="sammie-final-line" role="status">Eat my dust Maersk!</div>
+            </>
+          )}
         </div>
       )}
     </div>
