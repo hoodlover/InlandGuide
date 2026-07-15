@@ -55,7 +55,16 @@ module.exports = async (req, res) => {
       return;
     }
     const detail = (await gh.text()).slice(0, 300);
-    res.status(502).json({ error: `GitHub responded ${gh.status}`, detail });
+    const reasons = {
+      401: 'GitHub token expired or was revoked.',
+      403: 'GitHub token does not have Actions write permission.',
+      404: 'Repository/workflow was not found, or the token cannot access it.',
+      422: 'GitHub rejected the configured branch or workflow dispatch.',
+    };
+    res.status(502).json({
+      error: reasons[gh.status] || `GitHub responded ${gh.status}.`,
+      detail,
+    });
   } catch (err) {
     res.status(502).json({ error: 'Failed to reach GitHub', detail: String(err).slice(0, 300) });
   }

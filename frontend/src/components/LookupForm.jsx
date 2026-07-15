@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getPortGroups, getCities, getPortServices, calculateERDLRD, cityLabel, getRailTerminal, getRail, cityNeedsExtraDays, defaultExtraDays, getTerminals, getTerminalOptions, ssyForTerminal, terminalLabel, terminalForSSY, getPortNote } from '../lib/cutoff';
+import { getPortGroups, getPortSearchDetails, getCities, getCitySearchDetails, getPortServices, calculateERDLRD, cityLabel, getRailTerminal, getRail, cityNeedsExtraDays, defaultExtraDays, getTerminals, getTerminalOptions, ssyForTerminal, terminalLabel, terminalForSSY, getPortNote } from '../lib/cutoff';
 import { hlLogo } from '../assets/hlLogo';
 import { hlLogoOrange } from '../assets/hlLogoOrange';
 import Combobox from './Combobox';
 import { SalesforceIcon, OutlookIcon, TeamsIcon, TextIcon } from './BrandIcons';
 import ObieThinking from './ObieThinking';
+import { renderPasteCardImage } from '../lib/pasteCardImage';
 
 // Flexible date entry:  "9" = 9th of THIS month · "8/9" = Aug 9 · "8/9/26" or "8/9/2026" = full.
 function parseFlexibleDate(input) {
@@ -60,6 +61,37 @@ function today() {
   return { iso, mdy: `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}` };
 }
 
+// The city picker sometimes includes the rail terminal to distinguish two ramps
+// in the same city (for example "COLUMBUS, OH Discovery Park"). The copied card
+// already prints "NS / Discovery Park", so remove that repeated suffix there
+// while leaving the authoritative picker value untouched.
+function cityForResultTitle(city, railTerminal) {
+  const terminal = String(railTerminal || '').split('/').slice(1).join('/').trim();
+  if (!terminal) return city;
+  const cityText = String(city || '');
+  const suffix = ` ${terminal}`;
+  return cityText.toUpperCase().endsWith(suffix.toUpperCase())
+    ? cityText.slice(0, -suffix.length).trim()
+    : cityText;
+}
+
+function railTerminalForResultTitle(city, railTerminal) {
+  const parts = String(railTerminal || '').split('/').map(part => part.trim()).filter(Boolean);
+  if (parts.length < 2) return railTerminal;
+  const cityName = String(city || '').split(',')[0].trim();
+  const normalized = value => String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  return normalized(parts.slice(1).join(' / ')) === normalized(cityName) ? parts[0] : railTerminal;
+}
+
+// Outlook is sensitive to inline-image line boxes. A fixed-height presentation
+// cell gives the baked-orange logo enough top room and prevents it being clipped.
+function outlookLogoBlock() {
+  return `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" bgcolor="#EB6608" style="border-collapse:collapse;background-color:#EB6608;margin-top:12px">` +
+    `<tr><td height="34" valign="middle" align="right" bgcolor="#EB6608" style="height:34px;padding:6px 0 4px;line-height:24px;mso-line-height-rule:exactly">` +
+      `<img src="${hlLogoOrange}" width="150" height="24" alt="Hapag-Lloyd" style="display:block;width:150px;height:24px;max-height:24px;border:0;outline:none;text-decoration:none;margin-left:auto" />` +
+    `</td></tr></table>`;
+}
+
 export default function LookupForm({ onCanadaPort }) {
   const [formData, setFormData] = useState(() => ({ ...EMPTY_FORM, portCutDate: today().iso }));
 
@@ -70,6 +102,7 @@ export default function LookupForm({ onCanadaPort }) {
   const [results, setResults] = useState(null);
   const [error, setError] = useState('');
   const [copyMessage, setCopyMessage] = useState('');
+  const [pasteProof, setPasteProof] = useState(null);
 
   // All options are derived locally from the bundled data snapshot — no network.
   const portGroups = getPortGroups();
@@ -145,6 +178,7 @@ export default function LookupForm({ onCanadaPort }) {
     setResults(null);
     setError('');
     setCopyMessage('');
+    setPasteProof(null);
   };
 
   const handleSubmit = (e) => {
@@ -152,6 +186,7 @@ export default function LookupForm({ onCanadaPort }) {
     setError('');
     setResults(null);
     setCopyMessage('');
+    setPasteProof(null);
 
     if (!formData.portCutDate) {
       setError('Enter a valid Port Cut Date — e.g. 9, or 8/9, or 8/9/2026');
@@ -185,7 +220,7 @@ export default function LookupForm({ onCanadaPort }) {
 
     // Compact top line: "City, ST    RR / terminal" (4 spaces between the two).
     const railTerminal = getRailTerminal(results.rampMC, formData.startCity);
-    const cityST = formData.startCity;
+    const cityST = cityForResultTitle(formData.startCity, railTerminal);
     const topPlain = `${cityST}    ${railTerminal}`;
     const topHtml = `<b>${cityST}</b>&nbsp;&nbsp;&nbsp;&nbsp;<b>${railTerminal}</b>`;
     const divider = '─'.repeat(Math.max(24, topPlain.length));
@@ -235,25 +270,21 @@ export default function LookupForm({ onCanadaPort }) {
       ''
     ].filter(v => v !== null).join('<br>') + `</div>`;
 
+    setPasteProof({
+      heading: 'Plain copy ready to paste anywhere',
+      format: 'text',
+      content: text,
+    });
     try {
-      if (navigator.clipboard && window.ClipboardItem) {
-        await navigator.clipboard.write([
-          new ClipboardItem({
-            'text/plain': new Blob([text], { type: 'text/plain' }),
-            'text/html': new Blob([html], { type: 'text/html' })
-          })
-        ]);
-      } else {
-        await navigator.clipboard.writeText(text);
-      }
-      setCopyMessage('✓ Copied to clipboard!');
+      await navigator.clipboard.writeText(text);
+      setCopyMessage('✓ Plain copy ready!');
       setTimeout(() => setCopyMessage(''), 2000);
     } catch {
       setCopyMessage('Failed to copy');
     }
   };
 
-  const writeClip = async (text, html, okMsg) => {
+  const writeClip = async (text, html, okMsg, proofHeading) => {
     try {
       if (navigator.clipboard && window.ClipboardItem) {
         await navigator.clipboard.write([
@@ -266,6 +297,7 @@ export default function LookupForm({ onCanadaPort }) {
         await navigator.clipboard.writeText(text);
       }
       setCopyMessage(okMsg);
+      setPasteProof({ heading: proofHeading, format: 'html', content: html });
       setTimeout(() => setCopyMessage(''), 2000);
     } catch {
       setCopyMessage('Failed to copy');
@@ -275,8 +307,9 @@ export default function LookupForm({ onCanadaPort }) {
   // Shared title + plain-text body for both card variants. Title = "City, ST    RR
   // / terminal"; a smaller size for long titles so the box never overflows.
   const cardParts = () => {
-    const cityST = formData.startCity || '';
-    const railTerminal = getRailTerminal(results.rampMC, formData.startCity);
+    const fullRailTerminal = getRailTerminal(results.rampMC, formData.startCity);
+    const cityST = cityForResultTitle(formData.startCity, fullRailTerminal);
+    const railTerminal = railTerminalForResultTitle(cityST, fullRailTerminal);
     const titlePlain = `${cityST}    ${railTerminal}`;
     const titleHtml = `${cityST}&nbsp;&nbsp;&nbsp;&nbsp;${railTerminal}`;
     const titleSize = titlePlain.length > 34 ? 15 : (titlePlain.length > 26 ? 17 : 20);
@@ -290,7 +323,7 @@ export default function LookupForm({ onCanadaPort }) {
       polTerm ? `POL Terminal: ${polTerm}` : null,
       '', ''
     ].filter(v => v !== null).join('\n');
-    return { titleHtml, titleSize, text, polTerm };
+    return { titlePlain, titleHtml, titleSize, titleLeft: cityST, titleRight: railTerminal, text, polTerm };
   };
 
   // Salesforce card — div layout (SF shows no dashed cell guides; transparent
@@ -317,7 +350,7 @@ export default function LookupForm({ onCanadaPort }) {
         `<div style="text-align:right;margin-top:14px"><img src="${hlLogo}" width="150" alt="Hapag-Lloyd" style="display:inline-block;width:150px;height:auto" /></div>` +
       `</div>` +
       `<br><br>`;
-    writeClip(text, html, '✓ Copied for Salesforce!');
+    writeClip(text, html, '✓ Copied for Salesforce!', 'Ready to paste into Salesforce');
   };
 
   // Outlook & Teams card — table layout with bgcolor attrs (they strip div
@@ -339,16 +372,45 @@ export default function LookupForm({ onCanadaPort }) {
             row('Ramp Cut Time', results.rampCutTime) +
             (polTerm ? row('POL Terminal', polTerm) : '') +
           `</table>` +
-          `<div style="text-align:right;margin-top:14px"><img src="${hlLogoOrange}" width="150" alt="Hapag-Lloyd" style="display:inline-block;width:150px;height:auto" /></div>` +
+          outlookLogoBlock() +
         `</td></tr>` +
       `</table>` +
       `<br><br>`;
-    writeClip(text, html, '✓ Copied for Outlook / Teams!');
+    writeClip(text, html, '✓ Copied for Outlook!', 'Ready to paste into Outlook');
+  };
+
+  // Teams strips pasted HTML styling and prefers text when an item exposes both
+  // text and image flavors, so publish the finished branded card as image-only.
+  const handleCopyPretty = async () => {
+    if (!results) return;
+    const { titlePlain, titleLeft, titleRight, text, polTerm } = cardParts();
+    const rows = [
+      ['Earliest Return Date (ERD)', results.erd],
+      ['Latest Return Date (LRD)', results.lrd],
+      ['Ramp Cut Time', results.rampCutTime],
+      ...(polTerm ? [['POL Terminal', polTerm]] : []),
+    ];
+    try {
+      const image = await renderPasteCardImage({ title: titlePlain, titleLeft, titleRight, rows, logo: hlLogo });
+      setPasteProof({ heading: 'Pretty copy ready to paste anywhere', format: 'image', content: image.dataUrl });
+      if (navigator.clipboard && window.ClipboardItem) {
+        await navigator.clipboard.write([new ClipboardItem({
+          'image/png': image.blob,
+        })]);
+      } else {
+        await navigator.clipboard.writeText(text);
+        setPasteProof({ heading: 'Pretty copy unavailable — plain copy ready', format: 'text', content: text });
+      }
+      setCopyMessage('✓ Pretty copy ready!');
+      setTimeout(() => setCopyMessage(''), 2000);
+    } catch {
+      setCopyMessage('Failed to copy');
+    }
   };
 
   return (
-    <div className="grid md:grid-cols-2 gap-6">
-      <div className="bg-[#EB6608] rounded-lg border border-[#EB6608] shadow-sm p-6">
+    <div className="grid items-start md:grid-cols-2 gap-6">
+      <div className="self-start bg-[#EB6608] rounded-lg border border-[#EB6608] shadow-sm p-6">
         <h2 className="text-xl font-extrabold tracking-wide uppercase mb-4 pb-2 border-b-2 border-white/60 text-white txt-shadow-heavy">Inland Guide Rail Tool</h2>
         
         <form onSubmit={handleSubmit} className="space-y-3">
@@ -360,12 +422,12 @@ export default function LookupForm({ onCanadaPort }) {
               options={[
                 // US ports first (no header), then all four Canada ports (which
                 // route to the Canada tab), then any remaining groups (Mexico…).
-                ...(portGroups.find(g => g.label === 'United States')?.ports || []).map(p => ({ value: p, label: p })),
+                ...(portGroups.find(g => g.label === 'United States')?.ports || []).map(p => ({ value: p, label: p, search: getPortSearchDetails(p) })),
                 { header: 'Canada Ports' },
-                ...CANADA_PORTS.map(p => ({ value: p.code, label: p.code })),
+                ...CANADA_PORTS.map(p => ({ value: p.code, label: p.code, search: getPortSearchDetails(p.code) })),
                 ...portGroups
                   .filter(g => g.label !== 'United States' && g.label !== 'Canada')
-                  .flatMap(g => [{ header: `${g.label} Ports` }, ...g.ports.map(p => ({ value: p, label: p }))]),
+                  .flatMap(g => [{ header: `${g.label} Ports` }, ...g.ports.map(p => ({ value: p, label: p, search: getPortSearchDetails(p) }))]),
               ]}
               placeholder="Type or select a port…"
               required
@@ -377,7 +439,7 @@ export default function LookupForm({ onCanadaPort }) {
             <Combobox
               value={formData.startCity}
               onSelect={(value) => handleChange({ target: { name: 'startCity', value } })}
-              options={cities.map(c => ({ value: c, label: cityLabel(c) }))}
+              options={cities.map(c => ({ value: c, label: cityLabel(c), search: getCitySearchDetails(formData.pol, c) }))}
               placeholder={formData.pol ? 'Type or select a city…' : 'Select a port first'}
               disabled={!formData.pol}
               required
@@ -517,39 +579,48 @@ export default function LookupForm({ onCanadaPort }) {
       <div>
         {results ? (
           <div className="bg-[#002D72] rounded-lg border border-[#002D72] shadow-sm p-6">
-            <h3 className="text-xl font-extrabold tracking-wide uppercase mb-4 pb-2 border-b-2 border-[#EB6608] text-white txt-shadow-heavy">Results</h3>
+            <h3 className="text-xl font-extrabold tracking-wide uppercase mb-4 pb-2 border-b-2 border-[#EB6608] text-white txt-shadow-heavy">{pasteProof ? 'Ready to Paste' : 'Results'}</h3>
 
-            <div className="bg-white divide-y divide-slate-200 rounded-lg px-4 shadow-md">
-              <ResultCard label="Earliest Return Date (ERD)" value={results.erd} />
-              <ResultCard label="Latest Return Date (LRD)" value={results.lrd} />
-              <ResultCard label="Ramp Cut Time" value={results.rampCutTime} />
-              <RailCard railroad={getRail(results.rampMC, formData.startCity)} rampMC={results.rampMC} />
-              {selTerminalLabel && <ResultCard label="POL Terminal" value={selTerminalLabel} />}
-            </div>
-
-            {getPortNote(formData.pol) && (
-              <p className="mt-3 text-xs italic text-amber-200/90 leading-snug">⚠ {getPortNote(formData.pol)}</p>
+            {pasteProof ? (
+              <section className="rounded-lg border-2 border-emerald-400 bg-white p-4 shadow-lg" aria-live="polite">
+                <p className="text-base font-extrabold text-emerald-700">✓ {pasteProof.heading}</p>
+                <p className="mt-1 text-xs font-semibold text-slate-500">This is exactly what was copied:</p>
+                <div className="mt-3 overflow-x-auto rounded-md border border-slate-200 bg-white p-3 text-slate-900">
+                  {pasteProof.format === 'image' ? (
+                    <img src={pasteProof.content} alt="Pretty paste card preview" className="block max-w-full h-auto" />
+                  ) : (
+                    <pre className="whitespace-pre-wrap break-words font-mono text-xs leading-relaxed">{pasteProof.content}</pre>
+                  )}
+                </div>
+              </section>
+            ) : (
+              <>
+                <div className="bg-white divide-y divide-slate-200 rounded-lg px-4 shadow-md">
+                  <ResultCard label="Earliest Return Date (ERD)" value={results.erd} />
+                  <ResultCard label="Latest Return Date (LRD)" value={results.lrd} />
+                  <ResultCard label="Ramp Cut Time" value={results.rampCutTime} />
+                  <RailCard railroad={getRail(results.rampMC, formData.startCity)} rampMC={results.rampMC} />
+                  {selTerminalLabel && <ResultCard label="POL Terminal" value={selTerminalLabel} />}
+                </div>
+                {getPortNote(formData.pol) && (
+                  <p className="mt-3 text-xs italic text-amber-200/90 leading-snug">⚠ {getPortNote(formData.pol)}</p>
+                )}
+              </>
             )}
 
-            <p className="mt-4 text-center text-xs text-white/70">Click where you're pasting — copies ready for Ctrl+V.</p>
+            <p className="mt-4 text-center text-xs text-white/70">Choose a copy style — then paste with Ctrl+V.</p>
             <div className="mt-2 flex flex-wrap items-center justify-center gap-2.5">
               <button
-                onClick={handleCopySalesforce}
+                onClick={handleCopyPretty}
                 className="inline-flex items-center gap-2 px-4 py-1.5 text-sm bg-white text-slate-800 rounded-full hover:bg-slate-100 transition font-semibold shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
               >
-                <SalesforceIcon /> Salesforce
-              </button>
-              <button
-                onClick={handleCopyOutlook}
-                className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm bg-white text-slate-800 rounded-full hover:bg-slate-100 transition font-semibold shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
-              >
-                <OutlookIcon /><TeamsIcon /> <span className="ml-0.5">Outlook &amp; Teams</span>
+                <span aria-hidden="true">✨</span> Pretty
               </button>
               <button
                 onClick={handleCopyResults}
                 className="inline-flex items-center gap-2 px-4 py-1.5 text-sm bg-white/10 border border-white/40 text-white rounded-full hover:bg-white/20 transition font-semibold shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
               >
-                <TextIcon /> Boring Text
+                <TextIcon /> Plain
               </button>
             </div>
 
@@ -558,6 +629,7 @@ export default function LookupForm({ onCanadaPort }) {
                 {copyMessage}
               </div>
             )}
+
           </div>
         ) : (
           <div className="rounded-lg p-6 h-full flex flex-col items-center justify-center min-h-[32rem]">

@@ -191,6 +191,7 @@ function ObieWalkOn() {
   const [exit, setExit] = useState('wheelie');
   const [revealed, setRevealed] = useState(false);
   const [joke, setJoke] = useState(() => nextJoke());
+  const [scheduleKey, setScheduleKey] = useState(0);
 
   useEffect(() => {
     let timers = [];
@@ -213,9 +214,18 @@ function ObieWalkOn() {
         push(enter, OBIE_HIDE_MS);
       }, OBIE_SHOW_MS + OBIE_EXIT_MS);
     };
-    push(enter, OBIE_FIRST_MS);
+    // First visit is shortly after load. Clicking Obie restarts this effect and
+    // schedules his next normal visit ten minutes later.
+    push(enter, scheduleKey === 0 ? OBIE_FIRST_MS : OBIE_HIDE_MS);
     return () => timers.forEach(clearTimeout);
-  }, []);
+  }, [scheduleKey]);
+
+  const dismissObie = () => {
+    setVisible(false);
+    setLeaving(false);
+    setRevealed(false);
+    setScheduleKey(key => key + 1);
+  };
 
   const { q, a } = splitJoke(joke);
 
@@ -239,7 +249,15 @@ function ObieWalkOn() {
             <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
           </span>
         )}
-        <img src={obBot} alt="OB the Ops-Base Bot" className={`obie-jokebot ${leaving && exit === 'wheelie' ? 'obie-jokebot-leaving' : flipped ? 'obie-jokebot-in' : 'obie-jokebot-out'} w-[10.5rem] h-auto drop-shadow-xl`} />
+        <button
+          type="button"
+          onClick={dismissObie}
+          aria-label="Dismiss Joker Obie for 10 minutes"
+          title="Click Obie to send him away for 10 minutes"
+          className="block cursor-pointer bg-transparent border-0 p-0"
+        >
+          <img src={obBot} alt="OB the Ops-Base Bot" className={`obie-jokebot ${leaving && exit === 'wheelie' ? 'obie-jokebot-leaving' : flipped ? 'obie-jokebot-in' : 'obie-jokebot-out'} w-[10.5rem] h-auto drop-shadow-xl`} />
+        </button>
       </div>
     </div>
   );
@@ -434,6 +452,10 @@ function RefreshModal({ onClose }) {
 
   const submit = async () => {
     if (!pass || busy) return;
+    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+      setStatus({ ok: false, msg: 'Manual refresh only runs on the live app: inland-guide.vercel.app' });
+      return;
+    }
     setBusy(true); setStatus(null);
     try {
       const r = await fetch('/api/refresh', {
@@ -445,7 +467,13 @@ function RefreshModal({ onClose }) {
       if (r.ok && data.ok) setStatus({ ok: true, msg: '✓ Refresh started — new schedules deploy in a few minutes.' });
       else if (r.status === 401) setStatus({ ok: false, msg: 'Wrong passphrase.' });
       else if (r.status === 500) setStatus({ ok: false, msg: 'Not set up yet — add GH_TOKEN & REFRESH_PASSPHRASE in Vercel.' });
-      else setStatus({ ok: false, msg: data.error || 'Could not trigger the refresh.' });
+      else {
+        const detail = data.detail ? ` — ${data.detail}` : '';
+        setStatus({
+          ok: false,
+          msg: data.error ? `${data.error}${detail}` : `Refresh service returned HTTP ${r.status}.`,
+        });
+      }
     } catch {
       setStatus({ ok: false, msg: 'Network error — this only works on the live web app.' });
     } finally {

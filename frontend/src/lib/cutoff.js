@@ -163,6 +163,19 @@ export function getRailTerminal(rampMC, city) {
   return byCity || TERMINAL_BY_RAMP.get(key) || city || '';
 }
 
+// Extra searchable text for an inland-city option. The visible selection stays
+// "CITY, ST - LOCCODE", but users can also find it by railroad terminal or the
+// ramp matchcode from the workbook.
+export function getCitySearchDetails(pol, city) {
+  const details = [];
+  for (const lane of lanes.filter(l => l.pol === pol && l.name === city)) {
+    const terminal = getRailTerminal(lane.rampMC, city);
+    const detail = [terminal, normCode(lane.rampMC)].filter(Boolean).join(' · ');
+    if (detail && !details.includes(detail)) details.push(detail);
+  }
+  return details.join(' · ');
+}
+
 // Just the railroad abbreviation (e.g. "NS", "UP", "CPKC") — the part before the
 // " / " in the terminal label. Falls back to the prefix-based railroad name.
 export function getRail(rampMC, city) {
@@ -219,6 +232,18 @@ export function getTerminals(pol) {
 export function getTerminalOptions(pol) {
   const d = getTerminals(pol);
   return d ? d.terminals.map(t => ({ value: t.code, label: t.label, sub: t.ssys.join(' · ') })) : [];
+}
+
+// Extra searchable text for a POL option. This lets a user type a terminal name
+// or matchcode (for example APM or Maher) and then select the matched POL while
+// the underlying selected value remains the POL loccode.
+export function getPortSearchDetails(pol) {
+  const d = portInfo(pol);
+  if (!d) return '';
+  return d.terminals.map(t => {
+    const name = terminalLabel(t.code);
+    return name === t.code ? t.code : `${name} (${t.code})`;
+  }).join(' · ');
 }
 
 // The terminal label a given service code loads through (for the result line), or ''.

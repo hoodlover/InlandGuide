@@ -5,6 +5,7 @@ import { hlLogo } from '../assets/hlLogo';
 import { hlLogoOrange } from '../assets/hlLogoOrange';
 import { SalesforceIcon, OutlookIcon, TeamsIcon, TextIcon } from './BrandIcons';
 import ObieThinking from './ObieThinking';
+import { renderPasteCardImage } from '../lib/pasteCardImage';
 
 const EMPTY = { port: '', vessel: '', city: '' };
 
@@ -15,12 +16,20 @@ function formatPulled(iso) {
   return d.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
 }
 
+function outlookLogoBlock() {
+  return `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" bgcolor="#EB6608" style="border-collapse:collapse;background-color:#EB6608;margin-top:12px">` +
+    `<tr><td height="34" valign="middle" align="right" bgcolor="#EB6608" style="height:34px;padding:6px 0 4px;line-height:24px;mso-line-height-rule:exactly">` +
+      `<img src="${hlLogoOrange}" width="150" height="24" alt="Hapag-Lloyd" style="display:block;width:150px;height:24px;max-height:24px;border:0;outline:none;text-decoration:none;margin-left:auto" />` +
+    `</td></tr></table>`;
+}
+
 export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
   const ports = getPorts();
   // Preselect the port handed off from the US tab; else auto-select when there's
   // only one port.
   const [sel, setSel] = useState({ ...EMPTY, port: initialPort || (ports.length === 1 ? ports[0].slug : '') });
   const [copyMessage, setCopyMessage] = useState('');
+  const [pasteProof, setPasteProof] = useState(null);
 
   const vessels = sel.port ? getVessels(sel.port) : [];
   const cities = sel.port ? getCities(sel.port) : [];
@@ -34,11 +43,13 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
       return next;
     });
     setCopyMessage('');
+    setPasteProof(null);
   };
 
   const handleReset = () => {
     setSel({ ...EMPTY, port: ports.length === 1 ? ports[0].slug : '' });
     setCopyMessage('');
+    setPasteProof(null);
   };
 
   const meta = (sel.port && sel.vessel) ? getVesselMeta(sel.port, sel.vessel) : null;
@@ -83,7 +94,7 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
   };
 
   // Plain-text note, mirroring the "Copy Kind Text Note" style of the calculator.
-  const handleCopyText = () => {
+  const handleCopyText = async () => {
     if (!results) return;
     const railTerminal = `${results.rail || 'Rail'}${results.terminal ? ' / ' + results.terminal : ''}`;
     const top = `${results.city}    ${railTerminal}`;
@@ -105,29 +116,22 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
       ''
     ].filter(v => v !== null).join('\n');
 
-    const html = `<div style="font-family:'Times New Roman',Times,serif">` + [
-      'Here are the ramp cuts you requested:',
-      '',
-      `<b>${results.city}</b>&nbsp;&nbsp;&nbsp;&nbsp;<b>${railTerminal}</b>`,
-      divider,
-      `Vessel: <b>${results.vessel}</b>`,
-      `Earliest Receiving (ERD): <b>${results.erd}</b>`,
-      `Inland Cut-Off (LRD): <b>${results.cutoff}</b>`,
-      results.cutTime ? `Cut-Off Time: <b>${results.cutTime}</b>` : null,
-      results.comments ? `Note: ${results.comments}` : null,
-      '',
-      `${info.name} — as published ${info.runDate}`,
-      divider,
-      '',
-      ''
-    ].filter(v => v !== null).join('<br>') + `</div>`;
-
-    writeClipboard(text, html, '✓ Copied to clipboard!');
+    setPasteProof({ heading: 'Plain copy ready to paste anywhere', format: 'text', content: text });
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopyMessage('✓ Plain copy ready!');
+      setTimeout(() => setCopyMessage(''), 2000);
+    } catch {
+      setCopyMessage('Failed to copy');
+    }
   };
 
   // Shared title + plain-text body for both card variants.
   const cardParts = () => {
-    const railTerminal = `${results.rail || 'Rail'}${results.terminal ? ' / ' + results.terminal : ''}`;
+    const cityName = String(results.city || '').split(',')[0].trim();
+    const normalized = value => String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const showTerminal = results.terminal && normalized(results.terminal) !== normalized(cityName);
+    const railTerminal = `${results.rail || 'Rail'}${showTerminal ? ' / ' + results.terminal : ''}`;
     const titlePlain = `${results.city}    ${railTerminal}`;
     const titleHtml = `${results.city}&nbsp;&nbsp;&nbsp;&nbsp;${railTerminal}`;
     const titleSize = titlePlain.length > 34 ? 15 : (titlePlain.length > 26 ? 17 : 20);
@@ -141,7 +145,7 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
       results.comments ? `Note: ${results.comments}` : null,
       '', ''
     ].filter(v => v !== null).join('\n');
-    return { titleHtml, titleSize, text };
+    return { titlePlain, titleHtml, titleSize, titleLeft: results.city, titleRight: railTerminal, text };
   };
 
   const cardRows = (row) =>
@@ -185,11 +189,46 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
           `<div style="font-family:Arial,sans-serif;color:#ffffff;font-size:${titleSize}px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;border-bottom:2px solid #ffffff;padding-bottom:8px;margin-bottom:16px">${titleHtml}</div>` +
           `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff" style="border-collapse:separate;background-color:#ffffff;border-radius:8px">` + cardRows(row) + `</table>` +
           `<div style="font-family:Arial,sans-serif;color:#ffffff;font-size:11px;margin-top:10px">${info.name} — as published ${info.runDate}</div>` +
-          `<div style="text-align:right;margin-top:8px"><img src="${hlLogoOrange}" width="150" alt="Hapag-Lloyd" style="display:inline-block;width:150px;height:auto" /></div>` +
+          outlookLogoBlock() +
         `</td></tr>` +
       `</table>` +
       `<br><br>`;
-    writeClipboard(text, html, '✓ Copied for Outlook / Teams!');
+    writeClipboard(text, html, '✓ Copied for Outlook!');
+  };
+
+  const handleCopyPretty = async () => {
+    if (!results) return;
+    const { titlePlain, titleLeft, titleRight, text } = cardParts();
+    const rows = [
+      ['Vessel', results.vessel],
+      ['Earliest Receiving (ERD)', results.erd],
+      ['Inland Cut-Off (LRD)', results.cutoff],
+      ...(results.cutTime ? [['Cut-Off Time', results.cutTime]] : []),
+      ...(results.comments ? [['Note', results.comments]] : []),
+    ];
+    try {
+      const image = await renderPasteCardImage({
+        title: titlePlain,
+        titleLeft,
+        titleRight,
+        rows,
+        logo: hlLogo,
+        footer: `${info.name} — as published ${info.runDate}`,
+      });
+      setPasteProof({ heading: 'Pretty copy ready to paste anywhere', format: 'image', content: image.dataUrl });
+      if (navigator.clipboard && window.ClipboardItem) {
+        await navigator.clipboard.write([new ClipboardItem({
+          'image/png': image.blob,
+        })]);
+      } else {
+        await navigator.clipboard.writeText(text);
+        setPasteProof({ heading: 'Pretty copy unavailable — plain copy ready', format: 'text', content: text });
+      }
+      setCopyMessage('✓ Pretty copy ready!');
+      setTimeout(() => setCopyMessage(''), 2000);
+    } catch {
+      setCopyMessage('Failed to copy');
+    }
   };
 
   return (
@@ -279,40 +318,48 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
       <div>
         {results ? (
           <div className="bg-[#002D72] rounded-lg border border-[#002D72] shadow-sm p-6">
-            <h3 className="text-xl font-extrabold tracking-wide uppercase mb-4 pb-2 border-b-2 border-[#EB6608] text-white txt-shadow-heavy">{results.city}</h3>
+            <h3 className="text-xl font-extrabold tracking-wide uppercase mb-4 pb-2 border-b-2 border-[#EB6608] text-white txt-shadow-heavy">{pasteProof ? 'Ready to Paste' : results.city}</h3>
 
-            <div className="bg-white divide-y divide-slate-200 rounded-lg px-4 shadow-md">
-              <Row label="Vessel" value={results.vessel} />
-              <Row label="Inland Cut-Off (LRD)" value={results.cutoff} strong />
-              {results.cutTime && <Row label="Cut-Off Time" value={results.cutTime} />}
-              <Row label="Earliest Receiving (ERD)" value={results.erd} strong />
-              {results.rail && <Row label="Rail" value={results.rail} />}
-              {results.terminal && <Row label="Terminal" value={results.terminal} />}
-              {results.eta && <Row label="Vessel ETA" value={results.eta} />}
-              {results.etd && <Row label="Vessel ETD" value={results.etd} />}
-              {results.railPortCutoff && <Row label="Rail Port Cut-Off" value={results.railPortCutoff} />}
-              {results.comments && <Row label="Note" value={results.comments} />}
-            </div>
+            {pasteProof ? (
+              <section className="rounded-lg border-2 border-emerald-400 bg-white p-4 shadow-lg" aria-live="polite">
+                <p className="text-base font-extrabold text-emerald-700">✓ {pasteProof.heading}</p>
+                <p className="mt-1 text-xs font-semibold text-slate-500">This is exactly what was copied:</p>
+                <div className="mt-3 overflow-x-auto rounded-md border border-slate-200 bg-white p-3 text-slate-900">
+                  {pasteProof.format === 'image' ? (
+                    <img src={pasteProof.content} alt="Pretty paste card preview" className="block max-w-full h-auto" />
+                  ) : (
+                    <pre className="whitespace-pre-wrap break-words font-mono text-xs leading-relaxed">{pasteProof.content}</pre>
+                  )}
+                </div>
+              </section>
+            ) : (
+              <div className="bg-white divide-y divide-slate-200 rounded-lg px-4 shadow-md">
+                <Row label="Vessel" value={results.vessel} />
+                <Row label="Inland Cut-Off (LRD)" value={results.cutoff} strong />
+                {results.cutTime && <Row label="Cut-Off Time" value={results.cutTime} />}
+                <Row label="Earliest Receiving (ERD)" value={results.erd} strong />
+                {results.rail && <Row label="Rail" value={results.rail} />}
+                {results.terminal && <Row label="Terminal" value={results.terminal} />}
+                {results.eta && <Row label="Vessel ETA" value={results.eta} />}
+                {results.etd && <Row label="Vessel ETD" value={results.etd} />}
+                {results.railPortCutoff && <Row label="Rail Port Cut-Off" value={results.railPortCutoff} />}
+                {results.comments && <Row label="Note" value={results.comments} />}
+              </div>
+            )}
 
-            <p className="mt-4 text-center text-xs text-white/70">Click where you're pasting — copies ready for Ctrl+V.</p>
+            <p className="mt-4 text-center text-xs text-white/70">Choose a copy style — then paste with Ctrl+V.</p>
             <div className="mt-2 flex flex-wrap items-center justify-center gap-2.5">
               <button
-                onClick={handleCopySalesforce}
+                onClick={handleCopyPretty}
                 className="inline-flex items-center gap-2 px-4 py-1.5 text-sm bg-white text-slate-800 rounded-full hover:bg-slate-100 transition font-semibold shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
               >
-                <SalesforceIcon /> Salesforce
-              </button>
-              <button
-                onClick={handleCopyOutlook}
-                className="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm bg-white text-slate-800 rounded-full hover:bg-slate-100 transition font-semibold shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
-              >
-                <OutlookIcon /><TeamsIcon /> <span className="ml-0.5">Outlook &amp; Teams</span>
+                <span aria-hidden="true">✨</span> Pretty
               </button>
               <button
                 onClick={handleCopyText}
                 className="inline-flex items-center gap-2 px-4 py-1.5 text-sm bg-white/10 border border-white/40 text-white rounded-full hover:bg-white/20 transition font-semibold shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
               >
-                <TextIcon /> Boring Text
+                <TextIcon /> Plain
               </button>
             </div>
 

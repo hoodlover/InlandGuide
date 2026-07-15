@@ -19,9 +19,9 @@ export default function Combobox({ value, onSelect, options, placeholder, disabl
   // Keep the box showing the current selection unless the user is actively typing.
   useEffect(() => { setQuery(selectedLabel); }, [selectedLabel]);
 
-  // Searchable text for an option: label + its optional sub-line (SSY codes), so
-  // typing an SSY like "US2" finds the terminal whose sub-line lists it.
-  const searchText = (o) => `${o.label} ${o.sub || ''}`.toLowerCase();
+  // Searchable text can include a visible sub-line and/or hidden search aliases.
+  // Hidden aliases keep wide search useful without cluttering ordinary results.
+  const searchText = (o) => `${o.label} ${o.sub || ''} ${o.search || ''}`.toLowerCase();
 
   // Match on any substring of the label/sub — so "nyc" finds "USNYC" and "york"
   // finds "NEW YORK, NY - USNYC" — every space-separated term must appear. Keep a
