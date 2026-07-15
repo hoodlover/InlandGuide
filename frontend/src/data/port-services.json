@@ -1,0 +1,120 @@
+{
+  "USCHS": [
+    "ALL"
+  ],
+  "USBAL": [
+    "ALL"
+  ],
+  "USHOU": [
+    "AL2",
+    "MGX",
+    "GS1",
+    "CAR",
+    "SAX",
+    "US3"
+  ],
+  "USJAX": [
+    "AL3",
+    "EC1",
+    "EC5",
+    "SEC",
+    "FLS"
+  ],
+  "USLGB": [
+    "CCE",
+    "WSN",
+    "WC1",
+    "WC2",
+    "WC5",
+    "US2",
+    "WC6"
+  ],
+  "USLAX": [
+    "CCE",
+    "WSN",
+    "WC1",
+    "WC2",
+    "WC5",
+    "US2"
+  ],
+  "USMOB": [
+    "ALL"
+  ],
+  "USMSY": [
+    "ALL"
+  ],
+  "USNYC": [
+    "AL1",
+    "AL2",
+    "AL4",
+    "AL6",
+    "AL7",
+    "TPI",
+    "TNE",
+    "USW",
+    "TEX",
+    "AA7",
+    "US4",
+    "US1",
+    "US2",
+    "SEC",
+    "MUS"
+  ],
+  "USORF": [
+    "ALL"
+  ],
+  "USOAK": [
+    "ALL"
+  ],
+  "USPHL": [
+    "ALL"
+  ],
+  "USSAV": [
+    "ALL"
+  ],
+  "USSEA": [
+    "PN3",
+    "PN1",
+    "PN2",
+    "PN4",
+    "WSN",
+    "WC4"
+  ],
+  "USTIW": [
+    "PN3",
+    "PN1",
+    "PN2",
+    "PN4",
+    "WC4"
+  ],
+  "USILM": [
+    "ALL"
+  ],
+  "MXLZC": [
+    "AN1",
+    "AN2",
+    "TPM",
+    "CCM",
+    "CCE"
+  ],
+  "CAMTR": [
+    "AT1",
+    "AT2",
+    "MCA"
+  ],
+  "CASJB": [
+    "MCA"
+  ],
+  "CAPRR": [
+    "PN4"
+  ],
+  "CAVAN": [
+    "AL5",
+    "MPS",
+    "PN1",
+    "PN2",
+    "PN3",
+    "PN4",
+    "WSN"
+  ]
+}

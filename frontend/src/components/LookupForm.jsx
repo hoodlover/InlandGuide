@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getPortGroups, getCities, getSSY, calculateERDLRD, cityLabel, getRailTerminal, getRail, cityNeedsExtraDays, defaultExtraDays, getTerminals, getTerminalOptions, ssyForTerminal, terminalLabel, terminalForSSY, getPortNote } from '../lib/cutoff';
+import { getPortGroups, getCities, getPortServices, calculateERDLRD, cityLabel, getRailTerminal, getRail, cityNeedsExtraDays, defaultExtraDays, getTerminals, getTerminalOptions, ssyForTerminal, terminalLabel, terminalForSSY, getPortNote } from '../lib/cutoff';
 import { hlLogo } from '../assets/hlLogo';
 import { hlLogoOrange } from '../assets/hlLogoOrange';
 import Combobox from './Combobox';
@@ -74,24 +74,30 @@ export default function LookupForm({ onCanadaPort }) {
   // All options are derived locally from the bundled data snapshot — no network.
   const portGroups = getPortGroups();
   const cities = formData.pol ? getCities(formData.pol) : [];
-  const ssyList = (formData.pol && formData.startCity) ? getSSY(formData.pol, formData.startCity) : [];
-  // 'functional' ports (JAX, NYC) let the user pick the loading terminal, which
-  // selects the transit lane. Everything else uses the SSY picker.
-  const terminals = formData.pol ? getTerminals(formData.pol) : null;
-  // Only prompt for an SSY when the port+city offers more than one AND the port
-  // isn't using the terminal picker.
-  const showSSYField = !terminals && ssyList.length > 1;
+  const ssyList = formData.pol ? getPortServices(formData.pol) : [];
+  const allPol = ssyList.length === 1 && ssyList[0] === 'ALL';
+  const requiresSSY = ssyList.length > 0 && !allPol;
+  // PORTSERVICES decides whether a choice is required. PORTMC then decides
+  // whether that choice is presented as friendly terminals or raw SSY codes.
+  const terminals = formData.pol && requiresSSY ? getTerminals(formData.pol) : null;
+  const showSSYField = requiresSSY && !terminals;
   // Loading terminal to show in the result: for terminal ports it's the chosen
   // terminal; for SSY ports it's the terminal the chosen service code maps to.
-  const selTerminalLabel = terminals
-    ? (formData.terminal ? terminalLabel(formData.terminal) : '')
-    : terminalForSSY(formData.pol, formData.ssy);
+  // Include the POL so the terminal is never shown without its port context.
+  const selTerminalName = allPol
+    ? 'ALL'
+    : (terminals
+      ? (formData.terminal ? terminalLabel(formData.terminal) : '')
+      : terminalForSSY(formData.pol, formData.ssy));
+  const selTerminalLabel = selTerminalName
+    ? (selTerminalName === 'ALL' ? formData.pol : `${formData.pol} / ${selTerminalName}`)
+    : '';
 
-  // Auto-select when there's nothing to choose (e.g. only "ALL"); otherwise make the user pick.
+  // Auto-select a sole POL service (normally ALL); explicit lists require a pick.
   useEffect(() => {
-    const list = (formData.pol && formData.startCity) ? getSSY(formData.pol, formData.startCity) : [];
+    const list = formData.pol ? getPortServices(formData.pol) : [];
     setFormData(prev => ({ ...prev, ssy: list.length === 1 ? list[0] : '' }));
-  }, [formData.pol, formData.startCity]);
+  }, [formData.pol]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -101,7 +107,9 @@ export default function LookupForm({ onCanadaPort }) {
       const next = { ...prev, [name]: value };
       // Reset downstream picks when an upstream selection changes.
       if (name === 'pol') { next.startCity = ''; next.ssy = ''; next.terminal = ''; }
-      if (name === 'startCity') { next.ssy = ''; next.extraDays = defaultExtraDays(value); }
+      // SSY/terminal choices are POL-level, so selecting a city must preserve a
+      // choice the user may already have made immediately after selecting POL.
+      if (name === 'startCity') { next.extraDays = defaultExtraDays(value); }
       return next;
     });
   };
@@ -393,7 +401,7 @@ export default function LookupForm({ onCanadaPort }) {
 
           {terminals && (
             <div>
-              <label className="block text-xs font-semibold text-white mb-1 txt-shadow-soft">Terminal (POL) *</label>
+              <label className="block text-xs font-semibold text-white mb-1 txt-shadow-soft">SSY / Terminal (POL) *</label>
               <Combobox
                 value={formData.terminal}
                 onSelect={(value) => handleChange({ target: { name: 'terminal', value } })}
@@ -424,7 +432,7 @@ export default function LookupForm({ onCanadaPort }) {
 
           <div>
             <label className="block text-xs font-semibold text-white mb-1 txt-shadow-soft">Port Cut Date *</label>
-            <div className="flex gap-2 items-stretch">
+            <div className="relative">
               <input
                 type="text"
                 inputMode="numeric"
@@ -434,15 +442,21 @@ export default function LookupForm({ onCanadaPort }) {
                 onBlur={handleDateBlur}
                 placeholder="Day (9), or 8/9, or 8/9/2026"
                 required
-                className="flex-1 min-w-0 px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-slate-400"
+                className="w-full min-w-0 pl-3 pr-11 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-slate-400"
               />
+              <span className="pointer-events-none absolute inset-y-0 right-0 flex w-10 items-center justify-center text-slate-700" aria-hidden="true">
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="5" width="18" height="16" rx="2" />
+                  <path d="M16 3v4M8 3v4M3 11h18" />
+                </svg>
+              </span>
               <input
                 type="date"
                 aria-label="Pick date from calendar"
                 title="Pick from calendar"
                 value={formData.portCutDate || ''}
                 onChange={handleDatePick}
-                className="shrink-0 px-2 py-1.5 border border-slate-300 rounded-lg bg-white text-slate-700"
+                className="absolute inset-y-0 right-0 w-10 cursor-pointer opacity-0"
               />
             </div>
           </div>

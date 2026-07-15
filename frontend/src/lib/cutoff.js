@@ -4,6 +4,7 @@ import rawLanes from '../data/lanes.json';
 import holidays from '../data/holidays.json';
 import terminals from '../data/terminals.json';
 import portTerminals from '../data/portmc.json';
+import portServices from '../data/port-services.json';
 import terminalInfo from '../data/terminal-info.json';
 
 // Drop the spreadsheet header row and any blank rows.
@@ -190,15 +191,15 @@ function portInfo(pol) {
 }
 
 // Friendly names for terminal matchcodes come from terminal-info.json (names +
-// any added terminals); unknown codes fall back to the raw matchcode. Shown as
-// "Name (CODE)" so reps see both.
+// any added terminals). Matchcodes remain in the data for routing, but the UI
+// shows only the friendly name; unknown codes fall back to the raw matchcode.
 const TERMINAL_NAMES = { ...(terminalInfo.names || {}) };
 for (const list of Object.values(terminalInfo.addTerminals || {})) {
   for (const t of list) if (t.name) TERMINAL_NAMES[t.code] = t.name;
 }
 export function terminalLabel(code) {
   const name = TERMINAL_NAMES[code];
-  return name ? `${name} (${code})` : code;
+  return name || code;
 }
 
 // A caveat note to show in the result for this POL, or '' (from terminal-info.json).
@@ -218,13 +219,6 @@ export function getTerminals(pol) {
 export function getTerminalOptions(pol) {
   const d = getTerminals(pol);
   return d ? d.terminals.map(t => ({ value: t.code, label: t.label, sub: t.ssys.join(' · ') })) : [];
-}
-
-// Union of a port's service codes — used to offer an SSY dropdown for ssy-mode
-// ports/cities whose lanes are only "ALL", so reps can still record the SSY.
-function portServiceCodes(pol) {
-  const d = portInfo(pol);
-  return d ? [...new Set(d.terminals.flatMap(t => t.ssys))] : [];
 }
 
 // The terminal label a given service code loads through (for the result line), or ''.
@@ -261,13 +255,13 @@ export function getSSY(pol, city) {
         if (t) tokens.add(t);
       });
     });
-  // When this port+city only carries "ALL" but the port publishes PORTMC service
-  // codes, offer those codes so reps can pick/record the SSY (info-only — the
-  // dates don't change since the lane is "ALL").
-  if ((tokens.size === 0 || (tokens.size === 1 && tokens.has('ALL'))) && portServiceCodes(pol).length) {
-    return portServiceCodes(pol).sort();
-  }
   return [...tokens].sort();
+}
+
+// POL-level SSY visibility rule from the workbook's PORTSERVICES sheet.
+// ['ALL'] means no picker; explicit services mean the picker is required.
+export function getPortServices(pol) {
+  return portServices[pol] || [];
 }
 
 // A few inland ramps need extra transit days added by the user (a 3–7 day picker).

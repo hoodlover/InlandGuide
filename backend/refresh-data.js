@@ -90,6 +90,24 @@ fs.writeFileSync(path.join(dataDir, 'portmc.json'), JSON.stringify(portmc, null,
 console.log('  PORTMC: wrote ' + Object.keys(portmc).length + ' multi-terminal ports (' +
   Object.entries(portmc).filter(([, v]) => v.mode === 'terminal').map(([p]) => p).join(', ') + ' terminal-mode)');
 
+// 1d) Export the PORTSERVICES sheet -> frontend/src/data/port-services.json.
+// This is the workbook's POL-level rule for whether an SSY/terminal choice is
+// needed. A sole "ALL" stays automatic; an explicit service list shows the
+// picker as soon as the POL is selected (before the inland city is selected).
+const serviceRows = XLSX.utils.sheet_to_json(wb.Sheets['PORTSERVICES'], { header: 1 });
+const portServices = {};
+for (const r of serviceRows) {
+  const pol = String(r[0] || '').trim();
+  if (!/^(US|CA|MX)[A-Z]{3}$/.test(pol)) continue;
+  if (!portServices[pol]) portServices[pol] = [];
+  String(r[1] || '').split(',').forEach(s => {
+    const service = s.trim();
+    if (service && !portServices[pol].includes(service)) portServices[pol].push(service);
+  });
+}
+fs.writeFileSync(path.join(dataDir, 'port-services.json'), JSON.stringify(portServices, null, 2) + '\n');
+console.log('  PORTSERVICES: wrote ' + Object.keys(portServices).length + ' POL service rules');
+
 // 2) Convert the current banners (from /public) to WebP and embed as data URIs.
 const publicDir = path.join(ROOT, 'public');
 
