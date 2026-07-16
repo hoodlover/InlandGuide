@@ -1167,8 +1167,8 @@ function RefreshModal({ onClose }) {
             <span className="flex items-center gap-3">
               <span className="text-2xl" aria-hidden="true">🚆</span>
               <span>
-                <span className="block text-sm font-semibold text-[#002D72] dark:text-white">Update CP Rail &amp; CN Rail ramp cuts</span>
-                <span className="text-xs font-normal text-[#EB6608] group-hover:underline">Click here →</span>
+                <span className="block text-sm font-normal text-[#002D72] dark:text-white">Update CP Rail &amp; CN Rail ramp cuts</span>
+                <span className="mt-2 inline-flex rounded-full bg-[#EB6608] px-3 py-1 text-xs font-normal text-white shadow-md transition group-hover:bg-[#cf5a07]">Click to update Canadian ramp cuts →</span>
               </span>
             </span>
           </button>
@@ -1277,10 +1277,10 @@ function RefreshModal({ onClose }) {
       <ModalShell title="Lane Control" onClose={onClose}>
         <div className="rounded-xl border-2 border-[#EB6608] bg-orange-50 p-6 text-center shadow-inner dark:bg-slate-700">
           <div className="text-4xl" aria-hidden="true">🛠️</div>
-          <p className="mt-3 text-lg font-extrabold text-[#002D72] dark:text-white">Please open up T9400 and make it happen.</p>
+          <p className="mt-3 text-lg font-normal text-[#002D72] dark:text-white">Please open up T9400 and make it happen.</p>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">Lane activation and deactivation remain controlled in the source system.</p>
         </div>
-        <button type="button" onClick={() => setView('menu')} className="mt-4 text-sm font-bold text-[#002D72] hover:underline dark:text-white">← Back to Managers Hub</button>
+        <button type="button" onClick={() => setView('menu')} className="mt-4 text-sm font-normal text-[#002D72] hover:underline dark:text-white">← Back to Managers Hub</button>
       </ModalShell>
     );
   }
@@ -1347,7 +1347,7 @@ function RefreshModal({ onClose }) {
         <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
           Download the workbook from SharePoint first. The workbook itself stays on this computer; only validated calculator rows are sent to the secure deployment workflow. When saving, choose Z:\InlandCutoffGuide-DontTouch.
         </p>
-        <button type="button" onClick={() => { setStatus(null); setDbResult(null); verifiedMasterRef.current = null; setView('menu'); }} className="mt-4 text-sm font-bold text-[#002D72] hover:underline dark:text-white">← Back to Managers Hub</button>
+        <button type="button" onClick={() => { setStatus(null); setDbResult(null); verifiedMasterRef.current = null; setView('menu'); }} className="mt-4 text-sm font-normal text-[#002D72] hover:underline dark:text-white">← Back to Managers Hub</button>
       </ModalShell>
       {showPublishObie && (
         <div className="fixed inset-0 z-[140] flex flex-col items-center justify-center bg-black/55 p-6 backdrop-blur-md" role="dialog" aria-modal="true" aria-label="Live update complete">
@@ -1378,10 +1378,10 @@ function RefreshModal({ onClose }) {
 
   return (
     <ModalShell title="Update Rail Ramp Cuts" onClose={onClose}>
-      <button type="button" onClick={() => { setStatus(null); setView('menu'); }} className="mb-3 text-sm font-bold text-[#002D72] hover:underline dark:text-white">← Back to Managers Hub</button>
+      <button type="button" onClick={() => { setStatus(null); setView('menu'); }} className="mb-3 text-sm font-normal text-[#002D72] hover:underline dark:text-white">← Back to Managers Hub</button>
       <div className="rounded-xl border-2 border-[#002D72] bg-slate-50 p-6 text-center dark:bg-slate-700">
         <div className="text-4xl" aria-hidden="true">🚆</div>
-        <p className="mt-3 font-extrabold text-[#002D72] dark:text-white">CP Rail &amp; CN Rail ramp cuts</p>
+        <p className="mt-3 font-normal text-[#002D72] dark:text-white">CP Rail &amp; CN Rail ramp cuts</p>
         <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{busy ? 'Contacting GitHub…' : 'Refresh request submitted.'}</p>
       </div>
       {status && (
@@ -1395,7 +1395,7 @@ function RefreshModal({ onClose }) {
 
 // Help + light/dark toggle, both as round photo buttons. The theme toggle shows
 // the mode you'll switch TO: sunset (evening) in light mode, daylit ship in dark.
-function TopControls({ compact, onManagerAccess, showInstall }) {
+function TopControls({ compact, onManagerAccess, showInstall, mobile = false }) {
   const [dark, toggle] = useTheme();
   const [helpOpen, setHelpOpen] = useState(false);
   const circleBtn = `${compact ? 'w-11 h-11' : 'w-12 h-12 sm:w-20 sm:h-20'} shrink-0 rounded-full overflow-hidden shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition`;
@@ -1403,13 +1403,15 @@ function TopControls({ compact, onManagerAccess, showInstall }) {
   return (
     <>
       <div className="flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          onClick={onManagerAccess}
-          className={`${compact ? 'px-3 py-1.5 text-[11px]' : 'px-4 py-2 text-xs'} rounded-full border-2 border-[#EB6608] bg-[#002D72] font-extrabold uppercase tracking-wide text-white shadow-[0_5px_12px_rgba(0,0,0,0.35)] transition hover:-translate-y-0.5 hover:bg-[#EB6608] active:translate-y-0 whitespace-nowrap`}
-        >
-          Manager Console Access
-        </button>
+        {!mobile && (
+          <button
+            type="button"
+            onClick={onManagerAccess}
+            className={`${compact ? 'px-3 py-1.5 text-[11px]' : 'px-4 py-2 text-xs'} rounded-full border-2 border-[#EB6608] bg-[#002D72] font-extrabold uppercase tracking-wide text-white shadow-[0_5px_12px_rgba(0,0,0,0.35)] transition hover:-translate-y-0.5 hover:bg-[#EB6608] active:translate-y-0 whitespace-nowrap`}
+          >
+            Manager Console Access
+          </button>
+        )}
         <button
           className={circleBtn}
           onClick={() => setHelpOpen(true)}
@@ -1478,6 +1480,9 @@ export default function App() {
     try { localStorage.setItem('icg-compact', next ? '1' : '0'); } catch { /* ignore */ }
     return next;
   });
+  // The unlocked phone demo always uses the banner-led full layout. Compact
+  // remains a desktop preference and is intentionally hidden on mobile.
+  const compactView = compact && !mobileDevice;
 
   const refreshUpdatedData = async () => {
     try {
@@ -1547,7 +1552,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#EDE6D6] dark:bg-slate-900 flex flex-col">
       {/* Banner constrained to just past the content edges (~5% wider each side). */}
-      {!compact && (
+      {!compactView && (
         <div className="w-full max-w-[70rem] mx-auto px-4 pt-4">
           <img
             src={heroTop}
@@ -1558,26 +1563,28 @@ export default function App() {
       )}
 
       {/* Header constrained to the hero width so it no longer draws a full-width line. */}
-      <div className={`w-full max-w-[70rem] mx-auto px-4 ${compact ? 'pt-3' : 'mt-3'}`}>
-        <header className={`bg-[#F8F3EA] dark:bg-slate-800 border border-[#E0D8C5] dark:border-slate-700 rounded-xl flex flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-3 ${compact ? 'px-4 py-2' : 'px-4 py-3 sm:px-5'}`}>
-          <div>
-            <h1 onClick={secretTap} className={`${compact ? 'text-[1.15rem]' : 'text-[1.5rem]'} font-bold text-[#002D72] dark:text-white smallcaps txt-shadow-heavy select-none`}>Inland Cutoff Rail Guide</h1>
-            {!compact && <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Rail cutoff &amp; delivery date calculator</p>}
-            {!compact && !pwaInstalled && (
-              <button
-                onClick={() => setInstallOpen(true)}
-                className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-full bg-[#002D72] text-white hover:bg-[#01245c] transition shadow-[0_6px_14px_rgba(0,0,0,0.35)]"
-              >
-                ⬇ Install as an App
-              </button>
-            )}
-          </div>
-          <TopControls compact={compact} showInstall={!pwaInstalled} onManagerAccess={() => setRefreshOpen(true)} />
+      <div className={`w-full max-w-[70rem] mx-auto px-4 ${compactView ? 'pt-3' : 'mt-3'}`}>
+        <header className={`bg-[#F8F3EA] dark:bg-slate-800 border border-[#E0D8C5] dark:border-slate-700 rounded-xl flex flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-3 ${compactView ? 'px-4 py-2' : 'px-4 py-3 sm:px-5'}`}>
+          {!mobileDevice && (
+            <div>
+              <h1 onClick={secretTap} className={`${compactView ? 'text-[1.15rem]' : 'text-[1.5rem]'} font-bold text-[#002D72] dark:text-white smallcaps txt-shadow-heavy select-none`}>Inland Cutoff Rail Guide</h1>
+              {!compactView && <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Rail cutoff &amp; delivery date calculator</p>}
+              {!compactView && !pwaInstalled && (
+                <button
+                  onClick={() => setInstallOpen(true)}
+                  className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-full bg-[#002D72] text-white hover:bg-[#01245c] transition shadow-[0_6px_14px_rgba(0,0,0,0.35)]"
+                >
+                  ⬇ Install as an App
+                </button>
+              )}
+            </div>
+          )}
+          <TopControls compact={compactView} mobile={mobileDevice} showInstall={!pwaInstalled && !mobileDevice} onManagerAccess={() => setRefreshOpen(true)} />
         </header>
       </div>
 
-      <main className={`max-w-5xl mx-auto w-full ${compact ? 'px-3 py-3 sm:px-4' : 'flex-1 px-3 py-4 sm:px-5 sm:py-6'}`}>
-        <div className={`grid grid-cols-2 items-center gap-2 sm:flex sm:flex-wrap ${compact ? 'mb-3' : 'mb-5'}`}>
+      <main className={`max-w-5xl mx-auto w-full ${compactView ? 'px-3 py-3 sm:px-4' : 'flex-1 px-3 py-4 sm:px-5 sm:py-6'}`}>
+        <div className={`grid grid-cols-2 items-center gap-2 sm:flex sm:flex-wrap ${compactView ? 'mb-3' : 'mb-5'}`}>
           {[
             { id: 'calculator', label: 'US Rail Ramp Cuts' },
             { id: 'cpkc', label: 'Canada Rail Ramp Cuts' }
@@ -1594,29 +1601,33 @@ export default function App() {
               {t.label}
             </button>
           ))}
-          <button
-            onClick={toggleCompact}
-            title={compact ? 'Switch to full view' : 'Switch to compact view'}
-            aria-label={compact ? 'Switch to full view' : 'Switch to compact view'}
-            className="px-2.5 py-1.5 text-xs font-normal rounded-full transition shadow-[0_7px_16px_rgba(0,0,0,0.5)] bg-[#F8F3EA] dark:bg-slate-800 text-[#002D72] dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700 sm:ml-auto"
-          >
-            {compact ? '⤢ Full view' : '⤡ Compact'}
-          </button>
-          <button
-            type="button"
-            onClick={refreshUpdatedData}
-            title="Reload the guide with the newest published database"
-            className="px-2.5 py-1.5 text-xs font-normal rounded-full transition shadow-[0_7px_16px_rgba(0,0,0,0.5)] bg-emerald-700 text-white hover:bg-emerald-800"
-          >
-            ↻ Refresh Updated Data
-          </button>
-          <button
-            type="button"
-            onClick={() => setRequestOpen(true)}
-            className="col-span-2 rounded-full bg-[#EB6608] px-2.5 py-1.5 text-xs font-normal text-white shadow-[0_7px_16px_rgba(0,0,0,0.5)] transition hover:bg-[#cf5a07] sm:col-auto"
-          >
-            💡 Request a Feature / Change
-          </button>
+          {!mobileDevice && (
+            <>
+              <button
+                onClick={toggleCompact}
+                title={compact ? 'Switch to full view' : 'Switch to compact view'}
+                aria-label={compact ? 'Switch to full view' : 'Switch to compact view'}
+                className="px-2.5 py-1.5 text-xs font-normal rounded-full transition shadow-[0_7px_0_rgba(0,0,0,0.75),0_13px_22px_rgba(0,0,0,0.8)] bg-[#F8F3EA] dark:bg-slate-800 text-[#002D72] dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700 sm:ml-auto"
+              >
+                {compact ? '⤢ Full view' : '⤡ Compact'}
+              </button>
+              <button
+                type="button"
+                onClick={refreshUpdatedData}
+                title="Reload the guide with the newest published database"
+                className="px-2.5 py-1.5 text-xs font-normal rounded-full transition shadow-[0_7px_0_rgba(0,0,0,0.75),0_13px_22px_rgba(0,0,0,0.8)] bg-emerald-700 text-white hover:bg-emerald-800"
+              >
+                ↻ Refresh Updated Data
+              </button>
+              <button
+                type="button"
+                onClick={() => setRequestOpen(true)}
+                className="col-span-2 rounded-full bg-[#EB6608] px-2.5 py-1.5 text-xs font-normal text-white shadow-[0_7px_0_rgba(0,0,0,0.75),0_13px_22px_rgba(0,0,0,0.8)] transition hover:bg-[#cf5a07] sm:col-auto"
+              >
+                💡 Request a Feature / Change
+              </button>
+            </>
+          )}
           {mobileDevice && (
             <button
               type="button"
@@ -1636,13 +1647,13 @@ export default function App() {
       {requestOpen && <FeatureRequestModal onClose={() => setRequestOpen(false)} />}
       {refreshOpen && <RefreshModal onClose={() => setRefreshOpen(false)} />}
 
-      <WebappReminder enabled={!pwaInstalled} />
-      {jokerOn && !compact && <ObieWalkOn />}
+      <WebappReminder enabled={!pwaInstalled && !mobileDevice} />
+      {jokerOn && !compactView && <ObieWalkOn />}
 
-      <div className={`w-full max-w-[70rem] mx-auto px-4 text-right ${compact ? 'mt-3' : 'mt-8'}`}>
+      <div className={`w-full max-w-[70rem] mx-auto px-4 text-right ${compactView ? 'mt-3' : 'mt-8'}`}>
         <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">v {APP_VERSION}</span>
       </div>
-      {!compact && (
+      {!compactView && (
       <div className="w-full max-w-[70rem] mx-auto px-4 mt-1 mb-4">
         <img
           src={bannerBottom}

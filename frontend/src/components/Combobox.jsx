@@ -13,6 +13,7 @@ export default function Combobox({ value, onSelect, options, placeholder, disabl
   const [activeIdx, setActiveIdx] = useState(0);
   const wrapRef = useRef(null);
   const inputRef = useRef(null);
+  const suppressFirstTouchClickRef = useRef(false);
 
   const selectedLabel = options.find(o => !isHeader(o) && o.value === value)?.label || '';
 
@@ -47,6 +48,12 @@ export default function Combobox({ value, onSelect, options, placeholder, disabl
   };
   const filtered = computeFiltered(query);
   const firstSelectable = () => filtered.findIndex(o => !isHeader(o));
+  const openFullList = () => {
+    setQuery(selectedLabel);
+    setOpen(true);
+    const selectedIdx = options.findIndex(o => !isHeader(o) && o.value === value);
+    setActiveIdx(selectedIdx >= 0 ? selectedIdx : Math.max(0, firstSelectable()));
+  };
 
   useEffect(() => {
     const onDoc = (e) => {
@@ -83,15 +90,26 @@ export default function Combobox({ value, onSelect, options, placeholder, disabl
         required={required && !value}
         value={query}
         placeholder={placeholder}
+        onPointerDown={(e) => {
+          // On a phone, the first tap opens the choices without focusing the
+          // text box (and therefore without opening the software keyboard).
+          // A second tap is allowed through so the user can type to filter.
+          if (e.pointerType === 'touch' && !open && !disabled) {
+            e.preventDefault();
+            suppressFirstTouchClickRef.current = true;
+            openFullList();
+          }
+        }}
         onFocus={(e) => { setOpen(true); const f = firstSelectable(); setActiveIdx(f < 0 ? 0 : f); e.target.select(); }}
         // Selecting an option leaves this input focused, so a second click does
         // not fire onFocus again. Reopen the full list on that repeat click.
         onClick={(e) => {
+          if (suppressFirstTouchClickRef.current) {
+            suppressFirstTouchClickRef.current = false;
+            return;
+          }
           if (!open) {
-            setQuery(selectedLabel);
-            setOpen(true);
-            const selectedIdx = options.findIndex(o => !isHeader(o) && o.value === value);
-            setActiveIdx(selectedIdx >= 0 ? selectedIdx : Math.max(0, firstSelectable()));
+            openFullList();
           }
           e.target.select();
         }}

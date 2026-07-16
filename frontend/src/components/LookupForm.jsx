@@ -6,7 +6,6 @@ import Combobox from './Combobox';
 import { SalesforceIcon, OutlookIcon, TeamsIcon, TextIcon } from './BrandIcons';
 import ObieThinking from './ObieThinking';
 import { renderPasteCardImage } from '../lib/pasteCardImage';
-import masterStatus from '../data/master-status.json';
 
 // Flexible date entry:  "9" = 9th of THIS month · "8/9" = Aug 9 · "8/9/26" or "8/9/2026" = full.
 function parseFlexibleDate(input) {
@@ -93,31 +92,8 @@ function outlookLogoBlock() {
     `</td></tr></table>`;
 }
 
-const MASTER_DB_UPDATED_KEY = 'icg-master-db-updated-at';
-
-function readMasterDbUpdatedAt() {
-  try {
-    const localValue = localStorage.getItem(MASTER_DB_UPDATED_KEY) || '';
-    const sharedValue = masterStatus.publishedAt || '';
-    return new Date(localValue).getTime() > new Date(sharedValue).getTime() ? localValue : sharedValue;
-  }
-  catch { return masterStatus.publishedAt || ''; }
-}
-
-function formatMasterDbUpdatedDate(value) {
-  if (!value) return '—';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '—';
-  return date.toLocaleDateString('en-US', {
-    month: 'numeric',
-    day: 'numeric',
-    year: 'numeric',
-  });
-}
-
 export default function LookupForm({ onCanadaPort }) {
   const [formData, setFormData] = useState(() => ({ ...EMPTY_FORM, portCutDate: today().iso }));
-  const [masterDbUpdatedAt, setMasterDbUpdatedAt] = useState(readMasterDbUpdatedAt);
 
   // Date box prefilled to today so users can just tweak the day.
   const [dateInput, setDateInput] = useState(() => today().mdy);
@@ -155,18 +131,6 @@ export default function LookupForm({ onCanadaPort }) {
     const list = formData.pol ? getPortServices(formData.pol) : [];
     setFormData(prev => ({ ...prev, ssy: list.length === 1 ? list[0] : '' }));
   }, [formData.pol]);
-
-  useEffect(() => {
-    const refreshUpdatedAt = event => {
-      setMasterDbUpdatedAt(event?.detail || readMasterDbUpdatedAt());
-    };
-    window.addEventListener('icg-master-db-updated', refreshUpdatedAt);
-    window.addEventListener('storage', refreshUpdatedAt);
-    return () => {
-      window.removeEventListener('icg-master-db-updated', refreshUpdatedAt);
-      window.removeEventListener('storage', refreshUpdatedAt);
-    };
-  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -447,11 +411,8 @@ export default function LookupForm({ onCanadaPort }) {
   return (
     <div className="grid items-start md:grid-cols-2 gap-6">
       <div className="self-start bg-[#EB6608] rounded-lg border border-[#EB6608] shadow-sm p-6">
-        <div className="mb-4 flex items-baseline justify-between gap-3 border-b-2 border-white/60 pb-2 text-white">
-          <h2 className="text-xl font-extrabold tracking-wide uppercase txt-shadow-heavy">Inland Guide Rail Tool</h2>
-          <span className="shrink-0 text-right text-xs font-semibold normal-case tracking-normal txt-shadow-soft">
-            Updated {formatMasterDbUpdatedDate(masterDbUpdatedAt)}
-          </span>
+        <div className="mb-4 border-b-2 border-white/60 pb-2 text-white">
+          <h2 className="whitespace-nowrap text-lg font-extrabold uppercase tracking-wide txt-shadow-heavy sm:text-xl">Inland Guide Rail Tool</h2>
         </div>
         
         <form onSubmit={handleSubmit} className="space-y-3">
