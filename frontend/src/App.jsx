@@ -644,7 +644,12 @@ function RefreshModal({ onClose }) {
         link.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
       }
-      try { localStorage.setItem('icg-master-db-hash', verified.hash); } catch { /* local storage unavailable */ }
+      const savedAt = new Date().toISOString();
+      try {
+        localStorage.setItem('icg-master-db-hash', verified.hash);
+        localStorage.setItem('icg-master-db-updated-at', savedAt);
+      } catch { /* local storage unavailable */ }
+      window.dispatchEvent(new CustomEvent('icg-master-db-updated', { detail: savedAt }));
       setDbResult(current => ({
         ...current,
         changed: false,
