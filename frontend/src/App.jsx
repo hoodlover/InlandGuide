@@ -967,13 +967,16 @@ function RefreshModal({ onClose }) {
           1. Open the Inland SharePoint Folder
         </a>
         <p className="mt-2 text-center text-xs font-semibold text-slate-500 dark:text-slate-400">
-          Select InlandCutoffGuide.xlsm, then click Download.
+          Right-click InlandCutoffGuide.xlsm and select Download, then come back here to verify and save. Clicking the file itself opens it in Excel.
         </p>
 
         <label className={`mt-3 block w-full cursor-pointer rounded-lg bg-[#EB6608] px-4 py-3 text-center font-extrabold text-white shadow-md transition hover:bg-[#cf5a07] ${busy ? 'pointer-events-none opacity-60' : ''}`}>
           {busy ? 'Verifying…' : '2. Verify Downloaded Master'}
           <input type="file" accept=".xlsm,application/vnd.ms-excel.sheet.macroEnabled.12" onChange={verifyMasterDatabase} className="sr-only" />
         </label>
+        <p className="mt-2 text-center text-xs font-semibold text-slate-500 dark:text-slate-400">
+          Look for the file in your Downloads folder and double-click it to start the verify process.
+        </p>
 
         {dbResult && (
           <div className={`mt-3 rounded-xl border p-4 text-sm ${dbResult.ok ? (dbResult.changed ? 'border-amber-300 bg-amber-50 text-amber-900' : 'border-emerald-300 bg-emerald-50 text-emerald-800') : 'border-red-300 bg-red-50 text-red-700'}`}>
