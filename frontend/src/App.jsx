@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { unzipSync, strFromU8 } from 'fflate';
 import LookupForm from './components/LookupForm';
 import PortScheduleLookup from './components/PortScheduleLookup';
 import HlMockup from './components/HlMockup';
@@ -441,6 +442,80 @@ function InstallModal({ onClose }) {
   );
 }
 
+const MASTER_DB_SHEETS = ['LOOKUP', 'DATABASE', 'RAILTERMINALS', 'PORTMC', 'PORTSERVICES', 'HOLIDAYS', 'CONFIG'];
+
+function xmlDocument(bytes, label) {
+  if (!bytes) throw new Error(`${label} is missing from the workbook.`);
+  const doc = new DOMParser().parseFromString(strFromU8(bytes), 'application/xml');
+  if (doc.getElementsByTagName('parsererror').length) throw new Error(`${label} is not valid XML.`);
+  return doc;
+}
+
+function xmlElements(doc, localName) {
+  return Array.from(doc.getElementsByTagNameNS('*', localName));
+}
+
+function workbookPartPath(target) {
+  const raw = target.replace(/\\/g, '/').replace(/^\//, '');
+  const parts = (raw.startsWith('xl/') ? raw : `xl/${raw}`).split('/');
+  const clean = [];
+  parts.forEach((part) => {
+    if (!part || part === '.') return;
+    if (part === '..') clean.pop();
+    else clean.push(part);
+  });
+  return clean.join('/');
+}
+
+function validateMasterWorkbook(buffer) {
+  const files = unzipSync(new Uint8Array(buffer));
+  const workbook = xmlDocument(files['xl/workbook.xml'], 'Workbook definition');
+  const relationships = xmlDocument(files['xl/_rels/workbook.xml.rels'], 'Workbook relationships');
+  const relationshipMap = new Map(xmlElements(relationships, 'Relationship').map(rel => [
+    rel.getAttribute('Id'),
+    workbookPartPath(rel.getAttribute('Target') || ''),
+  ]));
+
+  const sheets = xmlElements(workbook, 'sheet').map(sheet => ({
+    name: sheet.getAttribute('name') || '',
+    relationId: sheet.getAttribute('r:id') || sheet.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id'),
+  }));
+  const sheetNames = sheets.map(sheet => sheet.name);
+  const missing = MASTER_DB_SHEETS.filter(name => !sheetNames.includes(name));
+  if (missing.length) throw new Error(`Missing required sheet${missing.length > 1 ? 's' : ''}: ${missing.join(', ')}`);
+
+  const database = sheets.find(sheet => sheet.name === 'DATABASE');
+  const databasePath = relationshipMap.get(database.relationId);
+  const databaseXml = xmlDocument(files[databasePath], 'DATABASE sheet');
+  const databaseRows = xmlElements(databaseXml, 'row').length;
+  if (databaseRows < 50) throw new Error('The DATABASE sheet does not contain the expected data rows.');
+
+  const sharedStringsXml = files['xl/sharedStrings.xml']
+    ? xmlDocument(files['xl/sharedStrings.xml'], 'Shared strings')
+    : null;
+  const sharedStrings = sharedStringsXml
+    ? xmlElements(sharedStringsXml, 'si').map(si => xmlElements(si, 't').map(t => t.textContent || '').join(''))
+    : [];
+  const columnAValues = xmlElements(databaseXml, 'c')
+    .filter(cell => /^A\d+$/i.test(cell.getAttribute('r') || ''))
+    .map((cell) => {
+      const type = cell.getAttribute('t');
+      if (type === 'inlineStr') return xmlElements(cell, 't').map(t => t.textContent || '').join('');
+      const value = xmlElements(cell, 'v')[0]?.textContent || '';
+      return type === 's' ? (sharedStrings[Number(value)] || '') : value;
+    });
+  if (!columnAValues.includes('STARTDATA') || !columnAValues.includes('ENDDATA')) {
+    throw new Error('The DATABASE sheet is missing its STARTDATA or ENDDATA marker.');
+  }
+
+  return { sheetNames, databaseRows };
+}
+
+async function sha256Hex(buffer) {
+  const digest = await crypto.subtle.digest('SHA-256', buffer);
+  return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('').toUpperCase();
+}
+
 // Hidden managers hub — revealed by a secret gesture (tap the title 5×).
 function RefreshModal({ onClose }) {
   const [view, setView] = useState('login');
@@ -448,6 +523,8 @@ function RefreshModal({ onClose }) {
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState(null);
+  const [dbResult, setDbResult] = useState(null);
+  const verifiedMasterRef = useRef(null);
 
   const verifyAccess = async () => {
     if (!pass || busy) return;
@@ -508,12 +585,81 @@ function RefreshModal({ onClose }) {
     }
   };
 
-  const triggerMasterDatabaseCheck = () => {
-    setStatus({
-      ok: true,
-      msg: 'Opening the local master-database checker. Approve the browser prompt if it appears.',
-    });
-    window.location.href = 'inlandguide://check-master-db';
+  const verifyMasterDatabase = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file || busy) return;
+    setBusy(true);
+    setDbResult(null);
+    verifiedMasterRef.current = null;
+    try {
+      if (!/\.xlsm$/i.test(file.name)) throw new Error('Choose the downloaded InlandCutoffGuide .xlsm workbook.');
+      const buffer = await file.arrayBuffer();
+      const validation = validateMasterWorkbook(buffer);
+      const hash = await sha256Hex(buffer);
+      let previousHash = '';
+      try { previousHash = localStorage.getItem('icg-master-db-hash') || ''; } catch { /* local storage unavailable */ }
+      const changed = !previousHash || previousHash !== hash;
+      verifiedMasterRef.current = { file, hash };
+      setDbResult({
+        ok: true,
+        changed,
+        fileName: file.name,
+        fileSize: file.size,
+        fileModified: file.lastModified,
+        hash,
+        ...validation,
+        message: changed
+          ? (previousHash ? 'This workbook is different from the last verified copy.' : 'Valid master workbook. This is the first verified copy in this browser.')
+          : 'This workbook matches the last verified copy.',
+      });
+    } catch (error) {
+      setDbResult({ ok: false, message: error?.message || 'The workbook could not be verified.' });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const saveVerifiedMaster = async () => {
+    const verified = verifiedMasterRef.current;
+    if (!verified || busy) return;
+    setBusy(true);
+    try {
+      if (window.showSaveFilePicker) {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: 'InlandCutoffGuideMASTER.xlsm',
+          types: [{
+            description: 'Excel Macro-Enabled Workbook',
+            accept: { 'application/vnd.ms-excel.sheet.macroEnabled.12': ['.xlsm'] },
+          }],
+        });
+        const writable = await handle.createWritable();
+        await writable.write(verified.file);
+        await writable.close();
+      } else {
+        const url = URL.createObjectURL(verified.file);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'InlandCutoffGuideMASTER.xlsm';
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+      try { localStorage.setItem('icg-master-db-hash', verified.hash); } catch { /* local storage unavailable */ }
+      setDbResult(current => ({
+        ...current,
+        changed: false,
+        saved: true,
+        message: window.showSaveFilePicker
+          ? 'Verified copy saved. Confirm that you selected the approved Z: folder.'
+          : 'Verified copy downloaded. Move it to the approved Z: folder if your browser did not ask where to save it.',
+      }));
+    } catch (error) {
+      if (error?.name !== 'AbortError') {
+        setDbResult(current => ({ ...current, saveError: error?.message || 'The verified copy could not be saved.' }));
+      }
+    } finally {
+      setBusy(false);
+    }
   };
 
   if (view === 'login') {
@@ -583,7 +729,7 @@ function RefreshModal({ onClose }) {
 
           <button
             type="button"
-            onClick={() => { setStatus(null); setView('database'); }}
+            onClick={() => { setStatus(null); setDbResult(null); verifiedMasterRef.current = null; setView('database'); }}
             className="group w-full rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#EB6608] hover:shadow-md dark:border-slate-600 dark:bg-slate-700"
           >
             <span className="flex items-center gap-3">
@@ -645,44 +791,58 @@ function RefreshModal({ onClose }) {
     return (
       <ModalShell title="Master Database Check" onClose={onClose}>
         <div className="rounded-xl border-2 border-[#002D72] bg-blue-50 p-5 dark:bg-slate-700">
-          <p className="text-lg font-extrabold text-[#002D72] dark:text-white">SharePoint → verified Z: mirror</p>
+          <p className="text-lg font-extrabold text-[#002D72] dark:text-white">Secure browser-only verification</p>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-            The checker uses this computer&apos;s signed-in SharePoint session, validates the required workbook sheets,
-            compares the file hash, and updates Z: only when the master actually changed.
+            No scripts or installers. The workbook stays on this computer while the browser validates its sheets and compares its fingerprint.
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={triggerMasterDatabaseCheck}
-          className="mt-4 w-full rounded-lg bg-[#002D72] px-4 py-3 font-extrabold text-white shadow-md transition hover:bg-[#01245c]"
+        <a
+          href="https://hlag.sharepoint.com/sites/RegionNorthAmerica/Shared%20Documents/Inland/InlandCutoffGuide.xlsm?web=1"
+          target="_blank"
+          rel="noreferrer"
+          className="mt-4 block w-full rounded-lg bg-[#002D72] px-4 py-3 text-center font-extrabold text-white shadow-md transition hover:bg-[#01245c]"
         >
-          Perform Check Now
-        </button>
+          1. Open Master in SharePoint
+        </a>
 
-        {status && (
-          <div className={`mt-3 rounded-lg border p-3 text-sm ${status.ok ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-red-200 bg-red-50 text-red-700'}`}>
-            {status.msg}
+        <label className={`mt-3 block w-full cursor-pointer rounded-lg bg-[#EB6608] px-4 py-3 text-center font-extrabold text-white shadow-md transition hover:bg-[#cf5a07] ${busy ? 'pointer-events-none opacity-60' : ''}`}>
+          {busy ? 'Verifying…' : '2. Verify Downloaded Master'}
+          <input type="file" accept=".xlsm,application/vnd.ms-excel.sheet.macroEnabled.12" onChange={verifyMasterDatabase} className="sr-only" />
+        </label>
+
+        {dbResult && (
+          <div className={`mt-3 rounded-xl border p-4 text-sm ${dbResult.ok ? (dbResult.changed ? 'border-amber-300 bg-amber-50 text-amber-900' : 'border-emerald-300 bg-emerald-50 text-emerald-800') : 'border-red-300 bg-red-50 text-red-700'}`}>
+            <p className="font-extrabold">{dbResult.ok ? (dbResult.saved ? '✓ Verified copy ready' : dbResult.changed ? '✓ Valid — new or changed master' : '✓ Valid — matches last verified master') : 'Verification failed'}</p>
+            <p className="mt-1">{dbResult.message}</p>
+            {dbResult.ok && (
+              <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
+                <dt className="font-bold">File</dt><dd className="break-all">{dbResult.fileName}</dd>
+                <dt className="font-bold">Modified</dt><dd>{new Date(dbResult.fileModified).toLocaleString()}</dd>
+                <dt className="font-bold">Size</dt><dd>{Math.round(dbResult.fileSize / 1024).toLocaleString()} KB</dd>
+                <dt className="font-bold">Database</dt><dd>{dbResult.databaseRows.toLocaleString()} rows</dd>
+                <dt className="font-bold">Fingerprint</dt><dd className="break-all font-mono">{dbResult.hash.slice(0, 20)}…</dd>
+              </dl>
+            )}
+            {dbResult.saveError && <p className="mt-2 font-semibold text-red-700">{dbResult.saveError}</p>}
           </div>
         )}
 
-        <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-          <p className="font-extrabold">First time on this computer?</p>
-          <p className="mt-1">Install the local checker once. It also creates the hourly 7:00 AM–4:00 PM schedule and a logon catch-up check.</p>
-          <a
-            href="/tools/InstallMasterDbChecker.ps1"
-            download
-            className="mt-3 inline-flex rounded-full bg-[#EB6608] px-4 py-2 font-bold text-white shadow hover:bg-[#cf5a07]"
+        {dbResult?.ok && (
+          <button
+            type="button"
+            onClick={saveVerifiedMaster}
+            disabled={busy}
+            className="mt-3 w-full rounded-lg bg-emerald-700 px-4 py-3 font-extrabold text-white shadow-md transition hover:bg-emerald-800 disabled:opacity-60"
           >
-            Download One-Time Installer
-          </a>
-          <p className="mt-2 text-xs">After downloading, right-click the file and choose <b>Run with PowerShell</b>. If Windows blocks it, open Properties, select Unblock, and run it again.</p>
-        </div>
+            3. Save Verified Copy — Choose Z:
+          </button>
+        )}
 
         <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
-          Requires access to the SharePoint workbook, Microsoft Excel, and Z:\InlandCutoffGuide-DontTouch.
+          Download the workbook from SharePoint first. Validation runs entirely inside this browser; the file is never uploaded. When saving, choose Z:\InlandCutoffGuide-DontTouch.
         </p>
-        <button type="button" onClick={() => { setStatus(null); setView('menu'); }} className="mt-4 text-sm font-bold text-[#002D72] hover:underline dark:text-white">← Back to Managers Hub</button>
+        <button type="button" onClick={() => { setStatus(null); setDbResult(null); verifiedMasterRef.current = null; setView('menu'); }} className="mt-4 text-sm font-bold text-[#002D72] hover:underline dark:text-white">← Back to Managers Hub</button>
       </ModalShell>
     );
   }
