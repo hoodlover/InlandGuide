@@ -405,7 +405,7 @@ function ModalShell({ title, onClose, children }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-extrabold text-[#002D72] dark:text-white smallcaps">{title}</h2>
+          <h2 className="text-lg font-normal tracking-wide text-[#002D72] dark:text-white">{title}</h2>
           <button
             onClick={onClose}
             aria-label="Close"
@@ -1140,7 +1140,7 @@ function RefreshModal({ onClose }) {
     return (
       <ModalShell title="Hapag-Lloyd Managers" onClose={onClose}>
         <div className="rounded-xl bg-gradient-to-r from-[#002D72] to-[#0a4b9b] px-5 py-4 text-white shadow-md">
-          <p className="text-lg font-extrabold">Welcome, Hapag-Lloyd Managers</p>
+          <p className="text-base font-semibold">Welcome, Hapag-Lloyd Managers</p>
           <p className="mt-1 text-sm text-white/80">Your shortcuts for keeping the Inland Guide moving.</p>
         </div>
 
@@ -1153,8 +1153,8 @@ function RefreshModal({ onClose }) {
             <span className="flex items-center gap-3">
               <span className="text-2xl" aria-hidden="true">💡</span>
               <span>
-                <span className="block font-extrabold text-[#002D72] dark:text-white">View feature &amp; change requests</span>
-                <span className="text-sm font-semibold text-[#EB6608] group-hover:underline">Newest requests first →</span>
+                <span className="block text-sm font-semibold text-[#002D72] dark:text-white">View feature &amp; change requests</span>
+                <span className="text-xs font-normal text-[#EB6608] group-hover:underline">Newest requests first →</span>
               </span>
             </span>
           </button>
@@ -1167,8 +1167,8 @@ function RefreshModal({ onClose }) {
             <span className="flex items-center gap-3">
               <span className="text-2xl" aria-hidden="true">🚆</span>
               <span>
-                <span className="block font-extrabold text-[#002D72] dark:text-white">Update CP Rail &amp; CN Rail ramp cuts</span>
-                <span className="text-sm font-semibold text-[#EB6608] group-hover:underline">Click here →</span>
+                <span className="block text-sm font-semibold text-[#002D72] dark:text-white">Update CP Rail &amp; CN Rail ramp cuts</span>
+                <span className="text-xs font-normal text-[#EB6608] group-hover:underline">Click here →</span>
               </span>
             </span>
           </button>
@@ -1181,8 +1181,8 @@ function RefreshModal({ onClose }) {
             <span className="flex items-center gap-3">
               <span className="text-2xl" aria-hidden="true">📊</span>
               <span>
-                <span className="block font-extrabold text-[#002D72] dark:text-white">Update the live guide from the SharePoint master</span>
-                <span className="text-sm font-semibold text-[#EB6608] group-hover:underline">Check &amp; Publish Now →</span>
+                <span className="block text-sm font-semibold text-[#002D72] dark:text-white">Update the live guide from the SharePoint master</span>
+                <span className="text-xs font-normal text-[#EB6608] group-hover:underline">Check &amp; Publish Now →</span>
               </span>
             </span>
           </button>
@@ -1195,8 +1195,8 @@ function RefreshModal({ onClose }) {
             <span className="flex items-center gap-3">
               <span className="text-2xl" aria-hidden="true">🔀</span>
               <span>
-                <span className="block font-extrabold text-[#002D72] dark:text-white">Turn a lane on or off</span>
-                <span className="text-sm font-semibold text-[#EB6608] group-hover:underline">Click here →</span>
+                <span className="block text-sm font-semibold text-[#002D72] dark:text-white">Turn a lane on or off</span>
+                <span className="text-xs font-normal text-[#EB6608] group-hover:underline">Click here →</span>
               </span>
             </span>
           </button>
@@ -1210,8 +1210,8 @@ function RefreshModal({ onClose }) {
             <span className="flex items-center gap-3">
               <span className="text-2xl" aria-hidden="true">📰</span>
               <span>
-                <span className="block font-extrabold text-[#002D72] dark:text-white">Read insider information</span>
-                <span className="text-sm font-semibold text-[#EB6608] group-hover:underline">Click here →</span>
+                <span className="block text-sm font-semibold text-[#002D72] dark:text-white">Read insider information</span>
+                <span className="text-xs font-normal text-[#EB6608] group-hover:underline">Click here →</span>
               </span>
             </span>
           </a>
@@ -1224,12 +1224,12 @@ function RefreshModal({ onClose }) {
     return (
       <ModalShell title="Feature & Change Requests" onClose={onClose}>
         <div className="flex items-center justify-between gap-3">
-          <button type="button" onClick={() => setView('menu')} className="text-sm font-bold text-[#002D72] hover:underline dark:text-white">← Back to Managers Hub</button>
+          <button type="button" onClick={() => setView('menu')} className="text-sm font-normal text-[#002D72] hover:underline dark:text-white">← Back to Managers Hub</button>
           <button
             type="button"
             onClick={loadRequests}
             disabled={busy}
-            className="rounded-lg bg-[#002D72] px-3 py-2 text-xs font-extrabold text-white disabled:opacity-60"
+            className="rounded-lg bg-[#002D72] px-3 py-1.5 text-xs font-normal text-white shadow-md disabled:opacity-60"
           >
             {busy ? 'Loading…' : '↻ Refresh list'}
           </button>
@@ -1251,19 +1251,19 @@ function RefreshModal({ onClose }) {
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-full bg-orange-100 px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wide text-orange-800">{request.type || 'Request'}</span>
-                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wide ${request.state === 'open' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'}`}>{request.state}</span>
+                    <span className="rounded-full bg-orange-100 px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-orange-800">{request.type || 'Request'}</span>
+                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide ${request.state === 'open' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'}`}>{request.state}</span>
                   </div>
-                  <h3 className="mt-2 font-extrabold text-[#002D72] dark:text-white">{request.title}</h3>
+                  <h3 className="mt-2 font-medium tracking-wide text-[#002D72] dark:text-white">{request.title}</h3>
                 </div>
-                <time className="text-xs font-semibold text-slate-500 dark:text-slate-300" dateTime={request.createdAt}>
+                <time className="text-xs font-normal text-slate-500 dark:text-slate-300" dateTime={request.createdAt}>
                   {new Date(request.createdAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
                 </time>
               </div>
               <p className="mt-3 whitespace-pre-wrap text-sm text-slate-700 dark:text-slate-200">{request.details}</p>
               <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3 text-xs dark:border-slate-600">
-                <span className="font-semibold text-slate-500 dark:text-slate-300">From: {request.submittedBy || 'Anonymous'}</span>
-                <a href={request.url} target="_blank" rel="noreferrer" className="font-extrabold text-[#EB6608] hover:underline">Open / close in GitHub →</a>
+                <span className="font-normal text-slate-500 dark:text-slate-300">From: {request.submittedBy || 'Anonymous'}</span>
+                <a href={request.url} target="_blank" rel="noreferrer" className="font-normal text-[#EB6608] hover:underline">Open / close in GitHub →</a>
               </div>
             </article>
           ))}
@@ -1595,25 +1595,25 @@ export default function App() {
             </button>
           ))}
           <button
-            type="button"
-            onClick={refreshUpdatedData}
-            title="Reload the guide with the newest published database"
-            className="px-3 py-2 text-sm font-extrabold rounded-lg transition shadow-[0_4px_10px_rgba(0,0,0,0.25)] bg-emerald-700 text-white hover:bg-emerald-800 sm:ml-auto"
-          >
-            ↻ Refresh Updated Data
-          </button>
-          <button
             onClick={toggleCompact}
             title={compact ? 'Switch to full view' : 'Switch to compact view'}
             aria-label={compact ? 'Switch to full view' : 'Switch to compact view'}
-            className="px-3 py-2 text-sm font-bold rounded-lg transition shadow-[0_4px_10px_rgba(0,0,0,0.25)] bg-[#F8F3EA] dark:bg-slate-800 text-[#002D72] dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700"
+            className="px-2.5 py-1.5 text-xs font-normal rounded-full transition shadow-[0_7px_16px_rgba(0,0,0,0.5)] bg-[#F8F3EA] dark:bg-slate-800 text-[#002D72] dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700 sm:ml-auto"
           >
             {compact ? '⤢ Full view' : '⤡ Compact'}
           </button>
           <button
             type="button"
+            onClick={refreshUpdatedData}
+            title="Reload the guide with the newest published database"
+            className="px-2.5 py-1.5 text-xs font-normal rounded-full transition shadow-[0_7px_16px_rgba(0,0,0,0.5)] bg-emerald-700 text-white hover:bg-emerald-800"
+          >
+            ↻ Refresh Updated Data
+          </button>
+          <button
+            type="button"
             onClick={() => setRequestOpen(true)}
-            className="col-span-2 rounded-lg bg-[#EB6608] px-3 py-2 text-sm font-extrabold text-white shadow-[0_4px_10px_rgba(0,0,0,0.25)] transition hover:bg-[#cf5a07] sm:col-auto"
+            className="col-span-2 rounded-full bg-[#EB6608] px-2.5 py-1.5 text-xs font-normal text-white shadow-[0_7px_16px_rgba(0,0,0,0.5)] transition hover:bg-[#cf5a07] sm:col-auto"
           >
             💡 Request a Feature / Change
           </button>
