@@ -992,6 +992,14 @@ function RefreshModal({ onClose }) {
               </dl>
             )}
             {dbResult.saveError && <p className="mt-2 font-semibold text-red-700">{dbResult.saveError}</p>}
+            {dbResult.published && (
+              <div className="mt-4 flex items-center justify-center gap-3 rounded-xl border border-emerald-200 bg-white/90 p-3 text-slate-800 shadow-sm" role="status">
+                <img src={obBot} alt="Obie" className="obie-confirm-pop w-24 shrink-0 drop-shadow-lg" />
+                <div className="rounded-2xl bg-[#002D72] px-4 py-3 text-sm font-extrabold text-white shadow-md">
+                  All done! Your live guide update is on the way. Have a nice day!
+                </div>
+              </div>
+            )}
           </div>
         )}
 
