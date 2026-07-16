@@ -959,13 +959,16 @@ function RefreshModal({ onClose }) {
         </div>
 
         <a
-          href="https://hlag.sharepoint.com/sites/RegionNorthAmerica/Shared%20Documents/Inland/InlandCutoffGuide.xlsm?web=1"
+          href="https://hlag.sharepoint.com/sites/RegionNorthAmerica/Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2FRegionNorthAmerica%2FShared%20Documents%2FInland"
           target="_blank"
           rel="noreferrer"
           className="mt-4 block w-full rounded-lg bg-[#002D72] px-4 py-3 text-center font-extrabold text-white shadow-md transition hover:bg-[#01245c]"
         >
-          1. Open Master in SharePoint
+          1. Open the Inland SharePoint Folder
         </a>
+        <p className="mt-2 text-center text-xs font-semibold text-slate-500 dark:text-slate-400">
+          Select InlandCutoffGuide.xlsm, then click Download.
+        </p>
 
         <label className={`mt-3 block w-full cursor-pointer rounded-lg bg-[#EB6608] px-4 py-3 text-center font-extrabold text-white shadow-md transition hover:bg-[#cf5a07] ${busy ? 'pointer-events-none opacity-60' : ''}`}>
           {busy ? 'Verifying…' : '2. Verify Downloaded Master'}
