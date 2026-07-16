@@ -233,18 +233,18 @@ textarea {
 
 @keyframes sammie-wheelie-pop {
   0% { transform: translate(-50%, -50%) rotate(0); }
-  28% { transform: translate(-50%, -52%) rotate(-18deg); }
-  55% { transform: translate(-50%, -50%) rotate(-10deg); }
-  100% { transform: translate(-50%, -51%) rotate(-15deg); }
+  28% { transform: translate(-50%, -52%) rotate(18deg); }
+  55% { transform: translate(-50%, -50%) rotate(10deg); }
+  100% { transform: translate(-50%, -51%) rotate(15deg); }
 }
 
 /* Barely moves at first, then gathers speed and rockets through the left edge. */
 @keyframes sammie-burnout-exit {
-  0% { transform: translate(-50%, -51%) rotate(-15deg); }
-  22% { transform: translate(-57%, -52%) rotate(-17deg); }
-  43% { transform: translate(-12vw, -51%) rotate(-13deg); }
-  68% { transform: translate(-36vw, -50%) rotate(-10deg); }
-  100% { transform: translate(calc(-58vw - 100%), -50%) rotate(-7deg); }
+  0% { transform: translate(-50%, -51%) rotate(15deg); }
+  22% { transform: translate(-57%, -52%) rotate(17deg); }
+  43% { transform: translate(-12vw, -51%) rotate(13deg); }
+  68% { transform: translate(-36vw, -50%) rotate(10deg); }
+  100% { transform: translate(calc(-58vw - 100%), -50%) rotate(7deg); }
 }
 
 .sammie-speech {
