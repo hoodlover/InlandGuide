@@ -348,8 +348,15 @@ async function fetchPdf(port) {
 async function main() {
   // Load the previous snapshot so a port that fails today keeps its last-good data
   // (partial-update resilience) — one broken PDF can't wipe or stall the others.
+  let prevSnapshot = {};
   let prevPorts = {};
-  try { prevPorts = (JSON.parse(readFileSync(OUT_PATH, 'utf8')).ports) || {}; } catch { prevPorts = {}; }
+  try {
+    prevSnapshot = JSON.parse(readFileSync(OUT_PATH, 'utf8'));
+    prevPorts = prevSnapshot.ports || {};
+  } catch {
+    prevSnapshot = {};
+    prevPorts = {};
+  }
 
   const out = { generatedAt: '', pulledAt: new Date().toISOString(), ports: {} };
   const failures = [];
@@ -369,7 +376,12 @@ async function main() {
       console.error(`[${port.slug}] FAILED — ${msg}`);
       if (prevPorts[port.slug]) {
         // Keep the last-good data, flagged so the app can show the "needs a pull" light.
-        out.ports[port.slug] = { ...prevPorts[port.slug], parseError: msg, notUpdatedAt: out.pulledAt };
+        const previous = prevPorts[port.slug];
+        // An identical repeated failure is not a new schedule change. Preserve
+        // its first failure timestamp so daily checks do not cause deployments.
+        out.ports[port.slug] = previous.parseError === msg
+          ? previous
+          : { ...previous, parseError: msg, notUpdatedAt: out.pulledAt };
         console.error(`[${port.slug}] keeping last-good data (published ${prevPorts[port.slug].runDate})`);
       }
     }
@@ -381,6 +393,14 @@ async function main() {
 
   if (Object.keys(out.ports).length === 0) {
     throw new Error('every port failed and there is no previous data to fall back on');
+  }
+
+  // pulledAt changes on every run, so compare only the meaningful per-port
+  // payload. Unchanged printed dates and tables leave the snapshot untouched,
+  // allowing the workflow to skip its rebuild, commit, and deployment.
+  if (JSON.stringify(out.ports) === JSON.stringify(prevPorts)) {
+    console.log('No published dates or schedule data changed; leaving the snapshot untouched.');
+    return;
   }
 
   writeFileSync(OUT_PATH, JSON.stringify(out, null, 2) + '\n');

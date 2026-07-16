@@ -1,19 +1,17 @@
 name: Refresh CPKC port schedules
 
-# Twice a week: download the CPKC/CN port-schedule PDFs, parse them into
-# frontend/src/data/cpkc-schedules.json, rebuild the single-file offline app,
-# and commit. A push to main triggers Vercel's auto-deploy.
+# Once daily: download the CPKC/CN port-schedule PDFs and inspect the
+# published/last-updated dates printed in them. Only when a date or schedule
+# actually changes do we rebuild the offline app, commit, and trigger Vercel.
 #
 # Resilience: a port that fails to parse keeps its last-good data and gets a
 # `parseError` flag — the app shows a subtle pulsing "needs a pull" light rather
 # than sending any alert. No notifications are sent from here.
 
 on:
-  # CPKC publishes ~twice a week. Tue & Fri, 13:00 UTC (~08:00 ET), just after
-  # the typical publish time. Adjust the cron if the cadence shifts.
+  # Once daily at 13:00 UTC (08:00 ET standard / 09:00 ET daylight).
   schedule:
-    - cron: '0 13 * * 2'
-    - cron: '0 13 * * 5'
+    - cron: '0 13 * * *'
   workflow_dispatch: {}
 
 permissions:
@@ -46,7 +44,19 @@ jobs:
         working-directory: scripts/refresh-cpkc
         run: node refresh.mjs
 
+      - name: Detect published schedule changes
+        id: schedule_changes
+        run: |
+          if git diff --quiet -- frontend/src/data/cpkc-schedules.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Published dates and schedule data are unchanged."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "A published date or schedule changed."
+          fi
+
       - name: Rebuild single-file offline app
+        if: steps.schedule_changes.outputs.changed == 'true'
         working-directory: frontend
         run: |
           npm install --legacy-peer-deps
@@ -55,6 +65,7 @@ jobs:
           cp dist/index.html ../InlandCutoffGuide.html
 
       - name: Commit refreshed schedules + rebuilt app
+        if: steps.schedule_changes.outputs.changed == 'true'
         run: |
           git config user.name "cpkc-refresh-bot"
           git config user.email "actions@github.com"
