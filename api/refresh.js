@@ -21,8 +21,8 @@ module.exports = async (req, res) => {
     GH_REF = 'main',
   } = process.env;
 
-  if (!REFRESH_PASSPHRASE || !GH_TOKEN) {
-    res.status(500).json({ error: 'Server not configured (missing REFRESH_PASSPHRASE or GH_TOKEN).' });
+  if (!REFRESH_PASSPHRASE) {
+    res.status(500).json({ error: 'Server not configured (missing REFRESH_PASSPHRASE).' });
     return;
   }
 
@@ -40,6 +40,11 @@ module.exports = async (req, res) => {
   // asking the manager to type it a second time.
   if (body.action === 'verify') {
     res.status(200).json({ ok: true, verified: true });
+    return;
+  }
+
+  if (!GH_TOKEN) {
+    res.status(500).json({ error: 'Server not configured (missing GH_TOKEN).' });
     return;
   }
 

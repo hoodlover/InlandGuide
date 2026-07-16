@@ -14,10 +14,13 @@ import './index.css';
 import versionData from './version.json'; // committed; regenerate with `node gen-version.mjs`
 const APP_VERSION = versionData.version;
 
-// Proof-of-concept block for phones/tablets (soft — can be bypassed via "desktop site").
+const MOBILE_DEMO_MS = 30 * 60 * 1000;
+
 function isMobileDevice() {
   const ua = navigator.userAgent || '';
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Silk/i.test(ua);
+  const mobileUserAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Silk/i.test(ua);
+  const smallTouchScreen = window.matchMedia?.('(max-width: 900px) and (pointer: coarse)').matches;
+  return mobileUserAgent || smallTouchScreen;
 }
 
 // OB the OPS-BASE BOT keeps the crowd entertained. A mix of on-brand cargo puns
@@ -103,38 +106,106 @@ const OB_JOKES = [
   "What do you call a fake noodle? An impasta. (Worth saying twice.)",
 ];
 
-function MobileBlock() {
-  const [i, setI] = useState(() => Math.floor(Math.random() * OB_JOKES.length));
+function MobileDemoGate({ onUnlock }) {
+  const [jokeIndex, setJokeIndex] = useState(() => Math.floor(Math.random() * OB_JOKES.length));
+  const [showForm, setShowForm] = useState(false);
+  const [passphrase, setPassphrase] = useState('');
+  const [showPassphrase, setShowPassphrase] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [status, setStatus] = useState('');
 
   useEffect(() => {
-    const id = setInterval(() => setI(n => (n + 1) % OB_JOKES.length), 6000);
+    const id = setInterval(() => setJokeIndex(index => (index + 1) % OB_JOKES.length), 6000);
     return () => clearInterval(id);
   }, []);
 
+  const verify = async (event) => {
+    event.preventDefault();
+    if (!passphrase || busy) return;
+    setBusy(true);
+    setStatus('');
+    try {
+      const response = await fetch('/api/refresh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ passphrase, action: 'verify' }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (response.ok && result.ok && result.verified) {
+        onUnlock();
+        return;
+      }
+      setStatus(response.status === 401 ? 'Wrong manager passphrase.' : (result.error || 'Mobile demo access could not be verified.'));
+    } catch {
+      setStatus('Network error — demo unlock only works on the live app.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#002D72] text-white flex flex-col items-center px-5 py-10 text-center">
-      <div className="w-full max-w-sm flex flex-col items-center">
-        <img src={obBot} alt="OB the Ops-Base Bot" className="w-44 h-auto obbot-in drop-shadow-2xl" />
+    <div className="min-h-screen bg-[#002D72] px-5 py-8 text-center text-white">
+      <div className="mx-auto flex w-full max-w-sm flex-col items-center">
+        <img src={obBot} alt="OB the Ops-Base Bot" className="w-40 h-auto obbot-in drop-shadow-2xl" />
+        <h1 className="mt-3 text-2xl font-extrabold uppercase tracking-wide text-[#EB6608]">Mobile Demo Locked</h1>
+        <p className="mt-2 text-base text-white/90">The Inland Cutoff Guide is currently desktop only.</p>
+        <p className="mt-1 text-sm text-white/70">A manager can temporarily unlock this phone for a demonstration.</p>
 
-        <h1 className="text-2xl font-extrabold uppercase tracking-wide mt-4 text-[#EB6608]">Access Denied</h1>
-        <p className="text-white/90 text-base mt-2">
-          OB here. The Inland Cutoff Guide is <b>desktop only</b>.
-        </p>
-        <p className="text-white/70 text-sm mt-1">Hop on your Hapag-Lloyd computer to run a lookup.</p>
+        {!showForm ? (
+          <button
+            type="button"
+            onClick={() => setShowForm(true)}
+            className="mt-6 w-full rounded-xl bg-[#EB6608] px-4 py-3 font-extrabold text-white shadow-lg transition hover:bg-[#cf5a07]"
+          >
+            🔓 Unlock 30-Minute Demo
+          </button>
+        ) : (
+          <form onSubmit={verify} className="mt-6 w-full rounded-2xl border border-white/25 bg-white/10 p-4 text-left">
+            <label className="block text-sm font-bold text-white">
+              Manager passphrase
+              <span className="relative mt-1 block">
+                <input
+                  type={showPassphrase ? 'text' : 'password'}
+                  value={passphrase}
+                  onChange={(event) => setPassphrase(event.target.value)}
+                  autoFocus
+                  autoComplete="current-password"
+                  className="w-full rounded-lg border border-white/40 bg-white px-3 py-2 pr-11 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#EB6608]"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassphrase(value => !value)}
+                  aria-label={showPassphrase ? 'Hide passphrase' : 'Show passphrase'}
+                  className="absolute inset-y-0 right-0 px-3 text-slate-500"
+                >
+                  {showPassphrase ? '🙈' : '👁️'}
+                </button>
+              </span>
+            </label>
+            <button
+              type="submit"
+              disabled={busy || !passphrase}
+              className="mt-3 w-full rounded-lg bg-[#EB6608] px-4 py-2.5 font-extrabold text-white disabled:opacity-50"
+            >
+              {busy ? 'Checking…' : 'Start Mobile Demo'}
+            </button>
+            <p className="mt-2 text-center text-xs text-white/60">Access ends automatically after 30 minutes.</p>
+            {status && <p className="mt-3 rounded-lg border border-red-300/40 bg-red-950/40 p-3 text-sm text-red-100" role="alert">{status}</p>}
+          </form>
+        )}
 
-        <div className="mt-8 w-full bg-white/10 border border-white/25 rounded-2xl px-5 py-4">
-          <p className="text-xs uppercase tracking-widest text-[#EB6608] font-bold mb-2">OB says…</p>
-          <p key={i} className="joke-fade text-white text-base font-medium min-h-[3.5rem] flex items-center justify-center">
-            {OB_JOKES[i]}
+        <div className="mt-7 w-full rounded-2xl border border-white/25 bg-white/10 px-5 py-4">
+          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-[#EB6608]">OB says…</p>
+          <p key={jokeIndex} className="joke-fade flex min-h-[3.5rem] items-center justify-center text-base font-medium text-white">
+            {OB_JOKES[jokeIndex]}
           </p>
         </div>
-        <p className="text-white/40 text-xs mt-4">(OB has plenty more where that came from.)</p>
       </div>
     </div>
   );
 }
 
-// OB strolls in on the desktop tool: every ~10 min he slides in from the left,
+// OB strolls in on the main tool: every ~10 min he slides in from the left,
 // tells a joke for ~30s, then leaves again.
 const OBIE_FIRST_MS = 15_000;   // first appearance shortly after load
 const OBIE_SHOW_MS = 30_000;    // stays on screen 30s
@@ -265,17 +336,18 @@ function ObieWalkOn() {
 }
 
 // One-time-per-session nudge to pin/install the app (dismissible, auto-hides).
-function WebappReminder() {
+function WebappReminder({ enabled = true }) {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
+    if (!enabled) return;
     try {
       if (!sessionStorage.getItem('icg_webapp_reminder')) {
         sessionStorage.setItem('icg_webapp_reminder', '1');
         setShow(true);
       }
     } catch { /* sessionStorage may be unavailable */ }
-  }, []);
+  }, [enabled]);
 
   useEffect(() => {
     if (!show) return;
@@ -283,7 +355,7 @@ function WebappReminder() {
     return () => clearTimeout(t);
   }, [show]);
 
-  if (!show) return null;
+  if (!enabled || !show) return null;
   return (
     <div className="webapp-reminder">
       <button className="wr-close" onClick={() => setShow(false)} aria-label="Dismiss">×</button>
@@ -380,6 +452,23 @@ function PwaInstallInfo() {
         </ol>
       </div>
 
+      <div>
+        <p className="font-bold text-[#002D72] dark:text-white mb-1">iPhone / iPad</p>
+        <ol className="list-decimal list-inside space-y-1">
+          <li>Open the guide in <b>Safari</b>.</li>
+          <li>Tap <b>Share</b>, then <b>Add to Home Screen</b>.</li>
+          <li>Tap <b>Add</b>.</li>
+        </ol>
+      </div>
+
+      <div>
+        <p className="font-bold text-[#002D72] dark:text-white mb-1">Android</p>
+        <ol className="list-decimal list-inside space-y-1">
+          <li>Open the guide in <b>Chrome</b>.</li>
+          <li>Open the menu and choose <b>Install app</b> or <b>Add to Home screen</b>.</li>
+        </ol>
+      </div>
+
       <p className="text-xs text-slate-500 dark:text-slate-400">
         Once installed, launch it any time from your taskbar, Start menu, or desktop — just like a regular app.
       </p>
@@ -388,7 +477,7 @@ function PwaInstallInfo() {
 }
 
 // Full help: how-to steps + the install section.
-function HelpModal({ onClose }) {
+function HelpModal({ onClose, showInstall = true }) {
   const steps = [
     'Select the Port of Loading.',
     'Choose the Start City (rail ramp).',
@@ -426,9 +515,13 @@ function HelpModal({ onClose }) {
           🤖 Joker Obie: {joker ? 'On' : 'Off'}
         </button>
       </div>
-      <hr className="my-5 border-slate-200 dark:border-slate-600" />
-      <h3 className="text-base font-extrabold text-[#002D72] dark:text-white smallcaps mb-2">Install as an app</h3>
-      <PwaInstallInfo />
+      {showInstall && (
+        <>
+          <hr className="my-5 border-slate-200 dark:border-slate-600" />
+          <h3 className="text-base font-extrabold text-[#002D72] dark:text-white smallcaps mb-2">Install as an app</h3>
+          <PwaInstallInfo />
+        </>
+      )}
     </ModalShell>
   );
 }
@@ -438,6 +531,105 @@ function InstallModal({ onClose }) {
   return (
     <ModalShell title="Install as an App" onClose={onClose}>
       <PwaInstallInfo />
+    </ModalShell>
+  );
+}
+
+function FeatureRequestModal({ onClose }) {
+  const [form, setForm] = useState({ type: 'Feature', title: '', details: '', submittedBy: '', website: '' });
+  const [busy, setBusy] = useState(false);
+  const [status, setStatus] = useState(null);
+  const update = (field, value) => setForm(current => ({ ...current, [field]: value }));
+
+  const submit = async (event) => {
+    event.preventDefault();
+    if (busy) return;
+    setBusy(true);
+    setStatus(null);
+    try {
+      const response = await fetch('/api/requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, page: `${location.pathname}${location.hash}` }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.ok) throw new Error(result.error || `Request service returned HTTP ${response.status}.`);
+      setStatus({ ok: true, message: 'Thanks — your request is now on the manager list.' });
+      setForm(current => ({ ...current, title: '', details: '', website: '' }));
+    } catch (error) {
+      setStatus({ ok: false, message: error?.message || 'The request could not be sent. Please try again.' });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const inputClass = 'mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-[#EB6608] focus:outline-none focus:ring-2 focus:ring-[#EB6608]/30';
+  return (
+    <ModalShell title="Request a Feature or Change" onClose={onClose}>
+      <p className="mb-4 text-sm text-slate-600 dark:text-slate-300">
+        Tell us what would make the Inland Guide more useful. No email is needed.
+      </p>
+      <form onSubmit={submit} className="space-y-4">
+        <label className="block text-sm font-bold text-slate-700 dark:text-slate-200">
+          Request type
+          <select value={form.type} onChange={(event) => update('type', event.target.value)} className={inputClass}>
+            <option>Feature</option>
+            <option>Change</option>
+            <option>Problem</option>
+            <option>Other</option>
+          </select>
+        </label>
+        <label className="block text-sm font-bold text-slate-700 dark:text-slate-200">
+          Short title *
+          <input
+            value={form.title}
+            onChange={(event) => update('title', event.target.value)}
+            maxLength={120}
+            required
+            placeholder="Example: Add a favorite rail ramp"
+            className={inputClass}
+          />
+        </label>
+        <label className="block text-sm font-bold text-slate-700 dark:text-slate-200">
+          What would you like to see? *
+          <textarea
+            value={form.details}
+            onChange={(event) => update('details', event.target.value)}
+            minLength={10}
+            maxLength={4000}
+            required
+            rows={6}
+            placeholder="Describe the idea, change, or problem and how it would help."
+            className={inputClass}
+          />
+        </label>
+        <label className="block text-sm font-bold text-slate-700 dark:text-slate-200">
+          Your name or team <span className="font-normal text-slate-400">(optional)</span>
+          <input
+            value={form.submittedBy}
+            onChange={(event) => update('submittedBy', event.target.value)}
+            maxLength={100}
+            placeholder="So the manager knows who suggested it"
+            className={inputClass}
+          />
+        </label>
+        <label className="hidden" aria-hidden="true">
+          Website
+          <input value={form.website} onChange={(event) => update('website', event.target.value)} tabIndex={-1} autoComplete="off" />
+        </label>
+        <button
+          type="submit"
+          disabled={busy}
+          className="w-full rounded-lg bg-[#EB6608] px-4 py-3 font-extrabold text-white shadow-md transition hover:bg-[#cf5a07] disabled:opacity-60"
+        >
+          {busy ? 'Sending…' : 'Send Request'}
+        </button>
+      </form>
+      {status && (
+        <div className={`mt-4 rounded-lg border p-3 text-sm font-semibold ${status.ok ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-red-200 bg-red-50 text-red-700'}`} role="status">
+          {status.message}
+        </div>
+      )}
     </ModalShell>
   );
 }
@@ -509,6 +701,47 @@ function validateMasterWorkbook(buffer) {
   }
 
   return { sheetNames, databaseRows };
+}
+
+function isStandalonePwa() {
+  return window.matchMedia?.('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+// Browsers expose the current display mode and the appinstalled event. They do
+// not provide a dependable cross-browser inventory of every installed PWA, so
+// remember installs observed by this browser and always detect standalone mode.
+function usePwaInstallStatus() {
+  const [installed, setInstalled] = useState(() => {
+    if (isStandalonePwa()) return true;
+    try { return localStorage.getItem('icg-pwa-installed') === '1'; } catch { return false; }
+  });
+
+  useEffect(() => {
+    const media = window.matchMedia?.('(display-mode: standalone)');
+    const syncDisplayMode = () => { if (isStandalonePwa()) setInstalled(true); };
+    const rememberInstall = () => {
+      setInstalled(true);
+      try { localStorage.setItem('icg-pwa-installed', '1'); } catch { /* storage unavailable */ }
+    };
+    if (typeof navigator.getInstalledRelatedApps === 'function') {
+      navigator.getInstalledRelatedApps().then((apps) => {
+        const detected = apps.some(app => app.platform === 'webapp');
+        if (detected) rememberInstall();
+        else if (!isStandalonePwa()) {
+          setInstalled(false);
+          try { localStorage.removeItem('icg-pwa-installed'); } catch { /* storage unavailable */ }
+        }
+      }).catch(() => { /* fall back to display mode and the install event */ });
+    }
+    media?.addEventListener?.('change', syncDisplayMode);
+    window.addEventListener('appinstalled', rememberInstall);
+    return () => {
+      media?.removeEventListener?.('change', syncDisplayMode);
+      window.removeEventListener('appinstalled', rememberInstall);
+    };
+  }, []);
+
+  return installed;
 }
 
 function columnIndex(cellReference) {
@@ -660,6 +893,8 @@ function RefreshModal({ onClose }) {
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState(null);
   const [dbResult, setDbResult] = useState(null);
+  const [requests, setRequests] = useState([]);
+  const [requestsStatus, setRequestsStatus] = useState(null);
   const [showPublishObie, setShowPublishObie] = useState(false);
   const [publishObieNudge, setPublishObieNudge] = useState(false);
   const verifiedMasterRef = useRef(null);
@@ -690,7 +925,7 @@ function RefreshModal({ onClose }) {
         setView('menu');
       }
       else if (r.status === 401) setStatus({ ok: false, msg: 'Wrong passphrase.' });
-      else if (r.status === 500) setStatus({ ok: false, msg: 'Not set up yet — add GH_TOKEN & REFRESH_PASSPHRASE in Vercel.' });
+      else if (r.status === 500) setStatus({ ok: false, msg: data.error || 'Manager access is not configured in Vercel.' });
       else {
         const detail = data.detail ? ` — ${data.detail}` : '';
         setStatus({
@@ -725,6 +960,32 @@ function RefreshModal({ onClose }) {
       }
     } catch {
       setStatus({ ok: false, msg: 'Network error — the refresh could not be started.' });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const loadRequests = async () => {
+    if (busy) return;
+    setView('requests');
+    setBusy(true);
+    setRequestsStatus(null);
+    try {
+      const response = await fetch('/api/requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'list', passphrase: pass }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (response.status === 401) {
+        setView('login');
+        setStatus({ ok: false, msg: 'Manager session expired. Please sign in again.' });
+        return;
+      }
+      if (!response.ok || !result.ok) throw new Error(result.error || `Request service returned HTTP ${response.status}.`);
+      setRequests(result.requests || []);
+    } catch (error) {
+      setRequestsStatus({ ok: false, message: error?.message || 'The requests could not be loaded.' });
     } finally {
       setBusy(false);
     }
@@ -886,6 +1147,20 @@ function RefreshModal({ onClose }) {
         <div className="mt-4 space-y-3">
           <button
             type="button"
+            onClick={loadRequests}
+            className="group w-full rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#EB6608] hover:shadow-md dark:border-slate-600 dark:bg-slate-700"
+          >
+            <span className="flex items-center gap-3">
+              <span className="text-2xl" aria-hidden="true">💡</span>
+              <span>
+                <span className="block font-extrabold text-[#002D72] dark:text-white">View feature &amp; change requests</span>
+                <span className="text-sm font-semibold text-[#EB6608] group-hover:underline">Newest requests first →</span>
+              </span>
+            </span>
+          </button>
+
+          <button
+            type="button"
             onClick={triggerRefresh}
             className="group w-full rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#EB6608] hover:shadow-md dark:border-slate-600 dark:bg-slate-700"
           >
@@ -940,6 +1215,58 @@ function RefreshModal({ onClose }) {
               </span>
             </span>
           </a>
+        </div>
+      </ModalShell>
+    );
+  }
+
+  if (view === 'requests') {
+    return (
+      <ModalShell title="Feature & Change Requests" onClose={onClose}>
+        <div className="flex items-center justify-between gap-3">
+          <button type="button" onClick={() => setView('menu')} className="text-sm font-bold text-[#002D72] hover:underline dark:text-white">← Back to Managers Hub</button>
+          <button
+            type="button"
+            onClick={loadRequests}
+            disabled={busy}
+            className="rounded-lg bg-[#002D72] px-3 py-2 text-xs font-extrabold text-white disabled:opacity-60"
+          >
+            {busy ? 'Loading…' : '↻ Refresh list'}
+          </button>
+        </div>
+
+        {requestsStatus && (
+          <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{requestsStatus.message}</div>
+        )}
+
+        {!busy && !requestsStatus && requests.length === 0 && (
+          <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-6 text-center text-sm text-slate-600 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300">
+            No requests have been submitted yet.
+          </div>
+        )}
+
+        <div className="mt-4 space-y-3">
+          {requests.map(request => (
+            <article key={request.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-600 dark:bg-slate-700">
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-orange-100 px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wide text-orange-800">{request.type || 'Request'}</span>
+                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wide ${request.state === 'open' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'}`}>{request.state}</span>
+                  </div>
+                  <h3 className="mt-2 font-extrabold text-[#002D72] dark:text-white">{request.title}</h3>
+                </div>
+                <time className="text-xs font-semibold text-slate-500 dark:text-slate-300" dateTime={request.createdAt}>
+                  {new Date(request.createdAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                </time>
+              </div>
+              <p className="mt-3 whitespace-pre-wrap text-sm text-slate-700 dark:text-slate-200">{request.details}</p>
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3 text-xs dark:border-slate-600">
+                <span className="font-semibold text-slate-500 dark:text-slate-300">From: {request.submittedBy || 'Anonymous'}</span>
+                <a href={request.url} target="_blank" rel="noreferrer" className="font-extrabold text-[#EB6608] hover:underline">Open / close in GitHub →</a>
+              </div>
+            </article>
+          ))}
         </div>
       </ModalShell>
     );
@@ -1068,14 +1395,14 @@ function RefreshModal({ onClose }) {
 
 // Help + light/dark toggle, both as round photo buttons. The theme toggle shows
 // the mode you'll switch TO: sunset (evening) in light mode, daylit ship in dark.
-function TopControls({ compact, onManagerAccess }) {
+function TopControls({ compact, onManagerAccess, showInstall }) {
   const [dark, toggle] = useTheme();
   const [helpOpen, setHelpOpen] = useState(false);
-  const circleBtn = `${compact ? 'w-11 h-11' : 'w-20 h-20'} rounded-full overflow-hidden shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition`;
+  const circleBtn = `${compact ? 'w-11 h-11' : 'w-12 h-12 sm:w-20 sm:h-20'} shrink-0 rounded-full overflow-hidden shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition`;
 
   return (
     <>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
           onClick={onManagerAccess}
@@ -1108,14 +1435,33 @@ function TopControls({ compact, onManagerAccess }) {
           <img src={vintageErd} alt="Vintage ERD Tool" className="w-full h-full object-cover" />
         </a>
       </div>
-      {helpOpen && <HelpModal onClose={() => setHelpOpen(false)} />}
+      {helpOpen && <HelpModal showInstall={showInstall} onClose={() => setHelpOpen(false)} />}
     </>
   );
 }
 
 export default function App() {
   const [installOpen, setInstallOpen] = useState(false);
+  const [requestOpen, setRequestOpen] = useState(false);
   const [refreshOpen, setRefreshOpen] = useState(false);
+  const pwaInstalled = usePwaInstallStatus();
+  const mobileDevice = isMobileDevice();
+  const [mobileDemoUntil, setMobileDemoUntil] = useState(() => {
+    try {
+      const expires = Number(sessionStorage.getItem('icg-mobile-demo-until') || 0);
+      return expires > Date.now() ? expires : 0;
+    } catch { return 0; }
+  });
+  const mobileDemoUnlocked = mobileDemoUntil > Date.now();
+  const unlockMobileDemo = () => {
+    const expires = Date.now() + MOBILE_DEMO_MS;
+    try { sessionStorage.setItem('icg-mobile-demo-until', String(expires)); } catch { /* storage unavailable */ }
+    setMobileDemoUntil(expires);
+  };
+  const lockMobileDemo = () => {
+    try { sessionStorage.removeItem('icg-mobile-demo-until'); } catch { /* storage unavailable */ }
+    setMobileDemoUntil(0);
+  };
   const [tab, setTab] = useState('calculator');
   // Picking a Canadian port in the US calculator hands off to the Canada Rail
   // Ramp tab, preselecting that port in the published-schedule tool.
@@ -1176,13 +1522,28 @@ export default function App() {
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
+  useEffect(() => {
+    if (pwaInstalled) setInstallOpen(false);
+  }, [pwaInstalled]);
+
+  useEffect(() => {
+    if (!mobileDemoUntil) return undefined;
+    const remaining = mobileDemoUntil - Date.now();
+    if (remaining <= 0) {
+      lockMobileDemo();
+      return undefined;
+    }
+    const timer = setTimeout(lockMobileDemo, remaining);
+    return () => clearTimeout(timer);
+  }, [mobileDemoUntil]);
+
+  if (mobileDevice && !mobileDemoUnlocked) {
+    return <MobileDemoGate onUnlock={unlockMobileDemo} />;
+  }
+
   if (hash === '#vintage-ERD-tool') {
     return <HlMockup />;
   }
-  if (isMobileDevice()) {
-    return <MobileBlock />;
-  }
-
   return (
     <div className="min-h-screen bg-[#EDE6D6] dark:bg-slate-900 flex flex-col">
       {/* Banner constrained to just past the content edges (~5% wider each side). */}
@@ -1198,11 +1559,11 @@ export default function App() {
 
       {/* Header constrained to the hero width so it no longer draws a full-width line. */}
       <div className={`w-full max-w-[70rem] mx-auto px-4 ${compact ? 'pt-3' : 'mt-3'}`}>
-        <header className={`bg-[#F8F3EA] dark:bg-slate-800 border border-[#E0D8C5] dark:border-slate-700 rounded-xl flex items-center justify-between gap-3 ${compact ? 'px-4 py-2' : 'px-5 py-3'}`}>
+        <header className={`bg-[#F8F3EA] dark:bg-slate-800 border border-[#E0D8C5] dark:border-slate-700 rounded-xl flex flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-3 ${compact ? 'px-4 py-2' : 'px-4 py-3 sm:px-5'}`}>
           <div>
             <h1 onClick={secretTap} className={`${compact ? 'text-[1.15rem]' : 'text-[1.5rem]'} font-bold text-[#002D72] dark:text-white smallcaps txt-shadow-heavy select-none`}>Inland Cutoff Rail Guide</h1>
             {!compact && <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Rail cutoff &amp; delivery date calculator</p>}
-            {!compact && (
+            {!compact && !pwaInstalled && (
               <button
                 onClick={() => setInstallOpen(true)}
                 className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-full bg-[#002D72] text-white hover:bg-[#01245c] transition shadow-[0_6px_14px_rgba(0,0,0,0.35)]"
@@ -1211,12 +1572,12 @@ export default function App() {
               </button>
             )}
           </div>
-          <TopControls compact={compact} onManagerAccess={() => setRefreshOpen(true)} />
+          <TopControls compact={compact} showInstall={!pwaInstalled} onManagerAccess={() => setRefreshOpen(true)} />
         </header>
       </div>
 
-      <main className={`max-w-5xl mx-auto w-full ${compact ? 'px-4 py-3' : 'flex-1 px-5 py-6'}`}>
-        <div className={`flex flex-wrap items-center gap-2 ${compact ? 'mb-3' : 'mb-5'}`}>
+      <main className={`max-w-5xl mx-auto w-full ${compact ? 'px-3 py-3 sm:px-4' : 'flex-1 px-3 py-4 sm:px-5 sm:py-6'}`}>
+        <div className={`grid grid-cols-2 items-center gap-2 sm:flex sm:flex-wrap ${compact ? 'mb-3' : 'mb-5'}`}>
           {[
             { id: 'calculator', label: 'US Rail Ramp Cuts' },
             { id: 'cpkc', label: 'Canada Rail Ramp Cuts' }
@@ -1237,7 +1598,7 @@ export default function App() {
             type="button"
             onClick={refreshUpdatedData}
             title="Reload the guide with the newest published database"
-            className="ml-auto px-3 py-2 text-sm font-extrabold rounded-lg transition shadow-[0_4px_10px_rgba(0,0,0,0.25)] bg-emerald-700 text-white hover:bg-emerald-800"
+            className="px-3 py-2 text-sm font-extrabold rounded-lg transition shadow-[0_4px_10px_rgba(0,0,0,0.25)] bg-emerald-700 text-white hover:bg-emerald-800 sm:ml-auto"
           >
             ↻ Refresh Updated Data
           </button>
@@ -1249,6 +1610,22 @@ export default function App() {
           >
             {compact ? '⤢ Full view' : '⤡ Compact'}
           </button>
+          <button
+            type="button"
+            onClick={() => setRequestOpen(true)}
+            className="col-span-2 rounded-lg bg-[#EB6608] px-3 py-2 text-sm font-extrabold text-white shadow-[0_4px_10px_rgba(0,0,0,0.25)] transition hover:bg-[#cf5a07] sm:col-auto"
+          >
+            💡 Request a Feature / Change
+          </button>
+          {mobileDevice && (
+            <button
+              type="button"
+              onClick={lockMobileDemo}
+              className="col-span-2 rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm font-extrabold text-red-700 shadow-[0_4px_10px_rgba(0,0,0,0.2)] transition hover:bg-red-100 sm:col-auto"
+            >
+              🔒 End Mobile Demo
+            </button>
+          )}
         </div>
         {tab === 'calculator'
           ? <LookupForm onCanadaPort={goCanada} />
@@ -1256,9 +1633,10 @@ export default function App() {
       </main>
 
       {installOpen && <InstallModal onClose={() => setInstallOpen(false)} />}
+      {requestOpen && <FeatureRequestModal onClose={() => setRequestOpen(false)} />}
       {refreshOpen && <RefreshModal onClose={() => setRefreshOpen(false)} />}
 
-      <WebappReminder />
+      <WebappReminder enabled={!pwaInstalled} />
       {jokerOn && !compact && <ObieWalkOn />}
 
       <div className={`w-full max-w-[70rem] mx-auto px-4 text-right ${compact ? 'mt-3' : 'mt-8'}`}>

@@ -9,6 +9,13 @@
   "orientation": "portrait-primary",
   "theme_color": "#002D72",
   "background_color": "#002D72",
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "/manifest.webmanifest",
+      "id": "https://inland-guide.vercel.app/"
+    }
+  ],
   "icons": [
     {
       "src": "./icon-192.png",
