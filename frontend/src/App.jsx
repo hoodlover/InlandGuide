@@ -1133,6 +1133,20 @@ export default function App() {
     return next;
   });
 
+  const refreshUpdatedData = async () => {
+    try {
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map(name => caches.delete(name)));
+      }
+      if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.getRegistration();
+        await registration?.update();
+      }
+    } catch { /* a normal network-first reload still runs below */ }
+    window.location.reload();
+  };
+
   // Secret gesture: tap the title 5× within ~1.2s each to open the managers hub.
   const tapRef = useRef({ n: 0, t: 0 });
   const secretTap = () => {
@@ -1202,7 +1216,7 @@ export default function App() {
       </div>
 
       <main className={`max-w-5xl mx-auto w-full ${compact ? 'px-4 py-3' : 'flex-1 px-5 py-6'}`}>
-        <div className={`flex items-center gap-2 ${compact ? 'mb-3' : 'mb-5'}`}>
+        <div className={`flex flex-wrap items-center gap-2 ${compact ? 'mb-3' : 'mb-5'}`}>
           {[
             { id: 'calculator', label: 'US Rail Ramp Cuts' },
             { id: 'cpkc', label: 'Canada Rail Ramp Cuts' }
@@ -1220,10 +1234,18 @@ export default function App() {
             </button>
           ))}
           <button
+            type="button"
+            onClick={refreshUpdatedData}
+            title="Reload the guide with the newest published database"
+            className="ml-auto px-3 py-2 text-sm font-extrabold rounded-lg transition shadow-[0_4px_10px_rgba(0,0,0,0.25)] bg-emerald-700 text-white hover:bg-emerald-800"
+          >
+            ↻ Refresh Updated Data
+          </button>
+          <button
             onClick={toggleCompact}
             title={compact ? 'Switch to full view' : 'Switch to compact view'}
             aria-label={compact ? 'Switch to full view' : 'Switch to compact view'}
-            className="ml-auto px-3 py-2 text-sm font-bold rounded-lg transition shadow-[0_4px_10px_rgba(0,0,0,0.25)] bg-[#F8F3EA] dark:bg-slate-800 text-[#002D72] dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700"
+            className="px-3 py-2 text-sm font-bold rounded-lg transition shadow-[0_4px_10px_rgba(0,0,0,0.25)] bg-[#F8F3EA] dark:bg-slate-800 text-[#002D72] dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700"
           >
             {compact ? '⤢ Full view' : '⤡ Compact'}
           </button>
