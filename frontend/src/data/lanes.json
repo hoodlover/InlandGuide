@@ -1,18 +1,5 @@
 [
   {
-    "pol": "POL LOCCODE",
-    "ssy": "SSY -Use Keyword \"ALL\" is to apply the same days figure for ramp/port combination",
-    "name": "NAME",
-    "loccode": "LOCCODE",
-    "rampMC": "RAMP MC",
-    "rampCutTime": "TIME",
-    "transit": 0,
-    "window": 0,
-    "ssyAdjustment": 0,
-    "reefer": "REEFER",
-    "windowReefer": 0
-  },
-  {
     "pol": "CAMTR",
     "ssy": "ALL",
     "name": "CALGARY, AB",

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { unzipSync, strFromU8 } from 'fflate';
+import { gzipSync, strFromU8, strToU8, unzipSync } from 'fflate';
 import LookupForm from './components/LookupForm';
 import PortScheduleLookup from './components/PortScheduleLookup';
 import HlMockup from './components/HlMockup';
@@ -511,6 +511,142 @@ function validateMasterWorkbook(buffer) {
   return { sheetNames, databaseRows };
 }
 
+function columnIndex(cellReference) {
+  const letters = String(cellReference || '').match(/^[A-Z]+/i)?.[0]?.toUpperCase() || '';
+  return [...letters].reduce((index, letter) => (index * 26) + letter.charCodeAt(0) - 64, 0) - 1;
+}
+
+function readMasterRows(buffer) {
+  const files = unzipSync(new Uint8Array(buffer));
+  const workbook = xmlDocument(files['xl/workbook.xml'], 'Workbook definition');
+  const relationships = xmlDocument(files['xl/_rels/workbook.xml.rels'], 'Workbook relationships');
+  const relationshipMap = new Map(xmlElements(relationships, 'Relationship').map(rel => [
+    rel.getAttribute('Id'),
+    workbookPartPath(rel.getAttribute('Target') || ''),
+  ]));
+  const sharedStringsXml = files['xl/sharedStrings.xml']
+    ? xmlDocument(files['xl/sharedStrings.xml'], 'Shared strings')
+    : null;
+  const sharedStrings = sharedStringsXml
+    ? xmlElements(sharedStringsXml, 'si').map(si => xmlElements(si, 't').map(t => t.textContent || '').join(''))
+    : [];
+  const sheets = new Map(xmlElements(workbook, 'sheet').map(sheet => {
+    const relationId = sheet.getAttribute('r:id') || sheet.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id');
+    return [sheet.getAttribute('name') || '', relationshipMap.get(relationId)];
+  }));
+
+  const readCell = (cell) => {
+    const type = cell.getAttribute('t');
+    if (type === 'inlineStr') return xmlElements(cell, 't').map(t => t.textContent || '').join('');
+    const raw = xmlElements(cell, 'v')[0]?.textContent || '';
+    if (type === 's') return sharedStrings[Number(raw)] || '';
+    if (type === 'str') return raw;
+    if (type === 'b') return raw === '1';
+    if (raw === '') return '';
+    const numeric = Number(raw);
+    return Number.isFinite(numeric) ? numeric : raw;
+  };
+
+  return Object.fromEntries(MASTER_DB_SHEETS.map((name) => {
+    const path = sheets.get(name);
+    const sheet = xmlDocument(files[path], `${name} sheet`);
+    const rows = xmlElements(sheet, 'row').map(rowElement => {
+      const row = [];
+      xmlElements(rowElement, 'c').forEach((cell) => {
+        const index = columnIndex(cell.getAttribute('r'));
+        if (index >= 0) row[index] = readCell(cell);
+      });
+      return row.map(value => value ?? '');
+    });
+    return [name, rows];
+  }));
+}
+
+function excelSerialToIso(serial) {
+  if (!Number.isFinite(Number(serial))) return '';
+  return new Date(Date.UTC(1899, 11, 30) + (Number(serial) * 86400000)).toISOString().slice(0, 10);
+}
+
+function buildMasterPayload(buffer, sourceHash) {
+  const sheets = readMasterRows(buffer);
+  const lanes = [];
+  let inData = false;
+  for (const row of sheets.DATABASE) {
+    if (row[0] === 'STARTDATA') { inData = true; continue; }
+    if (row[0] === 'ENDDATA') break;
+    if (!inData || !row[0] || row[0] === 'POL LOCCODE') continue;
+    lanes.push({
+      pol: row[0], ssy: row[1], name: row[2], loccode: row[3], rampMC: row[4], rampCutTime: row[5],
+      transit: parseFloat(row[6]) || 0, window: parseFloat(row[7]) || 0,
+      ssyAdjustment: parseFloat(row[8]) || 0, reefer: row[9], windowReefer: parseFloat(row[10]) || 0,
+    });
+  }
+  if (lanes.length < 100) throw new Error('The master did not produce enough calculator lanes to publish.');
+
+  const holidays = {};
+  for (const row of sheets.HOLIDAYS) {
+    const country = String(row[0] || '').trim();
+    const iso = excelSerialToIso(row[2]);
+    if ((country === 'US' || country === 'CA' || country === 'MX') && iso) (holidays[country] ||= []).push(iso);
+  }
+  Object.values(holidays).forEach(list => list.sort());
+
+  const terminalMap = {};
+  for (const row of sheets.PORTMC) {
+    const pol = String(row[0] || '').trim();
+    const terminal = String(row[2] || '').trim();
+    if (!/^(US|CA|MX)[A-Z]{3}$/.test(pol) || !terminal) continue;
+    terminalMap[pol] ||= new Map();
+    if (!terminalMap[pol].has(terminal)) terminalMap[pol].set(terminal, new Set());
+    String(row[1] || '').split(',').forEach(service => {
+      const value = service.trim();
+      if (value) terminalMap[pol].get(terminal).add(value);
+    });
+  }
+  const terminalForService = (pol, service) => {
+    for (const [terminal, services] of terminalMap[pol] || []) if (services.has(service)) return terminal;
+    return null;
+  };
+  const portmc = {};
+  for (const pol of Object.keys(terminalMap).sort()) {
+    const terminals = terminalMap[pol];
+    if (terminals.size < 2) continue;
+    const polLanes = lanes.filter(lane => lane.pol === pol);
+    if (!polLanes.length) continue;
+    const services = new Set();
+    polLanes.forEach(lane => String(lane.ssy || '').split(',').forEach(service => {
+      const value = service.trim();
+      if (value && value !== 'ALL') services.add(value);
+    }));
+    portmc[pol] = {
+      mode: [...services].every(service => terminalForService(pol, service)) ? 'terminal' : 'ssy',
+      terminals: [...terminals].map(([code, values]) => ({ code, ssys: [...values] })),
+    };
+  }
+
+  const portServices = {};
+  for (const row of sheets.PORTSERVICES) {
+    const pol = String(row[0] || '').trim();
+    if (!/^(US|CA|MX)[A-Z]{3}$/.test(pol)) continue;
+    portServices[pol] ||= [];
+    String(row[1] || '').split(',').forEach(service => {
+      const value = service.trim();
+      if (value && !portServices[pol].includes(value)) portServices[pol].push(value);
+    });
+  }
+
+  return { schema: 1, sourceHash, lanes, holidays, portmc, portServices };
+}
+
+function encodeMasterPayload(payload) {
+  const compressed = gzipSync(strToU8(JSON.stringify(payload)), { level: 9 });
+  let binary = '';
+  for (let index = 0; index < compressed.length; index += 0x8000) {
+    binary += String.fromCharCode(...compressed.subarray(index, index + 0x8000));
+  }
+  return btoa(binary);
+}
+
 async function sha256Hex(buffer) {
   const digest = await crypto.subtle.digest('SHA-256', buffer);
   return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('').toUpperCase();
@@ -597,10 +733,13 @@ function RefreshModal({ onClose }) {
       const buffer = await file.arrayBuffer();
       const validation = validateMasterWorkbook(buffer);
       const hash = await sha256Hex(buffer);
+      const masterPayload = buildMasterPayload(buffer, hash);
+      const encodedPayload = encodeMasterPayload(masterPayload);
+      if (encodedPayload.length > 60000) throw new Error('The calculator data is too large for the secure publish service.');
       let previousHash = '';
       try { previousHash = localStorage.getItem('icg-master-db-hash') || ''; } catch { /* local storage unavailable */ }
       const changed = !previousHash || previousHash !== hash;
-      verifiedMasterRef.current = { file, hash };
+      verifiedMasterRef.current = { file, hash, encodedPayload };
       setDbResult({
         ok: true,
         changed,
@@ -608,6 +747,7 @@ function RefreshModal({ onClose }) {
         fileSize: file.size,
         fileModified: file.lastModified,
         hash,
+        laneCount: masterPayload.lanes.length,
         ...validation,
         message: changed
           ? (previousHash ? 'This workbook is different from the last verified copy.' : 'Valid master workbook. This is the first verified copy in this browser.')
@@ -644,23 +784,39 @@ function RefreshModal({ onClose }) {
         link.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
       }
-      const savedAt = new Date().toISOString();
+      setDbResult(current => ({
+        ...current,
+        saved: true,
+        message: 'Verified copy saved. Publishing the calculator data now…',
+      }));
+
+      const publishResponse = await fetch('/api/refresh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ passphrase: pass, action: 'publish-master', payload: verified.encodedPayload }),
+      });
+      const publishResult = await publishResponse.json().catch(() => ({}));
+      if (!publishResponse.ok || !publishResult.ok) {
+        throw new Error(publishResult.error || `Live publish service returned HTTP ${publishResponse.status}.`);
+      }
+      const publishedAt = new Date().toISOString();
       try {
         localStorage.setItem('icg-master-db-hash', verified.hash);
-        localStorage.setItem('icg-master-db-updated-at', savedAt);
+        localStorage.setItem('icg-master-db-updated-at', publishedAt);
       } catch { /* local storage unavailable */ }
-      window.dispatchEvent(new CustomEvent('icg-master-db-updated', { detail: savedAt }));
+      window.dispatchEvent(new CustomEvent('icg-master-db-updated', { detail: publishedAt }));
       setDbResult(current => ({
         ...current,
         changed: false,
         saved: true,
+        published: true,
         message: window.showSaveFilePicker
-          ? 'Verified copy saved. Confirm that you selected the approved Z: folder.'
-          : 'Verified copy downloaded. Move it to the approved Z: folder if your browser did not ask where to save it.',
+          ? 'Verified copy saved and the live calculator update started. The new guide will deploy in a few minutes.'
+          : 'Verified copy downloaded and the live calculator update started. Move the file to the approved Z: folder if needed.',
       }));
     } catch (error) {
       if (error?.name !== 'AbortError') {
-        setDbResult(current => ({ ...current, saveError: error?.message || 'The verified copy could not be saved.' }));
+        setDbResult(current => ({ ...current, saveError: error?.message || 'The verified copy could not be saved or published.' }));
       }
     } finally {
       setBusy(false);
@@ -740,8 +896,8 @@ function RefreshModal({ onClose }) {
             <span className="flex items-center gap-3">
               <span className="text-2xl" aria-hidden="true">📊</span>
               <span>
-                <span className="block font-extrabold text-[#002D72] dark:text-white">Check the SharePoint master database</span>
-                <span className="text-sm font-semibold text-[#EB6608] group-hover:underline">Perform Check Now →</span>
+                <span className="block font-extrabold text-[#002D72] dark:text-white">Update the live guide from the SharePoint master</span>
+                <span className="text-sm font-semibold text-[#EB6608] group-hover:underline">Check &amp; Publish Now →</span>
               </span>
             </span>
           </button>
@@ -796,7 +952,7 @@ function RefreshModal({ onClose }) {
     return (
       <ModalShell title="Master Database Check" onClose={onClose}>
         <div className="rounded-xl border-2 border-[#002D72] bg-blue-50 p-5 dark:bg-slate-700">
-          <p className="text-lg font-extrabold text-[#002D72] dark:text-white">Secure browser-only verification</p>
+          <p className="text-lg font-extrabold text-[#002D72] dark:text-white">Secure live database update</p>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
             No scripts or installers. The workbook stays on this computer while the browser validates its sheets and compares its fingerprint.
           </p>
@@ -818,14 +974,14 @@ function RefreshModal({ onClose }) {
 
         {dbResult && (
           <div className={`mt-3 rounded-xl border p-4 text-sm ${dbResult.ok ? (dbResult.changed ? 'border-amber-300 bg-amber-50 text-amber-900' : 'border-emerald-300 bg-emerald-50 text-emerald-800') : 'border-red-300 bg-red-50 text-red-700'}`}>
-            <p className="font-extrabold">{dbResult.ok ? (dbResult.saved ? '✓ Verified copy ready' : dbResult.changed ? '✓ Valid — new or changed master' : '✓ Valid — matches last verified master') : 'Verification failed'}</p>
+            <p className="font-extrabold">{dbResult.ok ? (dbResult.published ? '✓ Live update started' : dbResult.saved ? '✓ Verified copy saved' : dbResult.changed ? '✓ Valid — new or changed master' : '✓ Valid — matches last verified master') : 'Verification failed'}</p>
             <p className="mt-1">{dbResult.message}</p>
             {dbResult.ok && (
               <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
                 <dt className="font-bold">File</dt><dd className="break-all">{dbResult.fileName}</dd>
                 <dt className="font-bold">Modified</dt><dd>{new Date(dbResult.fileModified).toLocaleString()}</dd>
                 <dt className="font-bold">Size</dt><dd>{Math.round(dbResult.fileSize / 1024).toLocaleString()} KB</dd>
-                <dt className="font-bold">Database</dt><dd>{dbResult.databaseRows.toLocaleString()} rows</dd>
+                <dt className="font-bold">Database</dt><dd>{dbResult.databaseRows.toLocaleString()} rows / {dbResult.laneCount.toLocaleString()} live lanes</dd>
                 <dt className="font-bold">Fingerprint</dt><dd className="break-all font-mono">{dbResult.hash.slice(0, 20)}…</dd>
               </dl>
             )}
@@ -840,12 +996,12 @@ function RefreshModal({ onClose }) {
             disabled={busy}
             className="mt-3 w-full rounded-lg bg-emerald-700 px-4 py-3 font-extrabold text-white shadow-md transition hover:bg-emerald-800 disabled:opacity-60"
           >
-            3. Save Verified Copy — Choose Z:
+            3. Save to Z: &amp; Publish Live Data
           </button>
         )}
 
         <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
-          Download the workbook from SharePoint first. Validation runs entirely inside this browser; the file is never uploaded. When saving, choose Z:\InlandCutoffGuide-DontTouch.
+          Download the workbook from SharePoint first. The workbook itself stays on this computer; only validated calculator rows are sent to the secure deployment workflow. When saving, choose Z:\InlandCutoffGuide-DontTouch.
         </p>
         <button type="button" onClick={() => { setStatus(null); setDbResult(null); verifiedMasterRef.current = null; setView('menu'); }} className="mt-4 text-sm font-bold text-[#002D72] hover:underline dark:text-white">← Back to Managers Hub</button>
       </ModalShell>

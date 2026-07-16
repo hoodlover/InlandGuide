@@ -43,9 +43,16 @@ module.exports = async (req, res) => {
     return;
   }
 
+  const publishingMaster = body.action === 'publish-master';
+  if (publishingMaster && (!body.payload || typeof body.payload !== 'string' || body.payload.length > 60000 || !/^[A-Za-z0-9+/=]+$/.test(body.payload))) {
+    res.status(400).json({ error: 'The extracted master database payload is missing or invalid.' });
+    return;
+  }
+
   try {
+    const workflow = publishingMaster ? 'publish-master.yml' : GH_WORKFLOW;
     const gh = await fetch(
-      `https://api.github.com/repos/${GH_REPO}/actions/workflows/${GH_WORKFLOW}/dispatches`,
+      `https://api.github.com/repos/${GH_REPO}/actions/workflows/${workflow}/dispatches`,
       {
         method: 'POST',
         headers: {
@@ -55,11 +62,14 @@ module.exports = async (req, res) => {
           'User-Agent': 'icg-refresh',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ref: GH_REF }),
+        body: JSON.stringify({
+          ref: GH_REF,
+          ...(publishingMaster ? { inputs: { payload: body.payload } } : {}),
+        }),
       }
     );
     if (gh.status === 204) {
-      res.status(200).json({ ok: true });
+      res.status(200).json({ ok: true, action: publishingMaster ? 'publish-master' : 'refresh-schedules' });
       return;
     }
     const detail = (await gh.text()).slice(0, 300);

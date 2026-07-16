@@ -6,14 +6,14 @@
 import { execSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 
-const BOT = 'cpkc-refresh-bot';
+const BOTS = new Set(['cpkc-refresh-bot', 'master-db-bot']);
 
 function version() {
   // author \x1f unix-ts \x1f short-date, one line per commit.
   const rows = execSync('git log --date=short --format=%an%x1f%at%x1f%ad', { encoding: 'utf8' })
     .trim().split('\n').filter(Boolean)
     .map(l => l.split('\x1f'))
-    .filter(([author]) => author !== BOT);
+    .filter(([author]) => !BOTS.has(author));
 
   const commits = rows.length;
   const days = new Set(rows.map(r => r[2])).size;

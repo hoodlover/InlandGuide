@@ -6,6 +6,7 @@ import Combobox from './Combobox';
 import { SalesforceIcon, OutlookIcon, TeamsIcon, TextIcon } from './BrandIcons';
 import ObieThinking from './ObieThinking';
 import { renderPasteCardImage } from '../lib/pasteCardImage';
+import masterStatus from '../data/master-status.json';
 
 // Flexible date entry:  "9" = 9th of THIS month · "8/9" = Aug 9 · "8/9/26" or "8/9/2026" = full.
 function parseFlexibleDate(input) {
@@ -95,8 +96,12 @@ function outlookLogoBlock() {
 const MASTER_DB_UPDATED_KEY = 'icg-master-db-updated-at';
 
 function readMasterDbUpdatedAt() {
-  try { return localStorage.getItem(MASTER_DB_UPDATED_KEY) || ''; }
-  catch { return ''; }
+  try {
+    const localValue = localStorage.getItem(MASTER_DB_UPDATED_KEY) || '';
+    const sharedValue = masterStatus.publishedAt || '';
+    return new Date(localValue).getTime() > new Date(sharedValue).getTime() ? localValue : sharedValue;
+  }
+  catch { return masterStatus.publishedAt || ''; }
 }
 
 function formatMasterDbUpdatedDate(value) {

@@ -22,7 +22,7 @@ let inData = false;
 for (let i = 0; i < rows.length; i++) {
   if (rows[i][0] === 'STARTDATA') { inData = true; continue; }
   if (rows[i][0] === 'ENDDATA' || !inData) continue;
-  if (rows[i][0]) {
+  if (rows[i][0] && rows[i][0] !== 'POL LOCCODE') {
     lanes.push({
       pol: rows[i][0], ssy: rows[i][1], name: rows[i][2], loccode: rows[i][3],
       rampMC: rows[i][4], rampCutTime: rows[i][5],
