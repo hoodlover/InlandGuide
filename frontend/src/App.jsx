@@ -508,6 +508,14 @@ function RefreshModal({ onClose }) {
     }
   };
 
+  const triggerMasterDatabaseCheck = () => {
+    setStatus({
+      ok: true,
+      msg: 'Opening the local master-database checker. Approve the browser prompt if it appears.',
+    });
+    window.location.href = 'inlandguide://check-master-db';
+  };
+
   if (view === 'login') {
     return (
       <ModalShell title="Managers Only" onClose={onClose}>
@@ -575,6 +583,20 @@ function RefreshModal({ onClose }) {
 
           <button
             type="button"
+            onClick={() => { setStatus(null); setView('database'); }}
+            className="group w-full rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#EB6608] hover:shadow-md dark:border-slate-600 dark:bg-slate-700"
+          >
+            <span className="flex items-center gap-3">
+              <span className="text-2xl" aria-hidden="true">📊</span>
+              <span>
+                <span className="block font-extrabold text-[#002D72] dark:text-white">Check the SharePoint master database</span>
+                <span className="text-sm font-semibold text-[#EB6608] group-hover:underline">Perform Check Now →</span>
+              </span>
+            </span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setView('lane')}
             className="group w-full rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#EB6608] hover:shadow-md dark:border-slate-600 dark:bg-slate-700"
           >
@@ -615,6 +637,52 @@ function RefreshModal({ onClose }) {
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">Lane activation and deactivation remain controlled in the source system.</p>
         </div>
         <button type="button" onClick={() => setView('menu')} className="mt-4 text-sm font-bold text-[#002D72] hover:underline dark:text-white">← Back to Managers Hub</button>
+      </ModalShell>
+    );
+  }
+
+  if (view === 'database') {
+    return (
+      <ModalShell title="Master Database Check" onClose={onClose}>
+        <div className="rounded-xl border-2 border-[#002D72] bg-blue-50 p-5 dark:bg-slate-700">
+          <p className="text-lg font-extrabold text-[#002D72] dark:text-white">SharePoint → verified Z: mirror</p>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+            The checker uses this computer&apos;s signed-in SharePoint session, validates the required workbook sheets,
+            compares the file hash, and updates Z: only when the master actually changed.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={triggerMasterDatabaseCheck}
+          className="mt-4 w-full rounded-lg bg-[#002D72] px-4 py-3 font-extrabold text-white shadow-md transition hover:bg-[#01245c]"
+        >
+          Perform Check Now
+        </button>
+
+        {status && (
+          <div className={`mt-3 rounded-lg border p-3 text-sm ${status.ok ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-red-200 bg-red-50 text-red-700'}`}>
+            {status.msg}
+          </div>
+        )}
+
+        <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          <p className="font-extrabold">First time on this computer?</p>
+          <p className="mt-1">Install the local checker once. It also creates the hourly 7:00 AM–4:00 PM schedule and a logon catch-up check.</p>
+          <a
+            href="/tools/InstallMasterDbChecker.ps1"
+            download
+            className="mt-3 inline-flex rounded-full bg-[#EB6608] px-4 py-2 font-bold text-white shadow hover:bg-[#cf5a07]"
+          >
+            Download One-Time Installer
+          </a>
+          <p className="mt-2 text-xs">After downloading, right-click the file and choose <b>Run with PowerShell</b>. If Windows blocks it, open Properties, select Unblock, and run it again.</p>
+        </div>
+
+        <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
+          Requires access to the SharePoint workbook, Microsoft Excel, and Z:\InlandCutoffGuide-DontTouch.
+        </p>
+        <button type="button" onClick={() => { setStatus(null); setView('menu'); }} className="mt-4 text-sm font-bold text-[#002D72] hover:underline dark:text-white">← Back to Managers Hub</button>
       </ModalShell>
     );
   }
