@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-15",
-  "pulledAt": "2026-07-15T19:33:04.336Z",
+  "generatedAt": "2026-07-16",
+  "pulledAt": "2026-07-16T15:03:00.001Z",
   "ports": {
     "montreal": {
       "name": "Port of Montreal",
@@ -1388,8 +1388,8 @@
     "prince-rupert": {
       "name": "Prince Rupert",
       "rail": "CN",
-      "runDate": "Wed 15-Jul",
-      "generatedAt": "2026-07-15",
+      "runDate": "Thu 16-Jul",
+      "generatedAt": "2026-07-16",
       "cities": [
         "TORONTO (MALPORT)",
         "MONTREAL",
