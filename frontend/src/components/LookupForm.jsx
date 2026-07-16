@@ -94,6 +94,7 @@ function outlookLogoBlock() {
 
 export default function LookupForm({ onCanadaPort }) {
   const [formData, setFormData] = useState(() => ({ ...EMPTY_FORM, portCutDate: today().iso }));
+  const resultsRef = useRef(null);
 
   // Date box prefilled to today so users can just tweak the day.
   const [dateInput, setDateInput] = useState(() => today().mdy);
@@ -103,6 +104,14 @@ export default function LookupForm({ onCanadaPort }) {
   const [error, setError] = useState('');
   const [copyMessage, setCopyMessage] = useState('');
   const [pasteProof, setPasteProof] = useState(null);
+
+  useEffect(() => {
+    if (!results || !window.matchMedia('(max-width: 767px)').matches) return undefined;
+    const frame = window.requestAnimationFrame(() => {
+      resultsRef.current?.scrollIntoView({ behavior: 'auto', block: 'start' });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [results]);
 
   // All options are derived locally from the bundled data snapshot — no network.
   const portGroups = getPortGroups();
@@ -578,7 +587,7 @@ export default function LookupForm({ onCanadaPort }) {
         </form>
       </div>
 
-      <div>
+      <div ref={resultsRef} className={results ? 'pb-32 md:pb-0' : ''}>
         {results ? (
           <div className="bg-[#002D72] rounded-lg border border-[#002D72] shadow-sm p-6">
             <h3 className="text-xl font-extrabold tracking-wide uppercase mb-4 pb-2 border-b-2 border-[#EB6608] text-white txt-shadow-heavy">{pasteProof ? 'Ready to Paste' : 'Results'}</h3>

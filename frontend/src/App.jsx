@@ -405,7 +405,7 @@ function ModalShell({ title, onClose, children }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-normal tracking-wide text-[#002D72] dark:text-white">{title}</h2>
+          <h2 className="text-lg font-light tracking-wide text-[#002D72] dark:text-white">{title}</h2>
           <button
             onClick={onClose}
             aria-label="Close"
@@ -1140,7 +1140,7 @@ function RefreshModal({ onClose }) {
     return (
       <ModalShell title="Hapag-Lloyd Managers" onClose={onClose}>
         <div className="rounded-xl bg-gradient-to-r from-[#002D72] to-[#0a4b9b] px-5 py-4 text-white shadow-md">
-          <p className="text-base font-semibold">Welcome, Hapag-Lloyd Managers</p>
+          <p className="text-base font-normal">Welcome, Hapag-Lloyd Managers</p>
           <p className="mt-1 text-sm text-white/80">Your shortcuts for keeping the Inland Guide moving.</p>
         </div>
 
@@ -1290,7 +1290,7 @@ function RefreshModal({ onClose }) {
       <>
       <ModalShell title="Master Database Check" onClose={onClose}>
         <div className="rounded-xl border-2 border-[#002D72] bg-blue-50 p-5 dark:bg-slate-700">
-          <p className="text-lg font-extrabold text-[#002D72] dark:text-white">Secure live database update</p>
+          <p className="text-lg font-normal text-[#002D72] dark:text-white">Secure live database update</p>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
             No scripts or installers. The workbook stays on this computer while the browser validates its sheets and compares its fingerprint.
           </p>
@@ -1300,19 +1300,19 @@ function RefreshModal({ onClose }) {
           href="https://hlag.sharepoint.com/sites/RegionNorthAmerica/Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2FRegionNorthAmerica%2FShared%20Documents%2FInland"
           target="_blank"
           rel="noreferrer"
-          className="mt-4 block w-full rounded-lg bg-[#002D72] px-4 py-3 text-center font-extrabold text-white shadow-md transition hover:bg-[#01245c]"
+          className="mt-4 block w-full rounded-lg bg-[#002D72] px-4 py-3 text-center font-normal text-white shadow-md transition hover:bg-[#01245c]"
         >
           1. Open the Inland SharePoint Folder
         </a>
-        <p className="mt-2 text-center text-xs font-semibold text-slate-500 dark:text-slate-400">
+        <p className="mt-2 text-center text-xs font-normal text-slate-500 dark:text-slate-400">
           Right-click InlandCutoffGuide.xlsm and select Download, then come back here to verify and save. Clicking the file itself opens it in Excel.
         </p>
 
-        <label className={`mt-3 block w-full cursor-pointer rounded-lg bg-[#EB6608] px-4 py-3 text-center font-extrabold text-white shadow-md transition hover:bg-[#cf5a07] ${busy ? 'pointer-events-none opacity-60' : ''}`}>
+        <label className={`mt-3 block w-full cursor-pointer rounded-lg bg-[#EB6608] px-4 py-3 text-center font-normal text-white shadow-md transition hover:bg-[#cf5a07] ${busy ? 'pointer-events-none opacity-60' : ''}`}>
           {busy ? 'Verifying…' : '2. Verify Downloaded Master'}
           <input type="file" accept=".xlsm,application/vnd.ms-excel.sheet.macroEnabled.12" onChange={verifyMasterDatabase} className="sr-only" />
         </label>
-        <p className="mt-2 text-center text-xs font-semibold text-slate-500 dark:text-slate-400">
+        <p className="mt-2 text-center text-xs font-normal text-slate-500 dark:text-slate-400">
           Look for the file in your Downloads folder and double-click it to start the verify process.
         </p>
 
@@ -1338,7 +1338,7 @@ function RefreshModal({ onClose }) {
             type="button"
             onClick={saveVerifiedMaster}
             disabled={busy}
-            className="mt-3 w-full rounded-lg bg-emerald-700 px-4 py-3 font-extrabold text-white shadow-md transition hover:bg-emerald-800 disabled:opacity-60"
+            className="mt-3 w-full rounded-lg bg-emerald-700 px-4 py-3 font-normal text-white shadow-md transition hover:bg-emerald-800 disabled:opacity-60"
           >
             3. Save to Z: &amp; Publish Live Data
           </button>
@@ -1407,7 +1407,7 @@ function TopControls({ compact, onManagerAccess, showInstall, mobile = false }) 
           <button
             type="button"
             onClick={onManagerAccess}
-            className={`${compact ? 'px-3 py-1.5 text-[11px]' : 'px-4 py-2 text-xs'} rounded-full border-2 border-[#EB6608] bg-[#002D72] font-extrabold uppercase tracking-wide text-white shadow-[0_5px_12px_rgba(0,0,0,0.35)] transition hover:-translate-y-0.5 hover:bg-[#EB6608] active:translate-y-0 whitespace-nowrap`}
+            className={`${compact ? 'px-3 py-1.5 text-[11px]' : 'px-4 py-2 text-xs'} rounded-full border-2 border-[#EB6608] bg-[#002D72] font-normal uppercase tracking-wide text-white shadow-[0_5px_12px_rgba(0,0,0,0.35)] transition hover:-translate-y-0.5 hover:bg-[#EB6608] active:translate-y-0 whitespace-nowrap`}
           >
             Manager Console Access
           </button>
@@ -1587,7 +1587,7 @@ export default function App() {
         <div className={`grid grid-cols-2 items-center gap-2 sm:flex sm:flex-wrap ${compactView ? 'mb-3' : 'mb-5'}`}>
           {[
             { id: 'calculator', label: 'US Rail Ramp Cuts' },
-            { id: 'cpkc', label: 'Canada Rail Ramp Cuts' }
+            { id: 'cpkc', label: 'Canada Rail Ramp Cuts', mobileLabel: 'Canada Rail Cuts' }
           ].map(t => (
             <button
               key={t.id}
@@ -1598,7 +1598,7 @@ export default function App() {
                   : 'bg-[#F8F3EA] dark:bg-slate-800 text-[#002D72] dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700'
               }`}
             >
-              {t.label}
+              {mobileDevice && t.mobileLabel ? t.mobileLabel : t.label}
             </button>
           ))}
           {!mobileDevice && (
