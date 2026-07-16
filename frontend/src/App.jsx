@@ -660,7 +660,16 @@ function RefreshModal({ onClose }) {
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState(null);
   const [dbResult, setDbResult] = useState(null);
+  const [showPublishObie, setShowPublishObie] = useState(false);
+  const [publishObieNudge, setPublishObieNudge] = useState(false);
   const verifiedMasterRef = useRef(null);
+
+  useEffect(() => {
+    if (!showPublishObie) return undefined;
+    setPublishObieNudge(false);
+    const timer = setTimeout(() => setPublishObieNudge(true), 5000);
+    return () => clearTimeout(timer);
+  }, [showPublishObie]);
 
   const verifyAccess = async () => {
     if (!pass || busy) return;
@@ -814,6 +823,7 @@ function RefreshModal({ onClose }) {
           ? 'Verified copy saved and the live calculator update started. The new guide will deploy in a few minutes.'
           : 'Verified copy downloaded and the live calculator update started. Move the file to the approved Z: folder if needed.',
       }));
+      setShowPublishObie(true);
     } catch (error) {
       if (error?.name !== 'AbortError') {
         setDbResult(current => ({ ...current, saveError: error?.message || 'The verified copy could not be saved or published.' }));
@@ -950,6 +960,7 @@ function RefreshModal({ onClose }) {
 
   if (view === 'database') {
     return (
+      <>
       <ModalShell title="Master Database Check" onClose={onClose}>
         <div className="rounded-xl border-2 border-[#002D72] bg-blue-50 p-5 dark:bg-slate-700">
           <p className="text-lg font-extrabold text-[#002D72] dark:text-white">Secure live database update</p>
@@ -992,14 +1003,6 @@ function RefreshModal({ onClose }) {
               </dl>
             )}
             {dbResult.saveError && <p className="mt-2 font-semibold text-red-700">{dbResult.saveError}</p>}
-            {dbResult.published && (
-              <div className="mt-4 flex items-center justify-center gap-3 rounded-xl border border-emerald-200 bg-white/90 p-3 text-slate-800 shadow-sm" role="status">
-                <img src={obBot} alt="Obie" className="obie-confirm-pop w-24 shrink-0 drop-shadow-lg" />
-                <div className="rounded-2xl bg-[#002D72] px-4 py-3 text-sm font-extrabold text-white shadow-md">
-                  All done! Your live guide update is on the way. Have a nice day!
-                </div>
-              </div>
-            )}
           </div>
         )}
 
@@ -1019,6 +1022,30 @@ function RefreshModal({ onClose }) {
         </p>
         <button type="button" onClick={() => { setStatus(null); setDbResult(null); verifiedMasterRef.current = null; setView('menu'); }} className="mt-4 text-sm font-bold text-[#002D72] hover:underline dark:text-white">← Back to Managers Hub</button>
       </ModalShell>
+      {showPublishObie && (
+        <div className="fixed inset-0 z-[140] flex flex-col items-center justify-center bg-black/55 p-6 backdrop-blur-md" role="dialog" aria-modal="true" aria-label="Live update complete">
+          <div key={publishObieNudge ? 'nudge' : 'done'} className="joke-fade thought-bubble relative mb-6 max-w-sm rounded-2xl bg-white px-5 py-4 text-center text-base font-extrabold leading-snug text-[#002D72] shadow-2xl" role="status">
+            {publishObieNudge
+              ? 'Hey, click me to do more manager stuff.'
+              : 'All done! Your live guide update is on the way. Have a nice day!'}
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setShowPublishObie(false);
+              setStatus(null);
+              setDbResult(null);
+              verifiedMasterRef.current = null;
+              setView('menu');
+            }}
+            className="rounded-full bg-transparent p-0 transition hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#EB6608]"
+            aria-label="Click Obie to return to the Managers Hub"
+          >
+            <img src={obBot} alt="Obie" className="obie-confirm-pop obie-float w-56 max-w-[70vw] drop-shadow-2xl" />
+          </button>
+        </div>
+      )}
+      </>
     );
   }
 
