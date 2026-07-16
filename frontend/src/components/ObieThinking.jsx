@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { obBot } from '../assets/banners';
-import obieCopilot from '../assets/obie-copilot-robot.png';
+import sammieBot from '../assets/obie-copilot-robot-sammie-bot.png';
 
 // Obie's idle thoughts — cargo/ops humor + encouragement. Rotate every 15s.
 const THOUGHTS = [
@@ -126,7 +126,7 @@ export default function ObieThinking() {
                   <div className="sammie-skid" aria-hidden="true"><i /><i /><i /></div>
                 </>
               )}
-              <img src={obieCopilot} alt="Sammie Bot, smiling and winking from his robot body" />
+              <img src={sammieBot} alt="Sammie Bot, smiling and winking from his robot body" />
             </div>
           )}
           {sammiePhase === 'offscreen' && (

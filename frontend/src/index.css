@@ -201,11 +201,11 @@ textarea {
 
 .sammie-bot {
   position: absolute;
-  left: 0;
-  bottom: clamp(12px, 3vh, 34px);
+  left: 50%;
+  top: 50%;
   width: clamp(11rem, 20vw, 18rem);
-  transform: translateX(112vw);
-  transform-origin: 48% 88%;
+  transform: translate(65vw, 65vh) scale(.8);
+  transform-origin: 50% 82%;
   filter: drop-shadow(0 18px 18px rgba(0, 0, 0, .42));
   will-change: transform;
 }
@@ -216,42 +216,35 @@ textarea {
   display: block;
   width: 100%;
   height: auto;
-  border: 4px solid #EB6608;
-  border-radius: 28%;
-  background: #002D72;
-  box-shadow: 0 0 0 4px #002D72, 0 12px 30px rgba(0, 45, 114, .45);
 }
 
 .sammie-bot-roll-in { animation: sammie-roll-in 2.4s cubic-bezier(.18, .8, .25, 1) forwards; }
 .sammie-bot-greet,
-.sammie-bot-beep { transform: translateX(22vw); }
+.sammie-bot-beep { transform: translate(-50%, -50%); }
 .sammie-bot-wheelie { animation: sammie-wheelie-pop 1.2s cubic-bezier(.22, .8, .35, 1) forwards; }
 .sammie-bot-exit { animation: sammie-burnout-exit 3.3s linear forwards; }
 
-.sammie-bot-wheelie > img,
-.sammie-bot-exit > img { transform: scaleX(-1); }
-
 @keyframes sammie-roll-in {
-  0% { transform: translateX(112vw) rotate(0); }
-  72% { transform: translateX(19vw) rotate(-2deg); }
-  87% { transform: translateX(24vw) rotate(1deg); }
-  100% { transform: translateX(22vw) rotate(0); }
+  0% { transform: translate(65vw, 65vh) rotate(5deg) scale(.8); }
+  72% { transform: translate(-56%, -56%) rotate(-3deg) scale(1.03); }
+  87% { transform: translate(-47%, -47%) rotate(1deg) scale(.99); }
+  100% { transform: translate(-50%, -50%) rotate(0) scale(1); }
 }
 
 @keyframes sammie-wheelie-pop {
-  0% { transform: translateX(22vw) rotate(0); }
-  28% { transform: translateX(22vw) rotate(-18deg) translateY(-5px); }
-  55% { transform: translateX(22vw) rotate(-10deg); }
-  100% { transform: translateX(21vw) rotate(-15deg) translateY(-3px); }
+  0% { transform: translate(-50%, -50%) rotate(0); }
+  28% { transform: translate(-50%, -52%) rotate(-18deg); }
+  55% { transform: translate(-50%, -50%) rotate(-10deg); }
+  100% { transform: translate(-50%, -51%) rotate(-15deg); }
 }
 
 /* Barely moves at first, then gathers speed and rockets through the left edge. */
 @keyframes sammie-burnout-exit {
-  0% { transform: translateX(21vw) rotate(-15deg) translateY(-3px); }
-  22% { transform: translateX(19vw) rotate(-17deg) translateY(-4px); }
-  43% { transform: translateX(13vw) rotate(-13deg); }
-  68% { transform: translateX(-3vw) rotate(-10deg); }
-  100% { transform: translateX(-36vw) rotate(-7deg); }
+  0% { transform: translate(-50%, -51%) rotate(-15deg); }
+  22% { transform: translate(-57%, -52%) rotate(-17deg); }
+  43% { transform: translate(-12vw, -51%) rotate(-13deg); }
+  68% { transform: translate(-36vw, -50%) rotate(-10deg); }
+  100% { transform: translate(calc(-58vw - 100%), -50%) rotate(-7deg); }
 }
 
 .sammie-speech {
@@ -351,7 +344,7 @@ textarea {
 .sammie-offscreen-smoke {
   position: absolute;
   left: -4rem;
-  bottom: 1vh;
+  top: 53%;
   width: 85vw;
   height: 24vh;
   animation: sammie-smoke-fade 2.1s ease-out forwards;
@@ -365,7 +358,7 @@ textarea {
 .sammie-final-line {
   position: absolute;
   left: -7px;
-  bottom: clamp(8rem, 25vh, 15rem);
+  top: 39%;
   padding: .8rem 1.25rem .8rem 1.7rem;
   border: 3px solid #EB6608;
   border-left: 0;
@@ -386,22 +379,4 @@ textarea {
 
 @media (max-width: 640px) {
   .sammie-bot { width: clamp(9rem, 39vw, 13rem); }
-  .sammie-bot-greet,
-  .sammie-bot-beep { transform: translateX(10vw); }
-  @keyframes sammie-roll-in {
-    0% { transform: translateX(112vw); }
-    75% { transform: translateX(7vw) rotate(-2deg); }
-    88% { transform: translateX(13vw) rotate(1deg); }
-    100% { transform: translateX(10vw); }
-  }
-  @keyframes sammie-wheelie-pop {
-    0% { transform: translateX(10vw); }
-    35%, 100% { transform: translateX(9vw) rotate(-15deg) translateY(-3px); }
-  }
-  @keyframes sammie-burnout-exit {
-    0% { transform: translateX(9vw) rotate(-15deg); }
-    24% { transform: translateX(7vw) rotate(-17deg); }
-    48% { transform: translateX(2vw) rotate(-13deg); }
-    100% { transform: translateX(-56vw) rotate(-7deg); }
-  }
 }
