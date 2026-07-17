@@ -20,7 +20,7 @@ import railTeamCWave from './assets/rail-team-c-wave.webp';
 import doviberLanceWalk from './assets/doviber-lance-walk.webp';
 import doviberLanceHighfive from './assets/doviber-lance-highfive.webp';
 import doviberLancePoint from './assets/doviber-lance-point.webp';
-import doviberDavisWalk from './assets/doviber-davis-walk.webp';
+import doviberDavisWalk from './assets/doviber-davis-walk-smile-v2.webp';
 import doviberDavisHighfive from './assets/doviber-davis-highfive.webp';
 import doviberDavisPoint from './assets/doviber-davis-point.webp';
 import guideMe from './assets/guide-me.webp';
@@ -523,12 +523,13 @@ function DoviberSurprise() {
       {rank >= DOVIBER_PHASE_RANK.lance && (
         <div className="doviber-person doviber-lance">
           <img src={lancePose} alt="Lance in Hapag-Lloyd gear" />
+          {phase === 'point-lance' && <span className="doviber-tooth-glint" aria-hidden="true" />}
           {(phase === 'lance' || phase === 'lance-solo') && <div className="doviber-speech doviber-speech-lance">Wassup DOViber!</div>}
           {phase === 'point-lance' && <div className="doviber-speech doviber-speech-exit-lance">Hoodlove out!</div>}
         </div>
       )}
 
-      {phase === 'impact' && (
+      {(phase === 'impact' || phase === 'cross') && (
         <div className="doviber-kazoow" aria-label="Kazoow">Kazoow</div>
       )}
     </div>
