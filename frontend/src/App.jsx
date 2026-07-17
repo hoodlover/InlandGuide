@@ -305,7 +305,10 @@ function ObieWalkOn() {
   return (
     <div className={`obie-walkon ${leaving ? `obie-leaving obie-exit-${exit}` : visible ? 'obie-in' : 'obie-out'}`} aria-hidden={!visible}>
       <div className="relative max-w-[300px] bg-white border-2 border-[#002D72] rounded-2xl px-5 py-4 shadow-xl">
-        <p className="text-[11px] uppercase tracking-widest text-[#EB6608] font-bold mb-1">OB says…</p>
+        <div className="mb-1 flex items-center justify-between gap-3">
+          <p className="text-[11px] uppercase tracking-widest text-[#EB6608] font-bold">OB says…</p>
+          <p className="whitespace-nowrap text-[9px] font-normal lowercase tracking-normal text-slate-400">click me to dismiss me</p>
+        </div>
         <p className="text-base font-semibold text-slate-800 leading-snug">{q}</p>
         {a && (
           <p
