@@ -395,6 +395,7 @@ function RailTeamSurprise() {
 const DOVIBER_PHASE_RANK = {
   davis: 0,
   lance: 1,
+  'lance-solo': 1,
   ready: 2,
   impact: 3,
   cross: 4,
@@ -420,12 +421,14 @@ function DoviberSurprise() {
 
       [
         ['lance', 1500],
-        ['ready', 3000],
-        ['impact', 3900],
-        ['cross', 6900],
-        ['point-lance', 9300],
-        ['point-davis', 10700],
-        ['exit', 12600],
+        ['lance-solo', 2500],
+        // Give each spoken/comic beat one extra second to breathe.
+        ['ready', 4000],
+        ['impact', 4900],
+        ['cross', 8900],
+        ['point-lance', 11300],
+        ['point-davis', 13700],
+        ['exit', 16600],
       ].forEach(([nextPhase, delay]) => {
         timers.push(window.setTimeout(() => setPhase(nextPhase), delay));
       });
@@ -433,7 +436,7 @@ function DoviberSurprise() {
       timers.push(window.setTimeout(() => {
         setPhase('idle');
         running = false;
-      }, 14400));
+      }, 18400));
     };
 
     const isTypingTarget = (target) => target instanceof HTMLElement && (
@@ -513,14 +516,14 @@ function DoviberSurprise() {
     >
       <div className="doviber-person doviber-davis">
         <img src={davisPose} alt="Davis in Hapag-Lloyd gear" />
-        {phase === 'davis' && <div className="doviber-speech doviber-speech-davis">Hey Hood ..</div>}
+        {(phase === 'davis' || phase === 'lance') && <div className="doviber-speech doviber-speech-davis">Hey Hood ..</div>}
         {phase === 'point-davis' && <div className="doviber-speech doviber-speech-exit-davis">Later, old weirdo friend.</div>}
       </div>
 
       {rank >= DOVIBER_PHASE_RANK.lance && (
         <div className="doviber-person doviber-lance">
           <img src={lancePose} alt="Lance in Hapag-Lloyd gear" />
-          {phase === 'lance' && <div className="doviber-speech doviber-speech-lance">Wassup DOViber!</div>}
+          {(phase === 'lance' || phase === 'lance-solo') && <div className="doviber-speech doviber-speech-lance">Wassup DOViber!</div>}
           {phase === 'point-lance' && <div className="doviber-speech doviber-speech-exit-lance">Hoodlove out!</div>}
         </div>
       )}
