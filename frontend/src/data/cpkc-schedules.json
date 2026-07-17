@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-16",
-  "pulledAt": "2026-07-16T15:03:00.001Z",
+  "generatedAt": "2026-07-17",
+  "pulledAt": "2026-07-17T14:44:08.449Z",
   "ports": {
     "montreal": {
       "name": "Port of Montreal",
@@ -1388,8 +1388,8 @@
     "prince-rupert": {
       "name": "Prince Rupert",
       "rail": "CN",
-      "runDate": "Thu 16-Jul",
-      "generatedAt": "2026-07-16",
+      "runDate": "Fri 17-Jul",
+      "generatedAt": "2026-07-17",
       "cities": [
         "TORONTO (MALPORT)",
         "MONTREAL",
@@ -1430,50 +1430,6 @@
         "ARCADIA": "1600 hrs"
       },
       "vessels": [
-        {
-          "vessel": "CSCL SOUTH CHINA SEA",
-          "terminal": "",
-          "eta": "",
-          "etd": "",
-          "railPortCutoff": "15-Jul",
-          "comments": "",
-          "cutoffs": {
-            "TORONTO (MALPORT)": "Sun, Jul-05",
-            "MONTREAL": "Mon, Jul-06",
-            "WINNIPEG": "Wed, Jul-08",
-            "SASKATOON": "Mon, Jul-06",
-            "REGINA": "Sat, Jul-04",
-            "CALGARY": "Tue, Jul-07",
-            "EDMONTON": "Sat, Jul-11",
-            "PRINCE GEORGE": "Sat, Jul-11",
-            "CHIPPEWA FALLS": "Thu, Jul-02",
-            "JOLIET": "Tue, Jul-07",
-            "INDIANAPOLIS": "Sat, Jul-04",
-            "CHICAGO": "Tue, Jul-07",
-            "DETROIT": "Mon, Jul-06",
-            "MEMPHIS": "Mon, Jul-06",
-            "NEW ORLEANS": "Fri, Jul-03",
-            "ARCADIA": "Tue, Jul-07"
-          },
-          "erds": {
-            "TORONTO (MALPORT)": "30-Jun",
-            "MONTREAL": "01-Jul",
-            "WINNIPEG": "03-Jul",
-            "SASKATOON": "01-Jul",
-            "REGINA": "29-Jun",
-            "CALGARY": "02-Jul",
-            "EDMONTON": "06-Jul",
-            "PRINCE GEORGE": "06-Jul",
-            "CHIPPEWA FALLS": "27-Jun",
-            "JOLIET": "02-Jul",
-            "INDIANAPOLIS": "29-Jun",
-            "CHICAGO": "02-Jul",
-            "DETROIT": "01-Jul",
-            "MEMPHIS": "01-Jul",
-            "NEW ORLEANS": "28-Jun",
-            "ARCADIA": "02-Jul"
-          }
-        },
         {
           "vessel": "MSC ABY X",
           "terminal": "",
@@ -1655,43 +1611,43 @@
           "terminal": "",
           "eta": "",
           "etd": "",
-          "railPortCutoff": "23-Jul",
+          "railPortCutoff": "24-Jul",
           "comments": "",
           "cutoffs": {
-            "TORONTO (MALPORT)": "Sun, Jul-12",
+            "TORONTO (MALPORT)": "Fri, Jul-17",
             "MONTREAL": "Thu, Jul-16",
-            "WINNIPEG": "Wed, Jul-15",
+            "WINNIPEG": "Fri, Jul-17",
             "SASKATOON": "Thu, Jul-16",
             "REGINA": "Sat, Jul-11",
-            "CALGARY": "Tue, Jul-14",
+            "CALGARY": "Sat, Jul-18",
             "EDMONTON": "Sat, Jul-18",
-            "PRINCE GEORGE": "Sun, Jul-19",
-            "CHIPPEWA FALLS": "Thu, Jul-09",
-            "JOLIET": "Tue, Jul-14",
-            "INDIANAPOLIS": "Sat, Jul-11",
-            "CHICAGO": "Wed, Jul-15",
+            "PRINCE GEORGE": "Mon, Jul-20",
+            "CHIPPEWA FALLS": "Sun, Jul-12",
+            "JOLIET": "Thu, Jul-16",
+            "INDIANAPOLIS": "Mon, Jul-13",
+            "CHICAGO": "Thu, Jul-16",
             "DETROIT": "Mon, Jul-13",
             "MEMPHIS": "Mon, Jul-13",
-            "NEW ORLEANS": "Mon, Jul-13",
-            "ARCADIA": "Wed, Jul-15"
+            "NEW ORLEANS": "Tue, Jul-14",
+            "ARCADIA": "Thu, Jul-16"
           },
           "erds": {
-            "TORONTO (MALPORT)": "07-Jul",
+            "TORONTO (MALPORT)": "12-Jul",
             "MONTREAL": "11-Jul",
-            "WINNIPEG": "10-Jul",
+            "WINNIPEG": "12-Jul",
             "SASKATOON": "11-Jul",
             "REGINA": "06-Jul",
-            "CALGARY": "09-Jul",
+            "CALGARY": "13-Jul",
             "EDMONTON": "13-Jul",
-            "PRINCE GEORGE": "14-Jul",
-            "CHIPPEWA FALLS": "04-Jul",
-            "JOLIET": "09-Jul",
-            "INDIANAPOLIS": "06-Jul",
-            "CHICAGO": "10-Jul",
+            "PRINCE GEORGE": "15-Jul",
+            "CHIPPEWA FALLS": "07-Jul",
+            "JOLIET": "11-Jul",
+            "INDIANAPOLIS": "08-Jul",
+            "CHICAGO": "11-Jul",
             "DETROIT": "08-Jul",
             "MEMPHIS": "08-Jul",
-            "NEW ORLEANS": "08-Jul",
-            "ARCADIA": "10-Jul"
+            "NEW ORLEANS": "09-Jul",
+            "ARCADIA": "11-Jul"
           }
         },
         {
@@ -2264,6 +2220,50 @@
             "MEMPHIS": "01-Aug",
             "NEW ORLEANS": "01-Aug",
             "ARCADIA": "02-Aug"
+          }
+        },
+        {
+          "vessel": "EXPRESS ROME",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "20-Aug",
+          "comments": "",
+          "cutoffs": {
+            "TORONTO (MALPORT)": "Sun, Aug-09",
+            "MONTREAL": "Thu, Aug-13",
+            "WINNIPEG": "Wed, Aug-12",
+            "SASKATOON": "Thu, Aug-13",
+            "REGINA": "Sat, Aug-08",
+            "CALGARY": "Tue, Aug-11",
+            "EDMONTON": "Sat, Aug-15",
+            "PRINCE GEORGE": "Sun, Aug-16",
+            "CHIPPEWA FALLS": "Thu, Aug-06",
+            "JOLIET": "Tue, Aug-11",
+            "INDIANAPOLIS": "Sat, Aug-08",
+            "CHICAGO": "Wed, Aug-12",
+            "DETROIT": "Mon, Aug-10",
+            "MEMPHIS": "Mon, Aug-10",
+            "NEW ORLEANS": "Mon, Aug-10",
+            "ARCADIA": "Wed, Aug-12"
+          },
+          "erds": {
+            "TORONTO (MALPORT)": "04-Aug",
+            "MONTREAL": "08-Aug",
+            "WINNIPEG": "07-Aug",
+            "SASKATOON": "08-Aug",
+            "REGINA": "03-Aug",
+            "CALGARY": "06-Aug",
+            "EDMONTON": "10-Aug",
+            "PRINCE GEORGE": "11-Aug",
+            "CHIPPEWA FALLS": "01-Aug",
+            "JOLIET": "06-Aug",
+            "INDIANAPOLIS": "03-Aug",
+            "CHICAGO": "07-Aug",
+            "DETROIT": "05-Aug",
+            "MEMPHIS": "05-Aug",
+            "NEW ORLEANS": "05-Aug",
+            "ARCADIA": "07-Aug"
           }
         }
       ]
