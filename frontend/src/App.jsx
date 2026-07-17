@@ -8,6 +8,9 @@ import heroTop from './assets/hero-top.webp';
 import darkModeBadge from './assets/dark-mode.webp';
 import lightModeBadge from './assets/light-mode.webp';
 import opsHubBadge from './assets/ops-hub.webp';
+import railTeamWeLove from './assets/rail-team-we-love.webp';
+import railTeamOurExport from './assets/rail-team-our-export.webp';
+import railTeamRailTeam from './assets/rail-team-rail-team.webp';
 import guideMe from './assets/guide-me.webp';
 import vintageErd from './assets/vintage-erd.webp';
 import './index.css';
@@ -257,6 +260,122 @@ function nextJoke() {
   return lastJoke;
 }
 
+const RAIL_TEAM_MEMBERS = [
+  { image: railTeamWeLove, line: 'We love', side: 'left', position: 'one' },
+  { image: railTeamOurExport, line: 'our export', side: 'right', position: 'two' },
+  { image: railTeamRailTeam, line: 'rail team!', side: 'left', position: 'three' },
+];
+
+const RAIL_TEAM_PHASE_RANK = {
+  arrive: 0,
+  first: 1,
+  second: 2,
+  third: 3,
+  thumbs: 4,
+  wave: 5,
+};
+
+function RailTeamSurprise() {
+  const [phase, setPhase] = useState('idle');
+
+  useEffect(() => {
+    const timers = [];
+    const gesture = { step: 0, last: 0 };
+    let running = false;
+
+    const resetGesture = () => {
+      gesture.step = 0;
+      gesture.last = 0;
+    };
+
+    const startSurprise = () => {
+      if (running) return;
+      running = true;
+      setPhase('arrive');
+
+      [
+        ['first', 2000],
+        ['second', 3000],
+        ['third', 4000],
+        ['thumbs', 5000],
+        ['wave', 6000],
+      ].forEach(([nextPhase, delay]) => {
+        timers.push(window.setTimeout(() => setPhase(nextPhase), delay));
+      });
+
+      timers.push(window.setTimeout(() => {
+        setPhase('idle');
+        running = false;
+      }, 8600));
+    };
+
+    const isTypingTarget = (target) => target instanceof HTMLElement && (
+      ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable
+    );
+
+    const onKeyDown = (event) => {
+      if (event.code !== 'Space' || isTypingTarget(event.target)) return;
+      const now = Date.now();
+      if (now - gesture.last > 2500) resetGesture();
+
+      event.preventDefault();
+      gesture.step = gesture.step === 0 || gesture.step === 1 ? gesture.step + 1 : 1;
+      gesture.last = now;
+    };
+
+    const onContextMenu = (event) => {
+      const now = Date.now();
+      if (now - gesture.last > 2500) resetGesture();
+
+      if (gesture.step === 2 || gesture.step === 3) {
+        event.preventDefault();
+        gesture.step += 1;
+        gesture.last = now;
+        if (gesture.step === 4) {
+          resetGesture();
+          startSurprise();
+        }
+      } else {
+        resetGesture();
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('contextmenu', onContextMenu);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('contextmenu', onContextMenu);
+      timers.forEach(window.clearTimeout);
+    };
+  }, []);
+
+  if (phase === 'idle') return null;
+  const phaseRank = RAIL_TEAM_PHASE_RANK[phase];
+  const hand = phase === 'wave' ? '👋' : '👍';
+
+  return (
+    <div className={`rail-team-stage rail-team-stage-${phase}`} role="status" aria-live="polite" aria-label="We love our export rail team!">
+      {RAIL_TEAM_MEMBERS.map((member, index) => (
+        <div key={member.line} className={`rail-team-member rail-team-member-${member.side} rail-team-member-${member.position}`}>
+          <div className="rail-team-head-wrap">
+            <img
+              src={member.image}
+              alt={`Rail team member saying ${member.line}`}
+              className={`rail-team-head rail-team-head-${member.position}`}
+            />
+            {phaseRank >= RAIL_TEAM_PHASE_RANK.thumbs && (
+              <span className="rail-team-hand" aria-hidden="true">{hand}</span>
+            )}
+          </div>
+          {phaseRank >= index + 1 && (
+            <div className="rail-team-line">{member.line}</div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function ObieWalkOn() {
   const [visible, setVisible] = useState(false);
   const [flipped, setFlipped] = useState(false);
@@ -307,7 +426,7 @@ function ObieWalkOn() {
       <div className="relative max-w-[300px] bg-white border-2 border-[#002D72] rounded-2xl px-5 py-4 shadow-xl">
         <div className="mb-1 flex items-center justify-between gap-3">
           <p className="text-[11px] uppercase tracking-widest text-[#EB6608] font-bold">OB says…</p>
-          <p className="whitespace-nowrap text-[9px] font-normal lowercase tracking-normal text-slate-400">click me to dismiss me</p>
+          <p className="whitespace-nowrap text-[9px] font-normal tracking-normal text-slate-400">Click me to dismiss me!</p>
         </div>
         <p className="text-base font-semibold text-slate-800 leading-snug">{q}</p>
         {a && (
@@ -1655,6 +1774,7 @@ export default function App() {
 
       <WebappReminder enabled={!pwaInstalled && !mobileDevice} />
       {jokerOn && !compactView && <ObieWalkOn />}
+      {!mobileDevice && <RailTeamSurprise />}
 
       <div className={`w-full max-w-[70rem] mx-auto px-4 text-right ${compactView ? 'mt-3' : 'mt-8'}`}>
         <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">v {APP_VERSION}</span>

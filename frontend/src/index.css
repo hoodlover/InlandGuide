@@ -61,6 +61,152 @@ textarea {
 .obie-out { transform: translateX(-130%); opacity: 0; pointer-events: none; }
 .obie-in { transform: translateX(0); opacity: 1; }
 
+/* Secret Space, Space, right-click, right-click rail-team celebration. */
+.rail-team-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 75;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.rail-team-member {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: clamp(.65rem, 1.8vw, 1.4rem);
+  max-width: 88vw;
+}
+
+.rail-team-member-left { left: -1.25rem; animation: rail-team-enter-left .72s cubic-bezier(.18, .9, .28, 1.2) both; }
+.rail-team-member-right { right: -1.25rem; flex-direction: row-reverse; animation: rail-team-enter-right .72s cubic-bezier(.18, .9, .28, 1.2) both; }
+.rail-team-member-one { top: 4%; }
+.rail-team-member-two { top: 36%; }
+.rail-team-member-three { bottom: 3%; }
+
+.rail-team-head-wrap {
+  position: relative;
+  flex: none;
+  width: clamp(9rem, min(19vw, 27vh), 15rem);
+  aspect-ratio: 1;
+}
+
+.rail-team-head {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: clamp(4px, .5vw, 7px) solid #fff;
+  border-radius: 50%;
+  background: #002D72;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, .48), 0 0 0 4px #EB6608;
+}
+
+.rail-team-head-three { object-position: 50% 8%; }
+
+.rail-team-line {
+  position: relative;
+  border: 4px solid #EB6608;
+  border-radius: 9999px;
+  background: #fff;
+  color: #002D72;
+  padding: .55rem clamp(.85rem, 2vw, 1.5rem);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, .35);
+  font-size: clamp(1.2rem, 2.6vw, 2.25rem);
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+  animation: rail-team-line-pop .32s cubic-bezier(.2, 1.35, .45, 1) both;
+}
+
+.rail-team-member-left .rail-team-line::before,
+.rail-team-member-right .rail-team-line::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  border-bottom: 4px solid #EB6608;
+  background: #fff;
+}
+
+.rail-team-member-left .rail-team-line::before {
+  left: -10px;
+  border-left: 4px solid #EB6608;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.rail-team-member-right .rail-team-line::before {
+  right: -10px;
+  border-right: 4px solid #EB6608;
+  transform: translateY(-50%) rotate(-45deg);
+}
+
+.rail-team-hand {
+  position: absolute;
+  z-index: 3;
+  top: 46%;
+  font-size: clamp(4.25rem, 8vw, 7.25rem);
+  line-height: 1;
+  filter: drop-shadow(0 8px 8px rgba(0, 0, 0, .42));
+  animation: rail-team-hand-pop .42s cubic-bezier(.16, 1.4, .35, 1) both;
+}
+
+.rail-team-member-left .rail-team-hand { right: -2.5rem; }
+.rail-team-member-right .rail-team-hand { left: -2.5rem; transform: scaleX(-1); }
+.rail-team-stage-wave .rail-team-hand { animation: rail-team-wave .62s ease-in-out infinite alternate; transform-origin: 50% 90%; }
+.rail-team-stage-wave .rail-team-member-right .rail-team-hand { animation-name: rail-team-wave-right; }
+.rail-team-stage-wave .rail-team-member-left { animation: rail-team-goodbye-left 2.6s ease-in forwards; }
+.rail-team-stage-wave .rail-team-member-right { animation: rail-team-goodbye-right 2.6s ease-in forwards; }
+
+@keyframes rail-team-enter-left {
+  from { opacity: 0; transform: translateX(-112%) scale(.72) rotate(-8deg); }
+  72% { opacity: 1; transform: translateX(3%) scale(1.05) rotate(2deg); }
+  to { opacity: 1; transform: translateX(0) scale(1) rotate(0); }
+}
+
+@keyframes rail-team-enter-right {
+  from { opacity: 0; transform: translateX(112%) scale(.72) rotate(8deg); }
+  72% { opacity: 1; transform: translateX(-3%) scale(1.05) rotate(-2deg); }
+  to { opacity: 1; transform: translateX(0) scale(1) rotate(0); }
+}
+
+@keyframes rail-team-line-pop {
+  from { opacity: 0; transform: scale(.35); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes rail-team-hand-pop {
+  from { opacity: 0; transform: translateY(45%) scale(.25) rotate(-20deg); }
+  to { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+}
+
+@keyframes rail-team-wave {
+  from { transform: rotate(-22deg); }
+  to { transform: rotate(24deg); }
+}
+
+@keyframes rail-team-wave-right {
+  from { transform: scaleX(-1) rotate(-22deg); }
+  to { transform: scaleX(-1) rotate(24deg); }
+}
+
+@keyframes rail-team-goodbye-left {
+  0%, 18% { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(-120%); }
+}
+
+@keyframes rail-team-goodbye-right {
+  0%, 18% { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(120%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail-team-member,
+  .rail-team-line,
+  .rail-team-hand { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}
+
 /* Once-per-session "make it an app" reminder (bottom-left) */
 .webapp-reminder {
   position: fixed;
