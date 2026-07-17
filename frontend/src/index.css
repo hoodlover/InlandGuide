@@ -87,22 +87,22 @@ textarea {
 .rail-team-head-wrap {
   position: relative;
   flex: none;
-  width: clamp(9rem, min(19vw, 27vh), 15rem);
-  aspect-ratio: 1;
+  width: clamp(8.5rem, min(17vw, 22vh), 13.5rem);
+  aspect-ratio: .76;
 }
 
 .rail-team-head {
+  position: relative;
+  z-index: 2;
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  border: clamp(4px, .5vw, 7px) solid #fff;
-  border-radius: 50%;
-  background: #002D72;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, .48), 0 0 0 4px #EB6608;
+  object-fit: contain;
+  filter: drop-shadow(0 15px 14px rgba(0, 0, 0, .48));
 }
 
-.rail-team-head-three { object-position: 50% 8%; }
+.rail-team-member-left .rail-team-head { transform: rotate(7deg); transform-origin: 25% 58%; }
+.rail-team-member-right .rail-team-head { transform: rotate(-7deg); transform-origin: 75% 58%; }
 
 .rail-team-line {
   position: relative;
@@ -142,20 +142,22 @@ textarea {
   transform: translateY(-50%) rotate(-45deg);
 }
 
-.rail-team-hand {
+.rail-team-arm {
   position: absolute;
   z-index: 3;
-  top: 46%;
-  font-size: clamp(4.25rem, 8vw, 7.25rem);
-  line-height: 1;
-  filter: drop-shadow(0 8px 8px rgba(0, 0, 0, .42));
-  animation: rail-team-hand-pop .42s cubic-bezier(.16, 1.4, .35, 1) both;
+  top: 42%;
+  width: 88%;
+  height: 72%;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 9px rgba(0, 0, 0, .42));
 }
 
-.rail-team-member-left .rail-team-hand { right: -2.5rem; }
-.rail-team-member-right .rail-team-hand { left: -2.5rem; transform: scaleX(-1); }
-.rail-team-stage-wave .rail-team-hand { animation: rail-team-wave .62s ease-in-out infinite alternate; transform-origin: 50% 90%; }
-.rail-team-stage-wave .rail-team-member-right .rail-team-hand { animation-name: rail-team-wave-right; }
+.rail-team-member-left .rail-team-arm { left: 52%; transform-origin: 20% 88%; }
+.rail-team-member-right .rail-team-arm { right: 52%; transform-origin: 80% 88%; }
+.rail-team-member-left .rail-team-arm-thumb { animation: rail-team-arm-pop-left .45s cubic-bezier(.16, 1.35, .35, 1) both; }
+.rail-team-member-right .rail-team-arm-thumb { animation: rail-team-arm-pop-right .45s cubic-bezier(.16, 1.35, .35, 1) both; }
+.rail-team-member-left .rail-team-arm-wave { animation: rail-team-real-wave-left .62s ease-in-out infinite alternate; }
+.rail-team-member-right .rail-team-arm-wave { animation: rail-team-real-wave-right .62s ease-in-out infinite alternate; }
 .rail-team-stage-wave .rail-team-member-left { animation: rail-team-goodbye-left 2.6s ease-in forwards; }
 .rail-team-stage-wave .rail-team-member-right { animation: rail-team-goodbye-right 2.6s ease-in forwards; }
 
@@ -176,35 +178,40 @@ textarea {
   to { opacity: 1; transform: scale(1); }
 }
 
-@keyframes rail-team-hand-pop {
-  from { opacity: 0; transform: translateY(45%) scale(.25) rotate(-20deg); }
-  to { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+@keyframes rail-team-arm-pop-left {
+  from { opacity: 0; transform: translateX(-85%) scale(.3) rotate(-18deg); }
+  to { opacity: 1; transform: translateX(0) scale(1) rotate(0); }
 }
 
-@keyframes rail-team-wave {
-  from { transform: rotate(-22deg); }
-  to { transform: rotate(24deg); }
+@keyframes rail-team-arm-pop-right {
+  from { opacity: 0; transform: translateX(85%) scaleX(-1) scale(.3) rotate(-18deg); }
+  to { opacity: 1; transform: translateX(0) scaleX(-1) scale(1) rotate(0); }
 }
 
-@keyframes rail-team-wave-right {
-  from { transform: scaleX(-1) rotate(-22deg); }
-  to { transform: scaleX(-1) rotate(24deg); }
+@keyframes rail-team-real-wave-left {
+  from { transform: rotate(-14deg); }
+  to { transform: rotate(17deg); }
+}
+
+@keyframes rail-team-real-wave-right {
+  from { transform: scaleX(-1) rotate(-14deg); }
+  to { transform: scaleX(-1) rotate(17deg); }
 }
 
 @keyframes rail-team-goodbye-left {
-  0%, 18% { opacity: 1; transform: translateX(0); }
+  0%, 45% { opacity: 1; transform: translateX(0); }
   to { opacity: 0; transform: translateX(-120%); }
 }
 
 @keyframes rail-team-goodbye-right {
-  0%, 18% { opacity: 1; transform: translateX(0); }
+  0%, 45% { opacity: 1; transform: translateX(0); }
   to { opacity: 0; transform: translateX(120%); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .rail-team-member,
   .rail-team-line,
-  .rail-team-hand { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+  .rail-team-arm { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }
 
 /* Once-per-session "make it an app" reminder (bottom-left) */

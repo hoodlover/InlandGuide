@@ -8,9 +8,15 @@ import heroTop from './assets/hero-top.webp';
 import darkModeBadge from './assets/dark-mode.webp';
 import lightModeBadge from './assets/light-mode.webp';
 import opsHubBadge from './assets/ops-hub.webp';
-import railTeamWeLove from './assets/rail-team-we-love.webp';
-import railTeamOurExport from './assets/rail-team-our-export.webp';
-import railTeamRailTeam from './assets/rail-team-rail-team.webp';
+import railTeamAHead from './assets/rail-team-a-head.webp';
+import railTeamAThumb from './assets/rail-team-a-thumb.webp';
+import railTeamAWave from './assets/rail-team-a-wave.webp';
+import railTeamBHead from './assets/rail-team-b-head.webp';
+import railTeamBThumb from './assets/rail-team-b-thumb.webp';
+import railTeamBWave from './assets/rail-team-b-wave.webp';
+import railTeamCHead from './assets/rail-team-c-head.webp';
+import railTeamCThumb from './assets/rail-team-c-thumb.webp';
+import railTeamCWave from './assets/rail-team-c-wave.webp';
 import guideMe from './assets/guide-me.webp';
 import vintageErd from './assets/vintage-erd.webp';
 import './index.css';
@@ -261,9 +267,9 @@ function nextJoke() {
 }
 
 const RAIL_TEAM_MEMBERS = [
-  { image: railTeamWeLove, line: 'We love', side: 'left', position: 'one' },
-  { image: railTeamOurExport, line: 'our export', side: 'right', position: 'two' },
-  { image: railTeamRailTeam, line: 'rail team!', side: 'left', position: 'three' },
+  { head: railTeamAHead, thumb: railTeamAThumb, wave: railTeamAWave, line: 'We love', side: 'left', position: 'one' },
+  { head: railTeamBHead, thumb: railTeamBThumb, wave: railTeamBWave, line: 'our export', side: 'right', position: 'two' },
+  { head: railTeamCHead, thumb: railTeamCThumb, wave: railTeamCWave, line: 'rail team!', side: 'left', position: 'three' },
 ];
 
 const RAIL_TEAM_PHASE_RANK = {
@@ -351,7 +357,6 @@ function RailTeamSurprise() {
 
   if (phase === 'idle') return null;
   const phaseRank = RAIL_TEAM_PHASE_RANK[phase];
-  const hand = phase === 'wave' ? '👋' : '👍';
 
   return (
     <div className={`rail-team-stage rail-team-stage-${phase}`} role="status" aria-live="polite" aria-label="We love our export rail team!">
@@ -359,12 +364,17 @@ function RailTeamSurprise() {
         <div key={member.line} className={`rail-team-member rail-team-member-${member.side} rail-team-member-${member.position}`}>
           <div className="rail-team-head-wrap">
             <img
-              src={member.image}
+              src={member.head}
               alt={`Rail team member saying ${member.line}`}
               className={`rail-team-head rail-team-head-${member.position}`}
             />
             {phaseRank >= RAIL_TEAM_PHASE_RANK.thumbs && (
-              <span className="rail-team-hand" aria-hidden="true">{hand}</span>
+              <img
+                src={phase === 'wave' ? member.wave : member.thumb}
+                alt=""
+                className={`rail-team-arm rail-team-arm-${phase === 'wave' ? 'wave' : 'thumb'}`}
+                aria-hidden="true"
+              />
             )}
           </div>
           {phaseRank >= index + 1 && (
