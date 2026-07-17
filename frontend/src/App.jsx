@@ -7,6 +7,7 @@ import { bannerBottom, obBot } from './assets/banners';
 import heroTop from './assets/hero-top.webp';
 import darkModeBadge from './assets/dark-mode.webp';
 import lightModeBadge from './assets/light-mode.webp';
+import managerConsoleBadge from './assets/manager-console.webp';
 import guideMe from './assets/guide-me.webp';
 import vintageErd from './assets/vintage-erd.webp';
 import './index.css';
@@ -1393,8 +1394,8 @@ function RefreshModal({ onClose }) {
   );
 }
 
-// Help + light/dark toggle, both as round photo buttons. The theme toggle shows
-// the mode you'll switch TO: sunset (evening) in light mode, daylit ship in dark.
+// Manager access, help, light/dark toggle, and the vintage tool use matching
+// round photo buttons. The theme toggle shows the mode you'll switch TO.
 function TopControls({ compact, onManagerAccess, showInstall, mobile = false }) {
   const [dark, toggle] = useTheme();
   const [helpOpen, setHelpOpen] = useState(false);
@@ -1407,9 +1408,11 @@ function TopControls({ compact, onManagerAccess, showInstall, mobile = false }) 
           <button
             type="button"
             onClick={onManagerAccess}
-            className={`${compact ? 'px-3 py-1.5 text-[11px]' : 'px-4 py-2 text-xs'} rounded-full border-2 border-[#EB6608] bg-[#002D72] font-normal uppercase tracking-wide text-white shadow-[0_5px_12px_rgba(0,0,0,0.35)] transition hover:-translate-y-0.5 hover:bg-[#EB6608] active:translate-y-0 whitespace-nowrap`}
+            className={circleBtn}
+            aria-label="Open Hapag-Lloyd Ops Hub"
+            title="Hapag-Lloyd Ops Hub"
           >
-            Manager Console Access
+            <img src={managerConsoleBadge} alt="Ops Hub" className="h-full w-full object-cover" />
           </button>
         )}
         <button
