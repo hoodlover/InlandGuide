@@ -17,6 +17,12 @@ import railTeamBWave from './assets/rail-team-b-wave.webp';
 import railTeamCHead from './assets/rail-team-c-head.webp';
 import railTeamCThumb from './assets/rail-team-c-thumb.webp';
 import railTeamCWave from './assets/rail-team-c-wave.webp';
+import doviberLanceWalk from './assets/doviber-lance-walk.webp';
+import doviberLanceHighfive from './assets/doviber-lance-highfive.webp';
+import doviberLancePoint from './assets/doviber-lance-point.webp';
+import doviberDavisWalk from './assets/doviber-davis-walk.webp';
+import doviberDavisHighfive from './assets/doviber-davis-highfive.webp';
+import doviberDavisPoint from './assets/doviber-davis-point.webp';
 import guideMe from './assets/guide-me.webp';
 import vintageErd from './assets/vintage-erd.webp';
 import './index.css';
@@ -382,6 +388,146 @@ function RailTeamSurprise() {
           )}
         </div>
       ))}
+    </div>
+  );
+}
+
+const DOVIBER_PHASE_RANK = {
+  davis: 0,
+  lance: 1,
+  ready: 2,
+  impact: 3,
+  cross: 4,
+  'point-lance': 5,
+  'point-davis': 6,
+  exit: 7,
+};
+
+function DoviberSurprise() {
+  const [phase, setPhase] = useState('idle');
+
+  useEffect(() => {
+    const timers = [];
+    let running = false;
+    let typed = '';
+    const bannerTaps = { count: 0, last: 0 };
+    const wordTaps = { counts: {}, last: 0 };
+
+    const startSurprise = () => {
+      if (running) return;
+      running = true;
+      setPhase('davis');
+
+      [
+        ['lance', 1500],
+        ['ready', 3000],
+        ['impact', 3900],
+        ['cross', 6900],
+        ['point-lance', 9300],
+        ['point-davis', 10700],
+        ['exit', 12600],
+      ].forEach(([nextPhase, delay]) => {
+        timers.push(window.setTimeout(() => setPhase(nextPhase), delay));
+      });
+
+      timers.push(window.setTimeout(() => {
+        setPhase('idle');
+        running = false;
+      }, 14400));
+    };
+
+    const isTypingTarget = (target) => target instanceof HTMLElement && (
+      ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable
+    );
+
+    const onKeyDown = (event) => {
+      if (isTypingTarget(event.target) || event.ctrlKey || event.altKey || event.metaKey) return;
+      if (event.key.length !== 1) return;
+      typed = `${typed}${event.key.toUpperCase()}`.slice(-7);
+      if (typed === 'DOVIBER') {
+        typed = '';
+        startSurprise();
+      }
+    };
+
+    const onBannerTap = (event) => {
+      if (!(event.target instanceof Element)) return;
+      const now = Date.now();
+
+      const word = event.target.closest('[data-doviber-word]')?.dataset.doviberWord;
+      if (word) {
+        if (now - wordTaps.last > 2500) wordTaps.counts = {};
+        wordTaps.last = now;
+        wordTaps.counts[word] = Math.min(2, (wordTaps.counts[word] || 0) + 1);
+        if (['inland', 'cutoff', 'rail', 'guide'].every(key => wordTaps.counts[key] === 2)) {
+          wordTaps.counts = {};
+          startSurprise();
+        }
+        return;
+      }
+
+      if (event.target.closest('[data-doviber-trigger]')) {
+        if (now - bannerTaps.last > 1200) bannerTaps.count = 0;
+        bannerTaps.last = now;
+        bannerTaps.count += 1;
+        if (bannerTaps.count >= 5) {
+          bannerTaps.count = 0;
+          startSurprise();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('click', onBannerTap);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('click', onBannerTap);
+      timers.forEach(window.clearTimeout);
+    };
+  }, []);
+
+  if (phase === 'idle') return null;
+
+  const rank = DOVIBER_PHASE_RANK[phase];
+  const lancePose = rank < DOVIBER_PHASE_RANK.ready
+    ? doviberLanceWalk
+    : rank < DOVIBER_PHASE_RANK.cross
+      ? doviberLanceHighfive
+      : rank < DOVIBER_PHASE_RANK['point-lance']
+        ? doviberLanceWalk
+        : doviberLancePoint;
+  const davisPose = rank < DOVIBER_PHASE_RANK.ready
+    ? doviberDavisWalk
+    : rank < DOVIBER_PHASE_RANK.cross
+      ? doviberDavisHighfive
+      : rank < DOVIBER_PHASE_RANK['point-lance']
+        ? doviberDavisWalk
+        : doviberDavisPoint;
+
+  return (
+    <div
+      className={`doviber-stage doviber-stage-${phase}`}
+      role="status"
+      aria-live="polite"
+      aria-label="Lance and Davis meet for a high five"
+    >
+      <div className="doviber-person doviber-davis">
+        <img src={davisPose} alt="Davis in Hapag-Lloyd gear" />
+        {phase === 'davis' && <div className="doviber-speech doviber-speech-davis">Hey Hood ..</div>}
+        {phase === 'point-davis' && <div className="doviber-speech doviber-speech-exit-davis">Later, old weirdo friend.</div>}
+      </div>
+
+      {rank >= DOVIBER_PHASE_RANK.lance && (
+        <div className="doviber-person doviber-lance">
+          <img src={lancePose} alt="Lance in Hapag-Lloyd gear" />
+          {phase === 'lance' && <div className="doviber-speech doviber-speech-lance">Wassup DOViber!</div>}
+          {phase === 'point-lance' && <div className="doviber-speech doviber-speech-exit-lance">Hoodlove out!</div>}
+        </div>
+      )}
+
+      {phase === 'impact' && (
+        <div className="doviber-kazoow" aria-label="Kazoow">Kazoow</div>
+      )}
     </div>
   );
 }
@@ -1634,12 +1780,16 @@ export default function App() {
   };
 
   // Secret gesture: tap the title 5× within ~1.2s each to open the managers hub.
-  const tapRef = useRef({ n: 0, t: 0 });
-  const secretTap = () => {
+  const tapRef = useRef({ n: 0, t: 0, key: '' });
+  const secretTap = (event) => {
     const now = Date.now();
     const c = tapRef.current;
-    if (now - c.t > 1200) c.n = 0;
+    const key = event?.target instanceof Element
+      ? event.target.closest('[data-doviber-word]')?.dataset.doviberWord || 'title'
+      : 'title';
+    if (now - c.t > 1200 || c.key !== key) c.n = 0;
     c.t = now;
+    c.key = key;
     c.n += 1;
     if (c.n >= 5) { c.n = 0; setRefreshOpen(true); }
   };
@@ -1692,6 +1842,7 @@ export default function App() {
           <img
             src={heroTop}
             alt="IDT Inland Cutoff Rail Guide"
+            data-doviber-trigger
             className="w-full h-auto block rounded-xl"
           />
         </div>
@@ -1702,7 +1853,12 @@ export default function App() {
         <header className={`bg-[#F8F3EA] dark:bg-slate-800 border border-[#E0D8C5] dark:border-slate-700 rounded-xl flex flex-col items-start sm:flex-row sm:items-center sm:justify-between gap-3 ${compactView ? 'px-4 py-2' : 'px-4 py-3 sm:px-5'}`}>
           {!mobileDevice && (
             <div>
-              <h1 onClick={secretTap} className={`${compactView ? 'text-[1.15rem]' : 'text-[1.5rem]'} font-bold text-[#002D72] dark:text-white smallcaps txt-shadow-heavy select-none`}>Inland Cutoff Rail Guide</h1>
+              <h1 onClick={secretTap} className={`${compactView ? 'text-[1.15rem]' : 'text-[1.5rem]'} font-bold text-[#002D72] dark:text-white smallcaps txt-shadow-heavy select-none`}>
+                <span data-doviber-word="inland">Inland</span>{' '}
+                <span data-doviber-word="cutoff">Cutoff</span>{' '}
+                <span data-doviber-word="rail">Rail</span>{' '}
+                <span data-doviber-word="guide">Guide</span>
+              </h1>
               {!compactView && <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Rail cutoff &amp; delivery date calculator</p>}
               {!compactView && !pwaInstalled && (
                 <button
@@ -1785,6 +1941,7 @@ export default function App() {
       <WebappReminder enabled={!pwaInstalled && !mobileDevice} />
       {jokerOn && !compactView && <ObieWalkOn />}
       {!mobileDevice && <RailTeamSurprise />}
+      <DoviberSurprise />
 
       <div className={`w-full max-w-[70rem] mx-auto px-4 text-right ${compactView ? 'mt-3' : 'mt-8'}`}>
         <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">v {APP_VERSION}</span>
