@@ -7,7 +7,7 @@ import { bannerBottom, obBot } from './assets/banners';
 import heroTop from './assets/hero-top.webp';
 import darkModeBadge from './assets/dark-mode.webp';
 import lightModeBadge from './assets/light-mode.webp';
-import managerConsoleBadge from './assets/manager-console.webp';
+import opsHubBadge from './assets/ops-hub.webp';
 import guideMe from './assets/guide-me.webp';
 import vintageErd from './assets/vintage-erd.webp';
 import './index.css';
@@ -1102,7 +1102,7 @@ function RefreshModal({ onClose }) {
     return (
       <ModalShell title="Managers Only" onClose={onClose}>
         <div className="mb-4 rounded-xl bg-gradient-to-r from-[#002D72] to-[#0a4b9b] px-5 py-4 text-white shadow-md">
-          <p className="text-lg font-extrabold">Hapag-Lloyd Managers</p>
+          <p className="text-lg font-extrabold">Hapag-Lloyd Managers &amp; Vibe Coders Hub</p>
           <p className="mt-1 text-sm text-white/80">Enter the manager passphrase to continue.</p>
         </div>
         <div className="relative mb-3">
@@ -1415,7 +1415,7 @@ function TopControls({ compact, onManagerAccess, showInstall, mobile = false }) 
             aria-label="Open Hapag-Lloyd Ops Hub"
             title="Hapag-Lloyd Ops Hub"
           >
-            <img src={managerConsoleBadge} alt="Ops Hub" className="h-full w-full object-cover" />
+            <img src={opsHubBadge} alt="Ops Hub" className="h-full w-full object-cover" />
           </button>
         )}
         <button
