@@ -483,19 +483,6 @@
   {
     "pol": "USCHS",
     "ssy": "ALL",
-    "name": "DALLAS, TX",
-    "loccode": "USDAL",
-    "rampMC": "UNIONP 081",
-    "rampCutTime": 0.7083333333333334,
-    "transit": 9,
-    "window": 2,
-    "ssyAdjustment": 0,
-    "reefer": "N",
-    "windowReefer": 0
-  },
-  {
-    "pol": "USCHS",
-    "ssy": "ALL",
     "name": "DILLON,SC",
     "loccode": "USDLL",
     "rampMC": "SCIPDI 001",
@@ -1579,7 +1566,7 @@
     "loccode": "USMKC",
     "rampMC": "NORFOL 061",
     "rampCutTime": 0.6666666666666666,
-    "transit": 10,
+    "transit": 9,
     "window": 2,
     "ssyAdjustment": 0,
     "reefer": "Y",
@@ -2212,7 +2199,7 @@
   {
     "pol": "USSAV",
     "ssy": "ALL",
-    "name": "BESSEMER, AL",
+    "name": "BIRMINGHAM, AL",
     "loccode": "USBHM",
     "rampMC": "CSXBES 001",
     "rampCutTime": 0.5833333333333334,
