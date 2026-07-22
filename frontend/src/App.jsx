@@ -1171,6 +1171,36 @@ async function sha256Hex(buffer) {
   return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('').toUpperCase();
 }
 
+// Managers-hub menu: crisp stroke icons (no emoji — they render inconsistently
+// across Windows builds and read as unprofessional) plus one uniform card.
+const HUB_ICONS = {
+  requests: <><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /><path d="M8 9h8" /><path d="M8 13h5" /></>,
+  stats: <><path d="M3 3v18h18" /><path d="M18 17V9" /><path d="M13 17V5" /><path d="M8 17v-3" /></>,
+  refresh: <><path d="M3 12a9 9 0 0 1 15-6.7L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-15 6.7L3 16" /><path d="M8 16H3v5" /></>,
+  publish: <><path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2" /><path d="M12 12v9" /><path d="m16 16-4-4-4 4" /></>,
+  toggle: <><rect x="2" y="6" width="20" height="12" rx="6" /><circle cx="16" cy="12" r="2" /></>,
+  news: <><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" /><path d="M18 14h-8" /><path d="M15 18h-5" /><path d="M10 6h8v4h-8V6Z" /></>,
+};
+
+function HubCard({ icon, title, subtitle, onClick, href }) {
+  const className = 'group flex w-full items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#EB6608]/60 hover:shadow-md dark:border-slate-600 dark:bg-slate-700 dark:hover:border-[#EB6608]/70';
+  const body = (
+    <>
+      <span className="flex h-10 w-10 flex-none items-center justify-center rounded-lg bg-[#002D72]/[0.06] text-[#002D72] transition group-hover:bg-[#EB6608]/10 group-hover:text-[#EB6608] dark:bg-white/10 dark:text-white" aria-hidden="true">
+        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{icon}</svg>
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-sm font-semibold text-[#002D72] dark:text-white">{title}</span>
+        <span className="mt-0.5 block text-xs text-slate-500 dark:text-slate-300">{subtitle}</span>
+      </span>
+      <svg viewBox="0 0 24 24" className="h-4 w-4 flex-none text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-[#EB6608] dark:text-slate-400" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+    </>
+  );
+  return href
+    ? <a href={href} target="_blank" rel="noreferrer" className={className}>{body}</a>
+    : <button type="button" onClick={onClick} className={className}>{body}</button>;
+}
+
 // Hidden managers hub — revealed by a secret gesture (tap the title 5×).
 function RefreshModal({ onClose }) {
   const [view, setView] = useState('login');
@@ -1430,91 +1460,43 @@ function RefreshModal({ onClose }) {
           <p className="mt-1 text-sm text-white/80">Your shortcuts for keeping the Inland Guide moving.</p>
         </div>
 
-        <div className="mt-4 space-y-3">
-          <button
-            type="button"
+        <div className="mt-4 space-y-2.5">
+          <HubCard
+            icon={HUB_ICONS.requests}
+            title="Feature & change requests"
+            subtitle="Review what the team is asking for, newest first"
             onClick={loadRequests}
-            className="group w-full rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#EB6608] hover:shadow-md dark:border-slate-600 dark:bg-slate-700"
-          >
-            <span className="flex items-center gap-3">
-              <span className="text-2xl" aria-hidden="true">💡</span>
-              <span>
-                <span className="block text-sm font-semibold text-[#002D72] dark:text-white">View feature &amp; change requests</span>
-                <span className="text-xs font-normal text-[#EB6608] group-hover:underline">Newest requests first →</span>
-              </span>
-            </span>
-          </button>
-
-          <button
-            type="button"
+          />
+          <HubCard
+            icon={HUB_ICONS.stats}
+            title="Usage report"
+            subtitle="Who's using the guide, trends & recent activity"
             onClick={() => setView('stats')}
-            className="group w-full rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#EB6608] hover:shadow-md dark:border-slate-600 dark:bg-slate-700"
-          >
-            <span className="flex items-center gap-3">
-              <span className="text-2xl" aria-hidden="true">📈</span>
-              <span>
-                <span className="block text-sm font-semibold text-[#002D72] dark:text-white">See who&apos;s using the guide</span>
-                <span className="text-xs font-normal text-[#EB6608] group-hover:underline">Usage stats &amp; recent activity →</span>
-              </span>
-            </span>
-          </button>
-
-          <button
-            type="button"
+          />
+          <HubCard
+            icon={HUB_ICONS.refresh}
+            title="Update CP Rail & CN Rail ramp cuts"
+            subtitle="Pull the latest published Canadian schedules"
             onClick={triggerRefresh}
-            className="group w-full rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#EB6608] hover:shadow-md dark:border-slate-600 dark:bg-slate-700"
-          >
-            <span className="flex items-center gap-3">
-              <span className="text-2xl" aria-hidden="true">🚆</span>
-              <span>
-                <span className="block text-sm font-normal text-[#002D72] dark:text-white">Update CP Rail &amp; CN Rail ramp cuts</span>
-                <span className="mt-2 inline-flex rounded-full bg-[#EB6608] px-3 py-1 text-xs font-normal text-white shadow-md transition group-hover:bg-[#cf5a07]">Click to update Canadian ramp cuts →</span>
-              </span>
-            </span>
-          </button>
-
-          <button
-            type="button"
+          />
+          <HubCard
+            icon={HUB_ICONS.publish}
+            title="Publish from the SharePoint master"
+            subtitle="Verify the workbook & update the live calculator"
             onClick={() => { setStatus(null); setDbResult(null); verifiedMasterRef.current = null; setView('database'); }}
-            className="group w-full rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#EB6608] hover:shadow-md dark:border-slate-600 dark:bg-slate-700"
-          >
-            <span className="flex items-center gap-3">
-              <span className="text-2xl" aria-hidden="true">📊</span>
-              <span>
-                <span className="block text-sm font-semibold text-[#002D72] dark:text-white">Update the live guide from the SharePoint master</span>
-                <span className="text-xs font-normal text-[#EB6608] group-hover:underline">Check &amp; Publish Now →</span>
-              </span>
-            </span>
-          </button>
-
-          <button
-            type="button"
+          />
+          <HubCard
+            icon={HUB_ICONS.toggle}
+            title="Turn a lane on or off"
+            subtitle="Lane activation stays in the source system"
             onClick={() => setView('lane')}
-            className="group w-full rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#EB6608] hover:shadow-md dark:border-slate-600 dark:bg-slate-700"
-          >
-            <span className="flex items-center gap-3">
-              <span className="text-2xl" aria-hidden="true">🔀</span>
-              <span>
-                <span className="block text-sm font-semibold text-[#002D72] dark:text-white">Turn a lane on or off</span>
-                <span className="text-xs font-normal text-[#EB6608] group-hover:underline">Click here →</span>
-              </span>
-            </span>
-          </button>
-
-          <a
+          />
+          <HubCard
+            icon={HUB_ICONS.news}
+            title="Insider information"
+            subtitle="RNA Inland Delivery Team news on SharePoint"
             href="https://hlag.sharepoint.com/sites/RegionNorthAmerica/SitePages/RNA-Inland-Delivery-Team-(IDT).aspx"
-            target="_blank"
-            rel="noreferrer"
-            className="group block w-full rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#EB6608] hover:shadow-md dark:border-slate-600 dark:bg-slate-700"
-          >
-            <span className="flex items-center gap-3">
-              <span className="text-2xl" aria-hidden="true">📰</span>
-              <span>
-                <span className="block text-sm font-semibold text-[#002D72] dark:text-white">Read insider information</span>
-                <span className="text-xs font-normal text-[#EB6608] group-hover:underline">Click here →</span>
-              </span>
-            </span>
-          </a>
+          />
         </div>
       </ModalShell>
     );
