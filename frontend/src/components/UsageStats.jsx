@@ -2,6 +2,77 @@
 // passphrase (same guard pattern as /api/refresh and /api/requests).
 
 import { useEffect, useState } from 'react';
+import * as XLSX from 'xlsx';
+
+const stamp = () => new Date().toISOString().slice(0, 10);
+
+// One sheet per section of the report, mirroring the on-screen dashboard.
+function exportExcel(data) {
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
+    ['Inland Cutoff Guide — usage report', ''],
+    ['Exported (UTC)', new Date().toISOString().slice(0, 16).replace('T', ' ')],
+    [],
+    ['Total calculations', data.summary.total],
+    ['Unique users', data.summary.uniqueUsers],
+    ['Last 30 days', data.summary.last30],
+    ['Today', data.summary.today],
+  ]), 'Summary');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(
+    data.daily.map(d => ({ 'Day (UTC)': d.day, 'Calculations': d.count }))
+  ), 'Daily trend');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(
+    data.byUser.map(u => ({ 'Name': u.user_name, 'Calculations': u.count, 'Last used (UTC)': u.last_used }))
+  ), 'By user');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(
+    data.recent.map(r => ({ 'Time (UTC)': r.ts, 'Name': r.user_name, 'ERD': r.erd || '', 'LRD': r.lrd || '' }))
+  ), 'Recent activity');
+  XLSX.writeFile(wb, `InlandGuide-usage-${stamp()}.xlsx`);
+}
+
+// PDF via the browser's print-to-PDF: opens a formatted report window with the
+// print dialog ready — the user picks "Save as PDF". No PDF library needed.
+function exportPdf(data) {
+  const esc = (v) => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const rows = (items, cols) => items.map(item =>
+    `<tr>${cols.map(c => `<td>${esc(item[c])}</td>`).join('')}</tr>`
+  ).join('');
+  const html = `<!doctype html><html><head><title>InlandGuide usage — ${stamp()}</title><style>
+    body { font-family: Segoe UI, Arial, sans-serif; color: #1e293b; margin: 32px; }
+    h1 { font-size: 20px; color: #002D72; margin: 0; }
+    .sub { color: #64748b; font-size: 12px; margin: 4px 0 24px; }
+    h2 { font-size: 14px; color: #002D72; margin: 24px 0 8px; }
+    table { border-collapse: collapse; width: 100%; font-size: 12px; }
+    th { text-align: left; text-transform: uppercase; font-size: 10px; letter-spacing: 0.05em; color: #64748b; }
+    th, td { border-bottom: 1px solid #e2e8f0; padding: 6px 8px 6px 0; }
+    .cards { display: flex; gap: 24px; margin-bottom: 8px; }
+    .card .n { font-size: 22px; font-weight: 600; color: #002D72; }
+    .card .l { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; }
+    @media print { body { margin: 12mm; } }
+  </style></head><body>
+    <h1>Inland Cutoff Guide — usage report</h1>
+    <p class="sub">Exported ${new Date().toLocaleString()} · times shown in UTC</p>
+    <div class="cards">
+      <div class="card"><div class="n">${esc(data.summary.total)}</div><div class="l">Total calcs</div></div>
+      <div class="card"><div class="n">${esc(data.summary.uniqueUsers)}</div><div class="l">Unique users</div></div>
+      <div class="card"><div class="n">${esc(data.summary.last30)}</div><div class="l">Last 30 days</div></div>
+      <div class="card"><div class="n">${esc(data.summary.today)}</div><div class="l">Today</div></div>
+    </div>
+    <h2>Calculations per day (last 30 days)</h2>
+    <table><thead><tr><th>Day</th><th>Calculations</th></tr></thead><tbody>${rows(data.daily, ['day', 'count'])}</tbody></table>
+    <h2>Most active users</h2>
+    <table><thead><tr><th>Name</th><th>Calculations</th><th>Last used</th></tr></thead><tbody>${rows(data.byUser, ['user_name', 'count', 'last_used'])}</tbody></table>
+    <h2>Recent activity</h2>
+    <table><thead><tr><th>Time</th><th>Name</th><th>ERD</th><th>LRD</th></tr></thead><tbody>${rows(data.recent, ['ts', 'user_name', 'erd', 'lrd'])}</tbody></table>
+  </body></html>`;
+  const w = window.open('', '_blank');
+  if (!w) return; // popup blocked — nothing else to do
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  // Give the new window a beat to lay out before the print dialog opens.
+  setTimeout(() => w.print(), 250);
+}
 
 function StatCard({ label, value }) {
   return (
@@ -63,8 +134,18 @@ export default function UsageStats({ passphrase, onAuthExpired }) {
 
   const { summary, daily, byUser, recent } = data;
 
+  const exportBtn = 'rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-[#002D72] shadow-sm transition hover:border-[#EB6608] hover:text-[#EB6608] dark:border-slate-500 dark:bg-slate-700 dark:text-white';
+
   return (
     <div className="space-y-6">
+      <div className="flex justify-end gap-2">
+        <button type="button" onClick={() => exportExcel(data)} className={exportBtn}>
+          ⬇ Excel
+        </button>
+        <button type="button" onClick={() => exportPdf(data)} className={exportBtn}>
+          ⬇ PDF
+        </button>
+      </div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatCard label="Total calcs" value={summary.total} />
         <StatCard label="Unique users" value={summary.uniqueUsers} />
