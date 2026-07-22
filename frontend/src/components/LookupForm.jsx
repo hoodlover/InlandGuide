@@ -10,7 +10,17 @@ import { getUserName } from './NamePrompt';
 
 // Fire-and-forget usage log — must never affect the calculator, so errors are
 // swallowed (also covers the offline double-click build, where /api is absent).
+// Re-submitting the same result within 15s (double-clicks, nervous re-clicks)
+// is suppressed so user error doesn't inflate the stats; a genuinely different
+// lookup still logs immediately.
+const DUPLICATE_WINDOW_MS = 15 * 1000;
+let lastLogged = { key: '', at: 0 };
+
 function logUsage(res) {
+  const key = `${res.erd}|${res.lrd}`;
+  const now = Date.now();
+  if (key === lastLogged.key && now - lastLogged.at < DUPLICATE_WINDOW_MS) return;
+  lastLogged = { key, at: now };
   try {
     fetch('/api/usage', {
       method: 'POST',
