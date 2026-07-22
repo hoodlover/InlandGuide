@@ -2,7 +2,7 @@
 // The app builds to a single self-contained index.html, so the "app shell"
 // is essentially just that one document plus the PWA icons/manifest.
 // Bump CACHE_VERSION whenever a new build should invalidate the offline cache.
-const CACHE_VERSION = 'icg-v7';
+const CACHE_VERSION = 'icg-v8';
 const APP_SHELL = [
   './',
   './index.html',
@@ -43,6 +43,10 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return; // let cross-origin requests pass through
+
+  // The update checker polls version.json — it must NEVER be served from (or
+  // added to) the cache, or open sessions would stop noticing new deploys.
+  if (url.pathname.endsWith('/version.json')) return;
 
   // Navigations: network-first so users get the latest build, fall back to cache offline.
   if (request.mode === 'navigate') {
