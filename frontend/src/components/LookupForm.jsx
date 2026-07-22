@@ -6,6 +6,19 @@ import Combobox from './Combobox';
 import { SalesforceIcon, OutlookIcon, TeamsIcon, TextIcon } from './BrandIcons';
 import ObieThinking from './ObieThinking';
 import { renderPasteCardImage } from '../lib/pasteCardImage';
+import { getUserName } from './NamePrompt';
+
+// Fire-and-forget usage log — must never affect the calculator, so errors are
+// swallowed (also covers the offline double-click build, where /api is absent).
+function logUsage(res) {
+  try {
+    fetch('/api/usage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userName: getUserName(), erd: res.erd, lrd: res.lrd }),
+    }).catch(() => {});
+  } catch { /* ignore */ }
+}
 
 // Flexible date entry:  "9" = 9th of THIS month · "8/9" = Aug 9 · "8/9/26" or "8/9/2026" = full.
 function parseFlexibleDate(input) {
@@ -221,6 +234,7 @@ export default function LookupForm({ onCanadaPort }) {
       setError(res.error);
     } else {
       setResults(res);
+      logUsage(res);
     }
   };
 

@@ -6,6 +6,7 @@ frontend/dist/
 
 # local env / secrets
 backend/.env
+.env.local
 
 # large tools / binaries (not part of the app)
 cloudflared.exe

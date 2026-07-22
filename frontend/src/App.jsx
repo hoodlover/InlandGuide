@@ -3,6 +3,8 @@ import { gzipSync, strFromU8, strToU8, unzipSync } from 'fflate';
 import LookupForm from './components/LookupForm';
 import PortScheduleLookup from './components/PortScheduleLookup';
 import HlMockup from './components/HlMockup';
+import NamePrompt from './components/NamePrompt';
+import UsageStats from './components/UsageStats';
 import { bannerBottom, obBot } from './assets/banners';
 import heroTop from './assets/hero-top.webp';
 import darkModeBadge from './assets/dark-mode.webp';
@@ -1444,6 +1446,20 @@ function RefreshModal({ onClose }) {
 
           <button
             type="button"
+            onClick={() => setView('stats')}
+            className="group w-full rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#EB6608] hover:shadow-md dark:border-slate-600 dark:bg-slate-700"
+          >
+            <span className="flex items-center gap-3">
+              <span className="text-2xl" aria-hidden="true">📈</span>
+              <span>
+                <span className="block text-sm font-semibold text-[#002D72] dark:text-white">See who&apos;s using the guide</span>
+                <span className="text-xs font-normal text-[#EB6608] group-hover:underline">Usage stats &amp; recent activity →</span>
+              </span>
+            </span>
+          </button>
+
+          <button
+            type="button"
             onClick={triggerRefresh}
             className="group w-full rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#EB6608] hover:shadow-md dark:border-slate-600 dark:bg-slate-700"
           >
@@ -1551,6 +1567,18 @@ function RefreshModal({ onClose }) {
             </article>
           ))}
         </div>
+      </ModalShell>
+    );
+  }
+
+  if (view === 'stats') {
+    return (
+      <ModalShell title="Guide Usage" onClose={onClose}>
+        <button type="button" onClick={() => setView('menu')} className="mb-4 text-sm font-normal text-[#002D72] hover:underline dark:text-white">← Back to Managers Hub</button>
+        <UsageStats
+          passphrase={pass}
+          onAuthExpired={() => { setStatus({ ok: false, msg: 'Manager session expired. Please sign in again.' }); setView('login'); }}
+        />
       </ModalShell>
     );
   }
@@ -1938,6 +1966,7 @@ export default function App() {
           : <PortScheduleLookup onUpdateRamps={() => setRefreshOpen(true)} initialPort={canadaPort} />}
       </main>
 
+      <NamePrompt />
       {installOpen && <InstallModal onClose={() => setInstallOpen(false)} />}
       {requestOpen && <FeatureRequestModal onClose={() => setRequestOpen(false)} />}
       {refreshOpen && <RefreshModal onClose={() => setRefreshOpen(false)} />}
