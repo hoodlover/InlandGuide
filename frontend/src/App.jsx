@@ -4,6 +4,7 @@ import LookupForm from './components/LookupForm';
 import PortScheduleLookup from './components/PortScheduleLookup';
 import HlMockup from './components/HlMockup';
 import NamePrompt from './components/NamePrompt';
+import UpdateToast from './components/UpdateToast';
 import UsageStats from './components/UsageStats';
 import { bannerBottom, obBot } from './assets/banners';
 import heroTop from './assets/hero-top.webp';
@@ -1967,6 +1968,7 @@ export default function App() {
       </main>
 
       <NamePrompt />
+      <UpdateToast />
       {installOpen && <InstallModal onClose={() => setInstallOpen(false)} />}
       {requestOpen && <FeatureRequestModal onClose={() => setRequestOpen(false)} />}
       {refreshOpen && <RefreshModal onClose={() => setRefreshOpen(false)} />}
