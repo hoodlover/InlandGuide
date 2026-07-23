@@ -6,15 +6,10 @@ import { hlLogoOrange } from '../assets/hlLogoOrange';
 import { SalesforceIcon, OutlookIcon, TeamsIcon, TextIcon } from './BrandIcons';
 import ObieThinking from './ObieThinking';
 import { renderPasteCardImage } from '../lib/pasteCardImage';
+import { IDT_TITLE, formatStamp } from '../lib/idt';
+import vesselMark from '../assets/idt-vessel.webp';
 
 const EMPTY = { port: '', vessel: '', city: '' };
-
-// ISO timestamp -> "Jul 12, 2026, 3:04 PM"
-function formatPulled(iso) {
-  const d = new Date(iso);
-  if (isNaN(d)) return iso;
-  return d.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
-}
 
 function outlookLogoBlock() {
   return `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" bgcolor="#EB6608" style="border-collapse:collapse;background-color:#EB6608;margin-top:12px">` +
@@ -196,7 +191,7 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
     writeClipboard(text, html, '✓ Copied for Outlook!');
   };
 
-  const handleCopyPretty = async () => {
+  const handleCopyImage = async () => {
     if (!results) return;
     const { titlePlain, titleLeft, titleRight, text } = cardParts();
     const rows = [
@@ -215,16 +210,16 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
         logo: hlLogo,
         footer: `${info.name} — as published ${info.runDate}`,
       });
-      setPasteProof({ heading: 'Pretty copy ready to paste anywhere', format: 'image', content: image.dataUrl });
+      setPasteProof({ heading: 'Image copy ready to paste anywhere', format: 'image', content: image.dataUrl });
       if (navigator.clipboard && window.ClipboardItem) {
         await navigator.clipboard.write([new ClipboardItem({
           'image/png': image.blob,
         })]);
       } else {
         await navigator.clipboard.writeText(text);
-        setPasteProof({ heading: 'Pretty copy unavailable — plain copy ready', format: 'text', content: text });
+        setPasteProof({ heading: 'Image copy unavailable — plain copy ready', format: 'text', content: text });
       }
-      setCopyMessage('✓ Pretty copy ready!');
+      setCopyMessage('✓ Image copy ready!');
       setTimeout(() => setCopyMessage(''), 2000);
     } catch {
       setCopyMessage('Failed to copy');
@@ -300,7 +295,7 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
               </span>
             )}
             {pulledAt && (
-              <span className="text-[11px] text-white/85 txt-shadow-soft ml-1">last pulled: <span className="font-semibold">{formatPulled(pulledAt)}</span></span>
+              <span className="text-[11px] text-white/85 txt-shadow-soft ml-1">last pulled: <span className="font-semibold">{formatStamp(pulledAt)}</span></span>
             )}
           </div>
 
@@ -312,6 +307,8 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
               </ul>
             </details>
           )}
+
+          <img src={vesselMark} alt="" title={IDT_TITLE} className="mt-5 h-40 w-full rounded-xl object-cover shadow-[0_8px_18px_rgba(0,0,0,0.35)]" />
         </div>
       </div>
 
@@ -326,7 +323,7 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
                 <p className="mt-1 text-xs font-semibold text-slate-500">This is exactly what was copied:</p>
                 <div className="mt-3 overflow-x-auto rounded-md border border-slate-200 bg-white p-3 text-slate-900">
                   {pasteProof.format === 'image' ? (
-                    <img src={pasteProof.content} alt="Pretty paste card preview" className="block max-w-full h-auto" />
+                    <img src={pasteProof.content} alt="Paste card image preview" className="block max-w-full h-auto" />
                   ) : (
                     <pre className="whitespace-pre-wrap break-words font-mono text-xs leading-relaxed">{pasteProof.content}</pre>
                   )}
@@ -350,10 +347,10 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
             <p className="mt-4 text-center text-xs text-white/70">Choose a copy style — then paste with Ctrl+V.</p>
             <div className="mt-2 flex flex-wrap items-center justify-center gap-2.5">
               <button
-                onClick={handleCopyPretty}
+                onClick={handleCopyImage}
                 className="inline-flex items-center gap-2 px-4 py-1.5 text-sm bg-white text-slate-800 rounded-full hover:bg-slate-100 transition font-semibold shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
               >
-                <span aria-hidden="true">✨</span> Pretty
+                <span aria-hidden="true">✨</span> Image
               </button>
               <button
                 onClick={handleCopyText}

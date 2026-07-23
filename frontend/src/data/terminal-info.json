@@ -17,7 +17,7 @@
   },
   "addTerminals": {
     "USLAX": [
-      { "code": "FENIX", "name": "Fenix", "ssys": [] }
+      { "code": "FENMAR", "name": "Fenix Marine", "ssys": ["WSN"] }
     ]
   },
   "notes": {

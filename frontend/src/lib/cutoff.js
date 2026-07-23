@@ -6,6 +6,11 @@ import terminals from '../data/terminals.json';
 import portTerminals from '../data/portmc.json';
 import portServices from '../data/port-services.json';
 import terminalInfo from '../data/terminal-info.json';
+import masterStatus from '../data/master-status.json';
+
+// When the US rail ramp data last changed — stamped by the publish workflow
+// each time a different master workbook is pushed live.
+export const masterUpdatedAt = masterStatus.publishedAt || '';
 
 // Drop the spreadsheet header row and any blank rows.
 const lanes = rawLanes.filter(
@@ -257,7 +262,7 @@ export function terminalForSSY(pol, ssy) {
 // The SSY to feed calculateERDLRD for a chosen terminal + city. Returns a service
 // code from the lane that terminal serves (so a port with two transit sets matches
 // the right lane). When the terminal's codes don't intersect the city's lanes (an
-// all-"ALL" city, or an added terminal like Fenix with no codes) it falls back to
+// all-"ALL" city, or a city that terminal's codes don't serve) it falls back to
 // the city's first lane SSY — safe because such ports don't vary transit by SSY.
 export function ssyForTerminal(pol, city, terminalCode) {
   const d = portInfo(pol);

@@ -4,6 +4,9 @@
 
 const REQUEST_PREFIX = '[Guide Request]';
 const REQUEST_MARKER = '<!-- inland-guide-request -->';
+// Clearing a request rewrites its marker instead of deleting the issue: the
+// GitHub history stays intact but the admin log stops listing it.
+const CLEARED_MARKER = '<!-- inland-guide-request-cleared -->';
 const VALID_TYPES = new Set(['Feature', 'Change', 'Problem', 'Other']);
 const recentSubmissions = new Map();
 
@@ -102,11 +105,42 @@ async function submitRequest(req, res, body) {
   return res.status(201).json({ ok: true, id: issue.number });
 }
 
-async function listRequests(res, body) {
+function requireManager(res, body) {
   if (!body.passphrase || body.passphrase !== process.env.REFRESH_PASSPHRASE) {
-    return res.status(401).json({ error: 'Wrong passphrase.' });
+    res.status(401).json({ error: 'Wrong passphrase.' });
+    return false;
   }
-  const issues = await github('/issues?state=all&per_page=100&sort=created&direction=desc');
+  return true;
+}
+
+// One repo-wide call keeps this to two GitHub requests no matter how many
+// issues are open; replies are then bucketed back onto their issue number.
+async function repliesByIssue() {
+  const comments = await github('/issues/comments?per_page=100&sort=created&direction=desc');
+  const buckets = new Map();
+  for (const comment of comments) {
+    const number = Number(String(comment.issue_url || '').split('/').pop());
+    if (!Number.isFinite(number)) continue;
+    if (!buckets.has(number)) buckets.set(number, []);
+    buckets.get(number).push({
+      id: comment.id,
+      author: comment.user?.login || 'GitHub',
+      body: multiline(comment.body, 4000),
+      createdAt: comment.created_at,
+      url: comment.html_url,
+    });
+  }
+  // Oldest reply first reads like a conversation under the request.
+  for (const list of buckets.values()) list.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  return buckets;
+}
+
+async function listRequests(res, body) {
+  if (!requireManager(res, body)) return undefined;
+  const [issues, replies] = await Promise.all([
+    github('/issues?state=all&per_page=100&sort=created&direction=desc'),
+    repliesByIssue().catch(() => new Map()),
+  ]);
   const requests = issues
     .filter(issue => !issue.pull_request && issue.title.startsWith(REQUEST_PREFIX) && issue.body?.includes(REQUEST_MARKER))
     .map(issue => {
@@ -122,9 +156,31 @@ async function listRequests(res, body) {
         updatedAt: issue.updated_at,
         state: issue.state,
         url: issue.html_url,
+        replies: replies.get(issue.number) || [],
       };
     });
   return res.status(200).json({ ok: true, requests });
+}
+
+// Clear = close the issue and retire its marker, so it drops off the admin log
+// while the conversation stays readable in GitHub.
+async function clearRequest(res, body) {
+  if (!requireManager(res, body)) return undefined;
+  const id = Number(body.id);
+  if (!Number.isInteger(id) || id <= 0) return res.status(400).json({ error: 'Which request should be cleared?' });
+
+  const issue = await github(`/issues/${id}`);
+  if (!issue.body?.includes(REQUEST_MARKER)) {
+    return res.status(404).json({ error: 'That request is no longer in the log.' });
+  }
+  await github(`/issues/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      state: 'closed',
+      body: issue.body.replace(REQUEST_MARKER, CLEARED_MARKER),
+    }),
+  });
+  return res.status(200).json({ ok: true, id });
 }
 
 module.exports = async (req, res) => {
@@ -132,6 +188,7 @@ module.exports = async (req, res) => {
   const body = parseBody(req);
   try {
     if (body.action === 'list') return await listRequests(res, body);
+    if (body.action === 'clear') return await clearRequest(res, body);
     return await submitRequest(req, res, body);
   } catch (error) {
     return res.status(error.status || 500).json({ error: error.message || 'Request service failed.' });

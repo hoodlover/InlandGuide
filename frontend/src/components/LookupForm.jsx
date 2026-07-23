@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getPortGroups, getPortSearchDetails, getCities, getCitySearchDetails, getPortServices, calculateERDLRD, cityLabel, getRailTerminal, getRail, cityNeedsExtraDays, defaultExtraDays, getTerminals, getTerminalOptions, ssyForTerminal, terminalLabel, terminalForSSY, getPortNote } from '../lib/cutoff';
+import { getPortGroups, getPortSearchDetails, getCities, getCitySearchDetails, getPortServices, calculateERDLRD, cityLabel, getRailTerminal, getRail, cityNeedsExtraDays, defaultExtraDays, getTerminals, getTerminalOptions, ssyForTerminal, terminalLabel, terminalForSSY, getPortNote, masterUpdatedAt } from '../lib/cutoff';
+import { IDT_TITLE, formatStamp } from '../lib/idt';
+import trainMark from '../assets/idt-train-mark.webp';
 import { hlLogo } from '../assets/hlLogo';
 import { hlLogoOrange } from '../assets/hlLogoOrange';
 import Combobox from './Combobox';
@@ -414,7 +416,7 @@ export default function LookupForm({ onCanadaPort }) {
 
   // Teams strips pasted HTML styling and prefers text when an item exposes both
   // text and image flavors, so publish the finished branded card as image-only.
-  const handleCopyPretty = async () => {
+  const handleCopyImage = async () => {
     if (!results) return;
     const { titlePlain, titleLeft, titleRight, text, polTerm } = cardParts();
     const rows = [
@@ -425,16 +427,16 @@ export default function LookupForm({ onCanadaPort }) {
     ];
     try {
       const image = await renderPasteCardImage({ title: titlePlain, titleLeft, titleRight, rows, logo: hlLogo });
-      setPasteProof({ heading: 'Pretty copy ready to paste anywhere', format: 'image', content: image.dataUrl });
+      setPasteProof({ heading: 'Image copy ready to paste anywhere', format: 'image', content: image.dataUrl });
       if (navigator.clipboard && window.ClipboardItem) {
         await navigator.clipboard.write([new ClipboardItem({
           'image/png': image.blob,
         })]);
       } else {
         await navigator.clipboard.writeText(text);
-        setPasteProof({ heading: 'Pretty copy unavailable — plain copy ready', format: 'text', content: text });
+        setPasteProof({ heading: 'Image copy unavailable — plain copy ready', format: 'text', content: text });
       }
-      setCopyMessage('✓ Pretty copy ready!');
+      setCopyMessage('✓ Image copy ready!');
       setTimeout(() => setCopyMessage(''), 2000);
     } catch {
       setCopyMessage('Failed to copy');
@@ -593,7 +595,7 @@ export default function LookupForm({ onCanadaPort }) {
             Calculate Cutoff Dates
           </button>
 
-          <div className="mt-4">
+          <div className="mt-4 flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={handleReset}
@@ -601,6 +603,9 @@ export default function LookupForm({ onCanadaPort }) {
             >
               Reset
             </button>
+            {masterUpdatedAt && (
+              <span className="text-[11px] text-white/85 txt-shadow-soft ml-1">rail data updated: <span className="font-semibold">{formatStamp(masterUpdatedAt)}</span></span>
+            )}
           </div>
 
           {error && (
@@ -609,6 +614,8 @@ export default function LookupForm({ onCanadaPort }) {
             </div>
           )}
         </form>
+
+        <img src={trainMark} alt="" title={IDT_TITLE} className="mt-5 h-40 w-full rounded-xl object-cover shadow-[0_8px_18px_rgba(0,0,0,0.35)]" />
       </div>
 
       <div ref={resultsRef} className={results ? 'pb-32 md:pb-0' : ''}>
@@ -622,7 +629,7 @@ export default function LookupForm({ onCanadaPort }) {
                 <p className="mt-1 text-xs font-semibold text-slate-500">This is exactly what was copied:</p>
                 <div className="mt-3 overflow-x-auto rounded-md border border-slate-200 bg-white p-3 text-slate-900">
                   {pasteProof.format === 'image' ? (
-                    <img src={pasteProof.content} alt="Pretty paste card preview" className="block max-w-full h-auto" />
+                    <img src={pasteProof.content} alt="Paste card image preview" className="block max-w-full h-auto" />
                   ) : (
                     <pre className="whitespace-pre-wrap break-words font-mono text-xs leading-relaxed">{pasteProof.content}</pre>
                   )}
@@ -646,10 +653,10 @@ export default function LookupForm({ onCanadaPort }) {
             <p className="mt-4 text-center text-xs text-white/70">Choose a copy style — then paste with Ctrl+V.</p>
             <div className="mt-2 flex flex-wrap items-center justify-center gap-2.5">
               <button
-                onClick={handleCopyPretty}
+                onClick={handleCopyImage}
                 className="inline-flex items-center gap-2 px-4 py-1.5 text-sm bg-white text-slate-800 rounded-full hover:bg-slate-100 transition font-semibold shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
               >
-                <span aria-hidden="true">✨</span> Pretty
+                <span aria-hidden="true">✨</span> Image
               </button>
               <button
                 onClick={handleCopyResults}

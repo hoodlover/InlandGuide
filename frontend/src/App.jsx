@@ -28,6 +28,13 @@ import doviberDavisHighfive from './assets/doviber-davis-highfive.webp';
 import doviberDavisPoint from './assets/doviber-davis-point.webp';
 import guideMe from './assets/guide-me.webp';
 import vintageErd from './assets/vintage-erd.webp';
+import eagleMark from './assets/idt-eagle.webp';
+import leafMark from './assets/idt-leaf.webp';
+import portScene from './assets/idt-port.webp';
+import truckScene from './assets/idt-truck-scene.webp';
+import truckMark from './assets/idt-truck-mark.webp';
+import trainScene from './assets/idt-train-scene.webp';
+import { IDT_TITLE } from './lib/idt';
 import './index.css';
 
 import versionData from './version.json'; // committed; regenerate with `node gen-version.mjs`
@@ -671,7 +678,9 @@ function useTheme() {
 }
 
 // Reusable modal shell with a blurred backdrop, Esc-to-close and scroll.
-function ModalShell({ title, onClose, children }) {
+// `onBack` puts a ← beside the × so every admin page can step back one level
+// without hunting for a link at the bottom of the panel.
+function ModalShell({ title, onClose, onBack, children }) {
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', onKey);
@@ -692,13 +701,25 @@ function ModalShell({ title, onClose, children }) {
       >
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-light tracking-wide text-[#002D72] dark:text-white">{title}</h2>
-          <button
-            onClick={onClose}
-            aria-label="Close"
-            className="text-slate-400 hover:text-slate-700 dark:hover:text-white text-2xl leading-none"
-          >
-            ×
-          </button>
+          <div className="flex items-center gap-3">
+            {onBack && (
+              <button
+                onClick={onBack}
+                aria-label="Back"
+                title="Back"
+                className="text-slate-400 hover:text-slate-700 dark:hover:text-white text-2xl leading-none"
+              >
+                ←
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              aria-label="Close"
+              className="text-slate-400 hover:text-slate-700 dark:hover:text-white text-2xl leading-none"
+            >
+              ×
+            </button>
+          </div>
         </div>
         {children}
       </div>
@@ -787,6 +808,7 @@ function HelpModal({ onClose, showInstall = true }) {
 
   return (
     <ModalShell title="How to use it" onClose={onClose}>
+      <img src={portScene} alt="" title={IDT_TITLE} className="mb-4 h-36 w-full rounded-xl object-cover shadow-md" />
       <ol className="list-decimal list-inside space-y-2 text-slate-700 dark:text-slate-200 text-sm">
         {steps.map((s, i) => <li key={i}>{s}</li>)}
       </ol>
@@ -852,6 +874,7 @@ function FeatureRequestModal({ onClose }) {
   const inputClass = 'mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-[#EB6608] focus:outline-none focus:ring-2 focus:ring-[#EB6608]/30';
   return (
     <ModalShell title="Request a Feature or Change" onClose={onClose}>
+      <img src={truckScene} alt="" title={IDT_TITLE} className="mb-4 h-36 w-full rounded-xl object-cover shadow-md" />
       <p className="mb-4 text-sm text-slate-600 dark:text-slate-300">
         Tell us what would make the Inland Guide more useful. No email is needed.
       </p>
@@ -1211,6 +1234,7 @@ function RefreshModal({ onClose }) {
   const [dbResult, setDbResult] = useState(null);
   const [requests, setRequests] = useState([]);
   const [requestsStatus, setRequestsStatus] = useState(null);
+  const [clearingId, setClearingId] = useState(0);
   const [showPublishObie, setShowPublishObie] = useState(false);
   const [publishObieNudge, setPublishObieNudge] = useState(false);
   const verifiedMasterRef = useRef(null);
@@ -1304,6 +1328,34 @@ function RefreshModal({ onClose }) {
       setRequestsStatus({ ok: false, message: error?.message || 'The requests could not be loaded.' });
     } finally {
       setBusy(false);
+    }
+  };
+
+  // Clearing closes the GitHub issue and retires its marker, so the request
+  // drops off this log while the thread stays readable in GitHub.
+  const clearRequest = async (request) => {
+    if (clearingId) return;
+    if (!window.confirm(`Clear "${request.title}" from the log?\n\nThe GitHub issue is closed and removed from this list — the conversation stays in GitHub.`)) return;
+    setClearingId(request.id);
+    setRequestsStatus(null);
+    try {
+      const response = await fetch('/api/requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'clear', id: request.id, passphrase: pass }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (response.status === 401) {
+        setView('login');
+        setStatus({ ok: false, msg: 'Manager session expired. Please sign in again.' });
+        return;
+      }
+      if (!response.ok || !result.ok) throw new Error(result.error || `Request service returned HTTP ${response.status}.`);
+      setRequests(list => list.filter(item => item.id !== request.id));
+    } catch (error) {
+      setRequestsStatus({ ok: false, message: error?.message || 'That request could not be cleared.' });
+    } finally {
+      setClearingId(0);
     }
   };
 
@@ -1410,6 +1462,15 @@ function RefreshModal({ onClose }) {
     }
   };
 
+  // Every hub page steps back here; the reset keeps a half-finished publish
+  // from reappearing when the page is opened again.
+  const backToMenu = () => {
+    setStatus(null);
+    setDbResult(null);
+    verifiedMasterRef.current = null;
+    setView('menu');
+  };
+
   if (view === 'login') {
     return (
       <ModalShell title="Managers Only" onClose={onClose}>
@@ -1504,9 +1565,8 @@ function RefreshModal({ onClose }) {
 
   if (view === 'requests') {
     return (
-      <ModalShell title="Feature & Change Requests" onClose={onClose}>
-        <div className="flex items-center justify-between gap-3">
-          <button type="button" onClick={() => setView('menu')} className="text-sm font-normal text-[#002D72] hover:underline dark:text-white">← Back to Managers Hub</button>
+      <ModalShell title="Feature & Change Requests" onClose={onClose} onBack={backToMenu}>
+        <div className="flex items-center justify-end gap-3">
           <button
             type="button"
             onClick={loadRequests}
@@ -1543,9 +1603,39 @@ function RefreshModal({ onClose }) {
                 </time>
               </div>
               <p className="mt-3 whitespace-pre-wrap text-sm text-slate-700 dark:text-slate-200">{request.details}</p>
+
+              {request.replies?.length > 0 && (
+                <div className="mt-3 space-y-2 border-t border-slate-100 pt-3 dark:border-slate-600">
+                  <p className="text-[11px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-300">
+                    {request.replies.length === 1 ? '1 reply' : `${request.replies.length} replies`} from GitHub
+                  </p>
+                  {request.replies.map(reply => (
+                    <div key={reply.id} className="rounded-lg bg-slate-50 p-3 dark:bg-slate-800">
+                      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-300">
+                        <span className="font-medium">{reply.author}</span>
+                        <time dateTime={reply.createdAt}>
+                          {new Date(reply.createdAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                        </time>
+                      </div>
+                      <p className="mt-1 whitespace-pre-wrap text-sm text-slate-700 dark:text-slate-200">{reply.body}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3 text-xs dark:border-slate-600">
                 <span className="font-normal text-slate-500 dark:text-slate-300">From: {request.submittedBy || 'Anonymous'}</span>
-                <a href={request.url} target="_blank" rel="noreferrer" className="font-normal text-[#EB6608] hover:underline">Open / close in GitHub →</a>
+                <div className="flex flex-wrap items-center gap-3">
+                  <a href={request.url} target="_blank" rel="noreferrer" className="font-normal text-[#EB6608] hover:underline">Open / reply in GitHub →</a>
+                  <button
+                    type="button"
+                    onClick={() => clearRequest(request)}
+                    disabled={clearingId === request.id}
+                    className="rounded-lg border border-slate-300 px-2 py-1 font-normal text-slate-600 transition hover:border-red-300 hover:bg-red-50 hover:text-red-700 disabled:opacity-60 dark:border-slate-500 dark:text-slate-300 dark:hover:bg-red-900/30"
+                  >
+                    {clearingId === request.id ? 'Clearing…' : '✕ Clear'}
+                  </button>
+                </div>
               </div>
             </article>
           ))}
@@ -1556,8 +1646,7 @@ function RefreshModal({ onClose }) {
 
   if (view === 'stats') {
     return (
-      <ModalShell title="Guide Usage" onClose={onClose}>
-        <button type="button" onClick={() => setView('menu')} className="mb-4 text-sm font-normal text-[#002D72] hover:underline dark:text-white">← Back to Managers Hub</button>
+      <ModalShell title="Guide Usage" onClose={onClose} onBack={backToMenu}>
         <UsageStats
           passphrase={pass}
           onAuthExpired={() => { setStatus({ ok: false, msg: 'Manager session expired. Please sign in again.' }); setView('login'); }}
@@ -1568,13 +1657,12 @@ function RefreshModal({ onClose }) {
 
   if (view === 'lane') {
     return (
-      <ModalShell title="Lane Control" onClose={onClose}>
+      <ModalShell title="Lane Control" onClose={onClose} onBack={backToMenu}>
         <div className="rounded-xl border-2 border-[#EB6608] bg-orange-50 p-6 text-center shadow-inner dark:bg-slate-700">
-          <div className="text-4xl" aria-hidden="true">🛠️</div>
+          <img src={truckMark} alt="" title={IDT_TITLE} className="mx-auto h-28 w-auto rounded-xl object-contain shadow-md" />
           <p className="mt-3 text-lg font-normal text-[#002D72] dark:text-white">Please open up T9400 and make it happen.</p>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">Lane activation and deactivation remain controlled in the source system.</p>
         </div>
-        <button type="button" onClick={() => setView('menu')} className="mt-4 text-sm font-normal text-[#002D72] hover:underline dark:text-white">← Back to Managers Hub</button>
       </ModalShell>
     );
   }
@@ -1582,7 +1670,7 @@ function RefreshModal({ onClose }) {
   if (view === 'database') {
     return (
       <>
-      <ModalShell title="Master Database Check" onClose={onClose}>
+      <ModalShell title="Master Database Check" onClose={onClose} onBack={backToMenu}>
         <div className="rounded-xl border-2 border-[#002D72] bg-blue-50 p-5 dark:bg-slate-700">
           <p className="text-lg font-normal text-[#002D72] dark:text-white">Secure live database update</p>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
@@ -1641,7 +1729,6 @@ function RefreshModal({ onClose }) {
         <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
           Download the workbook from SharePoint first. The workbook itself stays on this computer; only validated calculator rows are sent to the secure deployment workflow. When saving, choose Z:\InlandCutoffGuide-DontTouch.
         </p>
-        <button type="button" onClick={() => { setStatus(null); setDbResult(null); verifiedMasterRef.current = null; setView('menu'); }} className="mt-4 text-sm font-normal text-[#002D72] hover:underline dark:text-white">← Back to Managers Hub</button>
       </ModalShell>
       {showPublishObie && (
         <div className="fixed inset-0 z-[140] flex flex-col items-center justify-center bg-black/55 p-6 backdrop-blur-md" role="dialog" aria-modal="true" aria-label="Live update complete">
@@ -1652,13 +1739,7 @@ function RefreshModal({ onClose }) {
           </div>
           <button
             type="button"
-            onClick={() => {
-              setShowPublishObie(false);
-              setStatus(null);
-              setDbResult(null);
-              verifiedMasterRef.current = null;
-              setView('menu');
-            }}
+            onClick={() => { setShowPublishObie(false); backToMenu(); }}
             className="rounded-full bg-transparent p-0 transition hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#EB6608]"
             aria-label="Click Obie to return to the Managers Hub"
           >
@@ -1671,10 +1752,9 @@ function RefreshModal({ onClose }) {
   }
 
   return (
-    <ModalShell title="Update Rail Ramp Cuts" onClose={onClose}>
-      <button type="button" onClick={() => { setStatus(null); setView('menu'); }} className="mb-3 text-sm font-normal text-[#002D72] hover:underline dark:text-white">← Back to Managers Hub</button>
+    <ModalShell title="Update Rail Ramp Cuts" onClose={onClose} onBack={backToMenu}>
       <div className="rounded-xl border-2 border-[#002D72] bg-slate-50 p-6 text-center dark:bg-slate-700">
-        <div className="text-4xl" aria-hidden="true">🚆</div>
+        <img src={trainScene} alt="" title={IDT_TITLE} className="mx-auto h-32 w-auto object-contain" />
         <p className="mt-3 font-normal text-[#002D72] dark:text-white">CP Rail &amp; CN Rail ramp cuts</p>
         <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{busy ? 'Contacting GitHub…' : 'Refresh request submitted.'}</p>
       </div>
@@ -1892,18 +1972,19 @@ export default function App() {
       <main className={`max-w-5xl mx-auto w-full ${compactView ? 'px-3 py-3 sm:px-4' : 'flex-1 px-3 py-4 sm:px-5 sm:py-6'}`}>
         <div className={`grid grid-cols-2 items-center gap-2 sm:flex sm:flex-wrap ${compactView ? 'mb-3' : 'mb-5'}`}>
           {[
-            { id: 'calculator', label: 'US Rail Ramp Cuts' },
-            { id: 'cpkc', label: 'Canada Rail Ramp Cuts', mobileLabel: 'Canada Rail Cuts' }
+            { id: 'calculator', label: 'US Rail Ramp Cuts', icon: eagleMark },
+            { id: 'cpkc', label: 'Canada Rail Ramp Cuts', mobileLabel: 'Canada Rail Cuts', icon: leafMark }
           ].map(t => (
             <button
               key={t.id}
               onClick={() => { setCanadaPort(''); setTab(t.id); }}
-              className={`px-4 py-2 text-sm font-bold rounded-lg transition shadow-[0_4px_10px_rgba(0,0,0,0.25)] ${
+              className={`inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold rounded-lg transition shadow-[0_4px_10px_rgba(0,0,0,0.25)] ${
                 tab === t.id
                   ? 'bg-[#002D72] text-white'
                   : 'bg-[#F8F3EA] dark:bg-slate-800 text-[#002D72] dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700'
               }`}
             >
+              <img src={t.icon} alt="" title={IDT_TITLE} className="h-6 w-6 flex-none object-contain drop-shadow-[0_2px_3px_rgba(0,0,0,0.45)]" />
               {mobileDevice && t.mobileLabel ? t.mobileLabel : t.label}
             </button>
           ))}
