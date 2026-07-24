@@ -4,6 +4,7 @@ import LookupForm from './components/LookupForm';
 import PortScheduleLookup from './components/PortScheduleLookup';
 import HlMockup from './components/HlMockup';
 import NamePrompt, { getUserName } from './components/NamePrompt';
+import PwaInstallGate, { shouldShowInstallGate } from './components/PwaInstallGate';
 import UpdateToast from './components/UpdateToast';
 import UsageStats from './components/UsageStats';
 import { bannerBottom, obBot } from './assets/banners';
@@ -1843,6 +1844,10 @@ export default function App() {
     const timer = setTimeout(lockMobileDemo, remaining);
     return () => clearTimeout(timer);
   }, [mobileDemoUntil]);
+
+  if (shouldShowInstallGate()) {
+    return <PwaInstallGate />;
+  }
 
   if (mobileDevice && !mobileDemoUnlocked) {
     return <MobileDemoGate onUnlock={unlockMobileDemo} />;

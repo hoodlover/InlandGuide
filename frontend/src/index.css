@@ -2,6 +2,162 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hosted-browser install gate. The full guide renders only in standalone PWA mode. */
+.install-gate {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+  padding: 1.5rem;
+  background: #002D72 url('/install-port.webp') center / cover no-repeat;
+}
+
+.install-gate-blue {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: rgba(0, 45, 114, .72);
+  box-shadow: inset 0 0 12rem rgba(0, 18, 48, .72);
+}
+
+.install-gate-panel {
+  position: relative;
+  z-index: 2;
+  width: min(92vw, 29rem);
+  border: 1px solid rgba(255, 255, 255, .72);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .96);
+  padding: clamp(1.75rem, 5vw, 2.75rem);
+  color: #172033;
+  text-align: center;
+  box-shadow: 0 24px 70px rgba(0, 14, 38, .48);
+  backdrop-filter: blur(8px);
+}
+
+.install-gate-kicker {
+  margin: 0 0 .55rem;
+  color: #C4510A;
+  font-size: .72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.install-gate-panel h1 {
+  margin: 0;
+  color: #002D72;
+  font-size: 3rem;
+  font-weight: 850;
+  line-height: 1.02;
+  letter-spacing: 0;
+}
+
+.install-gate-copy {
+  margin: 1rem auto 0;
+  max-width: 23rem;
+  color: #475569;
+  font-size: .98rem;
+  line-height: 1.55;
+}
+
+.install-gate-button {
+  min-width: 11rem;
+  min-height: 2.9rem;
+  margin-top: 1.5rem;
+  border: 0;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  background: #EB6608;
+  color: #fff;
+  font-size: .95rem;
+  font-weight: 800;
+  box-shadow: 0 9px 20px rgba(109, 45, 2, .3);
+  cursor: pointer;
+  transition: background-color .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+
+.install-gate-button:hover {
+  background: #C4510A;
+  box-shadow: 0 12px 24px rgba(109, 45, 2, .38);
+  transform: translateY(-1px);
+}
+
+.install-gate-button:focus-visible {
+  outline: 3px solid #002D72;
+  outline-offset: 3px;
+}
+
+.install-gate-button span {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.install-gate-help,
+.install-gate-message {
+  margin: 1.35rem auto 0;
+  max-width: 22rem;
+  color: #526174;
+  font-size: .82rem;
+  line-height: 1.5;
+}
+
+.install-gate-message {
+  color: #9A3D05;
+  font-weight: 650;
+}
+
+.install-gate-obie {
+  position: absolute;
+  z-index: 1;
+  width: var(--obie-size);
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(0 20px 22px rgba(0, 12, 30, .5));
+  will-change: transform, opacity;
+}
+
+.install-gate-obie-pass {
+  top: var(--obie-top);
+  left: 100%;
+  animation: install-obie-pass var(--obie-duration) linear both;
+}
+
+.install-gate-obie-zoom {
+  top: var(--obie-top);
+  left: var(--obie-left);
+  animation: install-obie-zoom var(--obie-duration) cubic-bezier(.32, .08, .5, 1) both;
+}
+
+@keyframes install-obie-pass {
+  0% { opacity: 0; transform: translate3d(3vw, 0, 0) scale(.78); }
+  7%, 90% { opacity: .95; }
+  100% { opacity: 0; transform: translate3d(calc(-100vw - 130%), 0, 0) scale(.78); }
+}
+
+@keyframes install-obie-zoom {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.04); }
+  12%, 76% { opacity: .9; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(var(--obie-end-scale)); }
+}
+
+@media (max-width: 640px) {
+  .install-gate { padding: 1rem; }
+  .install-gate-panel { padding: 1.6rem 1.25rem; }
+  .install-gate-panel h1 { font-size: 2rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .install-gate-obie { display: none; }
+  .install-gate-button { transition: none; }
+}
+
 * {
   margin: 0;
   padding: 0;
