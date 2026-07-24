@@ -12,12 +12,6 @@
   "launch_handler": {
     "client_mode": "navigate-existing"
   },
-  "protocol_handlers": [
-    {
-      "protocol": "web+inlandcutoff",
-      "url": "./?open=%s"
-    }
-  ],
   "related_applications": [
     {
       "platform": "webapp",

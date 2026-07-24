@@ -148,8 +148,10 @@ export default function PwaInstallGate() {
 
           <a
             className="install-gate-open"
-            href="web+inlandcutoff://open"
-            onClick={() => setMessage('If prompted, allow your browser to open Inland Cutoff Guide.')}
+            href="./?open-app=1"
+            target="_blank"
+            rel="noopener"
+            onClick={() => setMessage('If the app does not open, select Open in app in the browser address bar.')}
           >
             {installed ? 'Open app' : 'Already installed? Open app'}
           </a>
