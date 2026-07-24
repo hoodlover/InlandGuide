@@ -1,5 +1,5 @@
 import { gunzipSync } from 'node:zlib';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '../..');
@@ -20,12 +20,10 @@ for (const lane of payload.lanes) {
 }
 
 const dataDir = resolve(root, 'frontend/src/data');
-const existingStatusPath = resolve(dataDir, 'master-status.json');
-let existingStatus = {};
-try { existingStatus = JSON.parse(readFileSync(existingStatusPath, 'utf8')); } catch { /* first publish */ }
-const publishedAt = existingStatus.sourceHash === payload.sourceHash
-  ? existingStatus.publishedAt
-  : new Date().toISOString();
+// Stamp every publish with the moment it ran, so the "Rail data updated" line
+// always reflects the manager's latest push — even a re-publish of the same
+// workbook — instead of only moving when the extracted data's hash changed.
+const publishedAt = new Date().toISOString();
 
 const writeJson = (name, value) => writeFileSync(resolve(dataDir, name), `${JSON.stringify(value, null, 2)}\n`);
 writeJson('lanes.json', payload.lanes);
