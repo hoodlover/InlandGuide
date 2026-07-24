@@ -6,6 +6,11 @@ import terminals from '../data/terminals.json';
 import portTerminals from '../data/portmc.json';
 import portServices from '../data/port-services.json';
 import terminalInfo from '../data/terminal-info.json';
+import masterStatus from '../data/master-status.json';
+
+// When the US rail ramp data last changed — stamped by the publish workflow
+// each time a different master workbook is pushed live.
+export const masterUpdatedAt = masterStatus.publishedAt || '';
 
 // Drop the spreadsheet header row and any blank rows.
 const lanes = rawLanes.filter(

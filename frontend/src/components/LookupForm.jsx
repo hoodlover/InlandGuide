@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getPortGroups, getPortSearchDetails, getCities, getCitySearchDetails, getPortServices, calculateERDLRD, cityLabel, getRailTerminal, getRail, cityNeedsExtraDays, defaultExtraDays, getTerminals, getTerminalOptions, ssyForTerminal, terminalLabel, terminalForSSY, getPortNote } from '../lib/cutoff';
+import { getPortGroups, getPortSearchDetails, getCities, getCitySearchDetails, getPortServices, calculateERDLRD, cityLabel, getRailTerminal, getRail, cityNeedsExtraDays, defaultExtraDays, getTerminals, getTerminalOptions, ssyForTerminal, terminalLabel, terminalForSSY, getPortNote, masterUpdatedAt } from '../lib/cutoff';
+import { IDT_TITLE, formatStamp } from '../lib/idt';
+import trainMark from '../assets/idt-train-mark.webp';
 import { hlLogo } from '../assets/hlLogo';
 import { hlLogoOrange } from '../assets/hlLogoOrange';
 import Combobox from './Combobox';
@@ -593,7 +595,7 @@ export default function LookupForm({ onCanadaPort }) {
             Calculate Cutoff Dates
           </button>
 
-          <div className="mt-4">
+          <div className="mt-4 flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={handleReset}
@@ -601,6 +603,9 @@ export default function LookupForm({ onCanadaPort }) {
             >
               Reset
             </button>
+            {masterUpdatedAt && (
+              <span className="text-[11px] text-white/85 txt-shadow-soft ml-1">rail data updated: <span className="font-semibold">{formatStamp(masterUpdatedAt)}</span></span>
+            )}
           </div>
 
           {error && (
@@ -609,6 +614,8 @@ export default function LookupForm({ onCanadaPort }) {
             </div>
           )}
         </form>
+
+        <img src={trainMark} alt="" title={IDT_TITLE} className="mt-5 h-40 w-full rounded-xl object-cover object-[center_35%] shadow-[0_8px_18px_rgba(0,0,0,0.35)]" />
       </div>
 
       <div ref={resultsRef} className={results ? 'pb-32 md:pb-0' : ''}>
