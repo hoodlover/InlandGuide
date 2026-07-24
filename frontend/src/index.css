@@ -787,6 +787,75 @@ textarea {
 .thought-bubble::after { width: 15px; height: 15px; bottom: -16px; margin-left: -18px; }
 .thought-bubble::before { width: 9px; height: 9px; bottom: -28px; margin-left: -6px; }
 
+/* ---- Sleeping Obie: slides + shrinks into the lower-right corner over 3s ---- */
+.obie-avatar {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 21.5rem;
+  max-width: 100%;
+  transform: translate(-50%, -50%);
+  transition: left 3s cubic-bezier(.4, 0, .2, 1),
+              top 3s cubic-bezier(.4, 0, .2, 1),
+              width 3s cubic-bezier(.4, 0, .2, 1),
+              transform 3s cubic-bezier(.4, 0, .2, 1);
+}
+.obie-avatar.is-asleep {
+  left: 100%;
+  top: 100%;
+  width: 7rem;
+  transform: translate(calc(-100% - 4px), calc(-100% - 4px));
+}
+
+.obie-sleep-bob { animation: obie-sleep-bob 4s ease-in-out infinite; transform-origin: 60% 90%; }
+@keyframes obie-sleep-bob {
+  0%, 100% { transform: rotate(-1.5deg) translateY(0); }
+  50% { transform: rotate(1.5deg) translateY(-3px); }
+}
+
+.obie-sleep-z {
+  position: absolute;
+  top: 0.25rem;
+  right: 1.1rem;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  pointer-events: none;
+}
+.obie-sleep-z span {
+  font-weight: 800;
+  line-height: 1;
+  color: #002D72;
+  opacity: 0;
+  animation: obie-sleep-z 3.2s ease-in-out infinite;
+}
+.dark .obie-sleep-z span { color: #cbd5e1; }
+.obie-sleep-z span:nth-child(1) { font-size: 0.7rem; animation-delay: 0s; }
+.obie-sleep-z span:nth-child(2) { font-size: 0.95rem; animation-delay: 0.55s; }
+.obie-sleep-z span:nth-child(3) { font-size: 1.25rem; animation-delay: 1.1s; }
+@keyframes obie-sleep-z {
+  0% { opacity: 0; transform: translateY(6px) rotate(-8deg); }
+  25% { opacity: 0.95; }
+  100% { opacity: 0; transform: translateY(-18px) rotate(10deg); }
+}
+
+.obie-sleep-mumble {
+  position: absolute;
+  bottom: calc(100% + 0.35rem);
+  right: 0;
+  max-width: 12rem;
+  white-space: nowrap;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 0.25rem 0.55rem;
+  font-size: 0.68rem;
+  font-style: italic;
+  color: #64748b;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+  animation: joke-fade 0.4s ease;
+}
+.dark .obie-sleep-mumble { background: rgba(30, 41, 59, 0.96); color: #cbd5e1; }
+
 /* Jokester Obie flips to face the way he's "pushing" the joke bubble. */
 .obie-jokebot { transition: transform 0.7s ease; }
 .obie-jokebot-out { transform: scaleX(-1); }   /* faces his entry direction while shown */

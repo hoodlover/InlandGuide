@@ -604,7 +604,7 @@ export default function LookupForm({ onCanadaPort }) {
               Reset
             </button>
             {masterUpdatedAt && (
-              <span className="text-[11px] text-white/85 txt-shadow-soft ml-1">rail data updated: <span className="font-semibold">{formatStamp(masterUpdatedAt)}</span></span>
+              <span className="text-[11px] text-white/85 txt-shadow-soft ml-1">Rail data updated: <span className="font-semibold">{formatStamp(masterUpdatedAt)}</span></span>
             )}
           </div>
 

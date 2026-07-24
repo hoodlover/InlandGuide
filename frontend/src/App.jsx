@@ -229,7 +229,7 @@ function MobileDemoGate({ onUnlock }) {
 
 // OB strolls in on the main tool: every ~10 min he slides in from the left,
 // tells a joke for ~30s, then leaves again.
-const OBIE_FIRST_MS = 15_000;   // first appearance shortly after load
+const OBIE_FIRST_MS = 420_000;  // first appearance held off until 7 min in
 const OBIE_SHOW_MS = 30_000;    // stays on screen 30s
 const OBIE_HIDE_MS = 600_000;   // hidden 10 min between visits
 
