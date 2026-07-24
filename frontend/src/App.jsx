@@ -1925,7 +1925,7 @@ export default function App() {
                 type="button"
                 onClick={() => setNameEditorOpen(true)}
                 title="Change the name used for calculation history"
-                className="inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-xs font-normal rounded-full transition shadow-[0_7px_0_rgba(0,0,0,0.75),0_13px_22px_rgba(0,0,0,0.8)] bg-[#F8F3EA] dark:bg-slate-800 text-[#002D72] dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700 sm:ml-auto"
+                className="toolbar-pill-shadow inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-xs font-normal rounded-full transition bg-[#F8F3EA] dark:bg-slate-800 text-[#002D72] dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700 sm:ml-auto"
               >
                 <span aria-hidden="true" className="text-sm leading-none">✎</span>
                 Change name
@@ -1934,7 +1934,7 @@ export default function App() {
                 onClick={toggleCompact}
                 title={compact ? 'Switch to full view' : 'Switch to compact view'}
                 aria-label={compact ? 'Switch to full view' : 'Switch to compact view'}
-                className="px-2.5 py-1.5 text-xs font-normal rounded-full transition shadow-[0_7px_0_rgba(0,0,0,0.75),0_13px_22px_rgba(0,0,0,0.8)] bg-[#F8F3EA] dark:bg-slate-800 text-[#002D72] dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700"
+                className="toolbar-pill-shadow px-2.5 py-1.5 text-xs font-normal rounded-full transition bg-[#F8F3EA] dark:bg-slate-800 text-[#002D72] dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700"
               >
                 {compact ? '⤢ Full view' : '⤡ Compact'}
               </button>
@@ -1942,14 +1942,14 @@ export default function App() {
                 type="button"
                 onClick={refreshUpdatedData}
                 title="Reload the guide with the newest published database"
-                className="px-2.5 py-1.5 text-xs font-normal rounded-full transition shadow-[0_7px_0_rgba(0,0,0,0.75),0_13px_22px_rgba(0,0,0,0.8)] bg-emerald-700 text-white hover:bg-emerald-800"
+                className="toolbar-pill-shadow px-2.5 py-1.5 text-xs font-normal rounded-full transition bg-emerald-700 text-white hover:bg-emerald-800"
               >
                 ↻ Refresh Updated Data
               </button>
               <button
                 type="button"
                 onClick={() => setRequestOpen(true)}
-                className="col-span-2 rounded-full bg-[#EB6608] px-2.5 py-1.5 text-xs font-normal text-white shadow-[0_7px_0_rgba(0,0,0,0.75),0_13px_22px_rgba(0,0,0,0.8)] transition hover:bg-[#cf5a07] sm:col-auto"
+                className="toolbar-pill-shadow col-span-2 rounded-full bg-[#EB6608] px-2.5 py-1.5 text-xs font-normal text-white transition hover:bg-[#cf5a07] sm:col-auto"
               >
                 💡 Request a Feature / Change
               </button>

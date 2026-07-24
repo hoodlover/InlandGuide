@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+.toolbar-pill-shadow {
+  box-shadow:
+    0 5px 12px rgba(15, 23, 42, .28),
+    0 2px 4px rgba(15, 23, 42, .18);
+}
+
+.toolbar-pill-shadow:hover {
+  box-shadow:
+    0 7px 16px rgba(15, 23, 42, .32),
+    0 3px 5px rgba(15, 23, 42, .2);
+}
+
 /* Hosted-browser install gate. The full guide renders only in standalone PWA mode. */
 .install-gate {
   position: relative;
