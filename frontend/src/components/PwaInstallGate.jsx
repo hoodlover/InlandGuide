@@ -88,7 +88,14 @@ export default function PwaInstallGate() {
   }, []);
 
   const install = async () => {
-    if (!installPrompt) return;
+    if (!installPrompt) {
+      setMessage(
+        isiOS
+          ? 'In Safari, tap Share, then Add to Home Screen.'
+          : 'Use the install icon in the browser address bar, or choose Install app from the browser menu.',
+      );
+      return;
+    }
     setMessage('');
     try {
       const result = await installPrompt.prompt();
@@ -126,20 +133,33 @@ export default function PwaInstallGate() {
             )}
         </p>
 
-        {!installed && status === 'ready' && (
-          <button type="button" className="install-gate-button" onClick={install}>
-            <span aria-hidden="true">↓</span>
-            Install app
-          </button>
-        )}
+        <div className="install-gate-actions">
+          {!installed && (
+            <button
+              type="button"
+              className="install-gate-button"
+              onClick={install}
+              disabled={status === 'installing'}
+            >
+              <span aria-hidden="true">↓</span>
+              {status === 'installing' ? 'Installing...' : 'Install app'}
+            </button>
+          )}
 
-        {!installed && status !== 'ready' && (
+          <a
+            className="install-gate-open"
+            href="web+inlandcutoff://open"
+            onClick={() => setMessage('If prompted, allow your browser to open Inland Cutoff Guide.')}
+          >
+            {installed ? 'Open app' : 'Already installed? Open app'}
+          </a>
+        </div>
+
+        {!installed && status !== 'ready' && status !== 'installing' && !message && (
           <p className="install-gate-help">
             {isiOS
               ? 'In Safari, tap Share, then Add to Home Screen.'
-              : status === 'installing'
-                ? 'Finishing installation...'
-                : 'Use the install icon in the browser address bar, or choose Install app from the browser menu.'}
+              : 'Select Install app above. If your browser does not open the installer, use its address-bar install icon.'}
           </p>
         )}
 

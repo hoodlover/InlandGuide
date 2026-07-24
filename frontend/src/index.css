@@ -70,10 +70,17 @@
   font-weight: 750;
 }
 
+.install-gate-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .75rem;
+  margin-top: 1.5rem;
+}
+
 .install-gate-button {
   min-width: 11rem;
   min-height: 2.9rem;
-  margin-top: 1.5rem;
   border: 0;
   border-radius: 6px;
   display: inline-flex;
@@ -95,6 +102,12 @@
   transform: translateY(-1px);
 }
 
+.install-gate-button:disabled {
+  opacity: .72;
+  cursor: wait;
+  transform: none;
+}
+
 .install-gate-button:focus-visible {
   outline: 3px solid #002D72;
   outline-offset: 3px;
@@ -103,6 +116,33 @@
 .install-gate-button span {
   font-size: 1.25rem;
   line-height: 1;
+}
+
+.install-gate-open {
+  min-width: 15rem;
+  min-height: 2.65rem;
+  border: 2px solid #002D72;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .55rem 1rem;
+  color: #002D72;
+  font-size: .9rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: background-color .18s ease, color .18s ease, transform .18s ease;
+}
+
+.install-gate-open:hover {
+  background: #002D72;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.install-gate-open:focus-visible {
+  outline: 3px solid #EB6608;
+  outline-offset: 3px;
 }
 
 .install-gate-help,
@@ -162,7 +202,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .install-gate-obie { display: none; }
-  .install-gate-button { transition: none; }
+  .install-gate-button,
+  .install-gate-open { transition: none; }
 }
 
 * {

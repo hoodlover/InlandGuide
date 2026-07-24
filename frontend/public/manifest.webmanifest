@@ -9,6 +9,15 @@
   "orientation": "portrait-primary",
   "theme_color": "#002D72",
   "background_color": "#002D72",
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+inlandcutoff",
+      "url": "./?open=%s"
+    }
+  ],
   "related_applications": [
     {
       "platform": "webapp",
