@@ -63,6 +63,13 @@
   line-height: 1.55;
 }
 
+.install-gate-copy-emphasis {
+  display: block;
+  color: #002D72;
+  font-size: calc(1em + 2pt);
+  font-weight: 750;
+}
+
 .install-gate-button {
   min-width: 11rem;
   min-height: 2.9rem;

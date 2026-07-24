@@ -117,8 +117,13 @@ export default function PwaInstallGate() {
         <h1 id="install-gate-title">Inland Cutoff Guide</h1>
         <p className="install-gate-copy">
           {installed
-            ? 'Installation complete. Open Inland Cutoff Guide from your desktop, taskbar, or Start menu.'
-            : 'Install Inland Cutoff Guide to open the rail cutoff and delivery date calculator.'}
+            ? 'Installation complete. Close this screen, then open Inland Cutoff Guide from your Start menu.'
+            : (
+              <>
+                Install Inland Cutoff Guide to open the
+                <span className="install-gate-copy-emphasis">ERD/LRD Inland Guide.</span>
+              </>
+            )}
         </p>
 
         {!installed && status === 'ready' && (
