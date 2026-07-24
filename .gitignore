@@ -20,3 +20,4 @@ $null
 *.log
 Thumbs.db
 .DS_Store
+auto-publish.log
