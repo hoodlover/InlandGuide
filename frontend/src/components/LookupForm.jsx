@@ -207,12 +207,9 @@ export default function LookupForm({ onCanadaPort }) {
   };
 
   const handleReset = () => {
-    setFormData({ ...EMPTY_FORM, portCutDate: today().iso });
-    setDateInput(today().mdy);
-    setResults(null);
-    setError('');
-    setCopyMessage('');
-    setPasteProof(null);
+    // Full hard reset: reload the page so every bit of state (form, results,
+    // Obie, any lingering UI) returns to a pristine first-load condition.
+    window.location.reload();
   };
 
   const handleSubmit = (e) => {

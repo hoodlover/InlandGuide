@@ -1398,29 +1398,42 @@ function RefreshModal({ onClose }) {
     if (!verified || busy) return;
     setBusy(true);
     try {
-      if (window.showSaveFilePicker) {
-        const handle = await window.showSaveFilePicker({
-          suggestedName: 'InlandCutoffGuideMASTER.xlsm',
-          types: [{
-            description: 'Excel Macro-Enabled Workbook',
-            accept: { 'application/vnd.ms-excel.sheet.macroEnabled.12': ['.xlsm'] },
-          }],
-        });
-        const writable = await handle.createWritable();
-        await writable.write(verified.file);
-        await writable.close();
-      } else {
-        const url = URL.createObjectURL(verified.file);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'InlandCutoffGuideMASTER.xlsm';
-        link.click();
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      // Saving a local copy is a convenience, not a gate — if the manager
+      // cancels the Save dialog we must still publish, otherwise the whole
+      // update silently dies with nothing sent to GitHub.
+      let savedCopy = false;
+      try {
+        if (window.showSaveFilePicker) {
+          const handle = await window.showSaveFilePicker({
+            suggestedName: 'InlandCutoffGuideMASTER.xlsm',
+            types: [{
+              description: 'Excel Macro-Enabled Workbook',
+              accept: { 'application/vnd.ms-excel.sheet.macroEnabled.12': ['.xlsm'] },
+            }],
+          });
+          const writable = await handle.createWritable();
+          await writable.write(verified.file);
+          await writable.close();
+        } else {
+          const url = URL.createObjectURL(verified.file);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = 'InlandCutoffGuideMASTER.xlsm';
+          link.click();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+        savedCopy = true;
+      } catch (saveErr) {
+        // A cancelled Save dialog (AbortError) is fine — publish anyway. A real
+        // save failure is surfaced by the outer catch.
+        if (saveErr?.name !== 'AbortError') throw saveErr;
       }
       setDbResult(current => ({
         ...current,
-        saved: true,
-        message: 'Verified copy saved. Publishing the calculator data now…',
+        saved: savedCopy,
+        message: savedCopy
+          ? 'Verified copy saved. Publishing the calculator data now…'
+          : 'Publishing the calculator data now…',
       }));
 
       const publishResponse = await fetch('/api/refresh', {
