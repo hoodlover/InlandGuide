@@ -649,7 +649,7 @@ export default function LookupForm({ onCanadaPort }) {
                 onClick={handleCopyPretty}
                 className="inline-flex items-center gap-2 px-4 py-1.5 text-sm bg-white text-slate-800 rounded-full hover:bg-slate-100 transition font-semibold shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
               >
-                <span aria-hidden="true">✨</span> Pretty
+                <span aria-hidden="true">✨</span> Image
               </button>
               <button
                 onClick={handleCopyResults}
