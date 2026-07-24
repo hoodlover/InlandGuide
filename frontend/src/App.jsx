@@ -3,7 +3,7 @@ import { gzipSync, strFromU8, strToU8, unzipSync } from 'fflate';
 import LookupForm from './components/LookupForm';
 import PortScheduleLookup from './components/PortScheduleLookup';
 import HlMockup from './components/HlMockup';
-import NamePrompt from './components/NamePrompt';
+import NamePrompt, { getUserName } from './components/NamePrompt';
 import UpdateToast from './components/UpdateToast';
 import UsageStats from './components/UsageStats';
 import { bannerBottom, obBot } from './assets/banners';
@@ -1742,6 +1742,8 @@ export default function App() {
   const [installOpen, setInstallOpen] = useState(false);
   const [requestOpen, setRequestOpen] = useState(false);
   const [refreshOpen, setRefreshOpen] = useState(false);
+  const [userName, setUserName] = useState(getUserName);
+  const [nameEditorOpen, setNameEditorOpen] = useState(false);
   const pwaInstalled = usePwaInstallStatus();
   const mobileDevice = isMobileDevice();
   const [mobileDemoUntil, setMobileDemoUntil] = useState(() => {
@@ -1875,6 +1877,11 @@ export default function App() {
                 <span data-doviber-word="guide">Guide</span>
               </h1>
               {!compactView && <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Rail cutoff &amp; delivery date calculator</p>}
+              {userName && (
+                <p className={`${compactView ? 'mt-0.5 text-xs' : 'mt-1 text-sm'} text-slate-600 dark:text-slate-300`}>
+                  Welcome, <span className="font-semibold text-[#002D72] dark:text-white">{userName}</span>
+                </p>
+              )}
               {!compactView && !pwaInstalled && (
                 <button
                   onClick={() => setInstallOpen(true)}
@@ -1910,10 +1917,19 @@ export default function App() {
           {!mobileDevice && (
             <>
               <button
+                type="button"
+                onClick={() => setNameEditorOpen(true)}
+                title="Change the name used for calculation history"
+                className="inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-xs font-normal rounded-full transition shadow-[0_7px_0_rgba(0,0,0,0.75),0_13px_22px_rgba(0,0,0,0.8)] bg-[#F8F3EA] dark:bg-slate-800 text-[#002D72] dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700 sm:ml-auto"
+              >
+                <span aria-hidden="true" className="text-sm leading-none">✎</span>
+                Change name
+              </button>
+              <button
                 onClick={toggleCompact}
                 title={compact ? 'Switch to full view' : 'Switch to compact view'}
                 aria-label={compact ? 'Switch to full view' : 'Switch to compact view'}
-                className="px-2.5 py-1.5 text-xs font-normal rounded-full transition shadow-[0_7px_0_rgba(0,0,0,0.75),0_13px_22px_rgba(0,0,0,0.8)] bg-[#F8F3EA] dark:bg-slate-800 text-[#002D72] dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700 sm:ml-auto"
+                className="px-2.5 py-1.5 text-xs font-normal rounded-full transition shadow-[0_7px_0_rgba(0,0,0,0.75),0_13px_22px_rgba(0,0,0,0.8)] bg-[#F8F3EA] dark:bg-slate-800 text-[#002D72] dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700"
               >
                 {compact ? '⤢ Full view' : '⤡ Compact'}
               </button>
@@ -1949,7 +1965,15 @@ export default function App() {
           : <PortScheduleLookup onUpdateRamps={() => setRefreshOpen(true)} initialPort={canadaPort} />}
       </main>
 
-      <NamePrompt />
+      <NamePrompt
+        open={!userName || nameEditorOpen}
+        initialName={userName}
+        onSave={(name) => {
+          setUserName(name);
+          setNameEditorOpen(false);
+        }}
+        onClose={() => setNameEditorOpen(false)}
+      />
       <UpdateToast />
       {installOpen && <InstallModal onClose={() => setInstallOpen(false)} />}
       {requestOpen && <FeatureRequestModal onClose={() => setRequestOpen(false)} />}
