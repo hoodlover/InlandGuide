@@ -300,7 +300,7 @@ export default function LookupForm({ onCanadaPort }) {
       setError('Please choose a Terminal.');
       return;
     }
-    // Normalize the box to the full date on submit (covers pressing Enter).
+    // Normalize the box to the full date when the Calculate button submits.
     if (resolvedDate) setDateInput(resolvedDate.mdy);
 
     // Terminal ports resolve the SSY from the chosen terminal (which selects the
@@ -585,6 +585,12 @@ export default function LookupForm({ onCanadaPort }) {
                 inputMode="numeric"
                 value={dateInput}
                 onChange={handleDateInput}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    e.currentTarget.form?.elements.namedItem('bookingNumber')?.focus();
+                  }
+                }}
                 onFocus={(e) => e.target.select()}
                 onBlur={handleDateBlur}
                 placeholder="Day (9), or 8/9, or 8/9/2026"

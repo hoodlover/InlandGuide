@@ -1968,7 +1968,7 @@ export default function App() {
                 <span data-doviber-word="rail">Rail</span>{' '}
                 <span data-doviber-word="guide">Guide</span>
               </h1>
-              {!compactView && <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Rail cutoff &amp; delivery date calculator</p>}
+              {!compactView && <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">ERD/LRD Rail Cut Off Lookup</p>}
               {userName && (
                 <p className={`${compactView ? 'mt-0.5 text-xs' : 'mt-1 text-sm'} text-slate-600 dark:text-slate-300`}>
                   Welcome, <span className="font-semibold text-[#002D72] dark:text-white">{userName}</span>
