@@ -163,9 +163,14 @@ export default function ObieThinking() {
         className={`obie-avatar ${asleep ? 'is-asleep' : 'is-awake'} cursor-pointer rounded-full bg-transparent p-0 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#EB6608]/70`}
       >
         {settled && (
-          <span className="obie-sleep-z" aria-hidden="true">
-            <span>Z</span><span>Z</span><span>Z</span>
-          </span>
+          <>
+            <span className="obie-sleep-z obie-sleep-z-behind" aria-hidden="true">
+              <span>Z</span><span>Z</span><span>Z</span><span>Z</span><span>Z</span>
+            </span>
+            <span className="obie-sleep-z obie-sleep-z-front" aria-hidden="true">
+              <span>Z</span><span>Z</span><span>Z</span>
+            </span>
+          </>
         )}
         {settled && mumble && (
           <span className="obie-sleep-mumble" role="status">{mumble}</span>
@@ -173,7 +178,7 @@ export default function ObieThinking() {
         <img
           src={obBot}
           alt="OB the Ops-Base Bot"
-          className={`h-auto w-full drop-shadow-2xl ${settled ? 'obie-sleep-bob' : 'obie-float'}`}
+          className={`relative z-10 h-auto w-full drop-shadow-2xl ${settled ? 'obie-sleep-bob' : 'obie-float'}`}
         />
       </button>
 

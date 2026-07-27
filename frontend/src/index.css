@@ -815,24 +815,57 @@ textarea {
 
 .obie-sleep-z {
   position: absolute;
-  top: 0.25rem;
-  right: 1.1rem;
+  pointer-events: none;
+}
+.obie-sleep-z-behind {
+  z-index: 5;
+  top: -0.15rem;
+  right: 0.15rem;
   display: flex;
   align-items: flex-end;
-  gap: 3px;
-  pointer-events: none;
+  gap: 2px;
 }
 .obie-sleep-z span {
   font-weight: 800;
   line-height: 1;
   color: #002D72;
   opacity: 0;
-  animation: obie-sleep-z 3.2s ease-in-out infinite;
+  animation: obie-sleep-z 3.8s ease-in-out infinite;
 }
 .dark .obie-sleep-z span { color: #cbd5e1; }
-.obie-sleep-z span:nth-child(1) { font-size: 0.7rem; animation-delay: 0s; }
-.obie-sleep-z span:nth-child(2) { font-size: 0.95rem; animation-delay: 0.55s; }
-.obie-sleep-z span:nth-child(3) { font-size: 1.25rem; animation-delay: 1.1s; }
+.obie-sleep-z-behind span:nth-child(1) { font-size: 0.55rem; animation-delay: 0s; }
+.obie-sleep-z-behind span:nth-child(2) { font-size: 0.7rem; animation-delay: 0.42s; }
+.obie-sleep-z-behind span:nth-child(3) { font-size: 0.85rem; animation-delay: 0.84s; }
+.obie-sleep-z-behind span:nth-child(4) { font-size: 1.05rem; animation-delay: 1.26s; }
+.obie-sleep-z-behind span:nth-child(5) { font-size: 1.3rem; animation-delay: 1.68s; }
+
+.obie-sleep-z-front {
+  z-index: 20;
+  inset: 0;
+}
+.obie-sleep-z-front span {
+  position: absolute;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+.dark .obie-sleep-z-front span { text-shadow: 0 1px 2px rgba(15, 23, 42, 0.9); }
+.obie-sleep-z-front span:nth-child(1) {
+  top: 48%;
+  left: 16%;
+  font-size: 0.58rem;
+  animation-delay: 0.2s;
+}
+.obie-sleep-z-front span:nth-child(2) {
+  top: 35%;
+  left: 39%;
+  font-size: 0.72rem;
+  animation-delay: 0.95s;
+}
+.obie-sleep-z-front span:nth-child(3) {
+  top: 56%;
+  left: 62%;
+  font-size: 0.62rem;
+  animation-delay: 1.7s;
+}
 @keyframes obie-sleep-z {
   0% { opacity: 0; transform: translateY(6px) rotate(-8deg); }
   25% { opacity: 0.95; }
