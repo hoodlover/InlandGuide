@@ -18,6 +18,6 @@ if errorlevel 1 (
   exit /b 1
 )
 
-echo SUCCESS - live update pushed, Vercel will deploy shortly.
-echo SUCCESS %DATE% %TIME% >> auto-publish.log
+echo SUCCESS - check complete; a live update is published only when rail data changed.
+echo SUCCESS %DATE% %TIME% - check complete >> auto-publish.log
 exit /b 0

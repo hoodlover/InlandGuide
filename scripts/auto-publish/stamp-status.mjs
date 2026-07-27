@@ -3,9 +3,8 @@
 // The manual (browser) publish records when the master workbook was pushed
 // live; the scheduled job has no browser, so this does the same thing locally:
 // hashes the workbook at EXCEL_PATH, counts the freshly-exported lanes, and
-// writes the current time as publishedAt. Because publishedAt always changes,
-// there is always something to commit, so every hourly 9am-3pm run refreshes the
-// "Rail data updated" stamp and redeploys.
+// writes the current time as publishedAt. The orchestrator calls this only
+// after detecting a real change in the exported master data.
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';

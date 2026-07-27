@@ -1,9 +1,10 @@
 // Scheduled auto-publish orchestrator (run hourly from 9am through 3pm by
 // AutoPublish.bat and Windows Task Scheduler).
 //
-// Regenerates the calculator data from the master workbook, stamps the publish
-// time, rebuilds the live + offline guides, and pushes to main so Vercel
-// redeploys. Designed to run safely on a machine that is ALSO used for dev:
+// Regenerates the calculator data from the master workbook. Only when the
+// exported rail data actually changes does it stamp the publish time, rebuild
+// the live + offline guides, and push to main so Vercel redeploys. Designed to
+// run safely on a machine that is ALSO used for dev:
 //   - never resets or discards anything; only commits the generated files
 //     (frontend/src/data, version.json, InlandCutoffGuide.html)
 //   - if the push is rejected (someone/the CPKC bot pushed first), it rebases
@@ -27,6 +28,14 @@ const tryRun = (cmd, cwd = root) => {
 // git diff --cached --quiet exits 0 when nothing is staged.
 const nothingStaged = () => tryRun('git diff --cached --quiet');
 const log = (m) => console.log(`[auto-publish] ${m}`);
+const masterDataPaths = [
+  'frontend/src/data/lanes.json',
+  'frontend/src/data/holidays.json',
+  'frontend/src/data/portmc.json',
+  'frontend/src/data/port-services.json',
+];
+const masterDataUnchanged = () =>
+  tryRun(`git diff --quiet -- ${masterDataPaths.join(' ')}`);
 
 try {
   log('sync local main to latest (fast-forward only, non-destructive)');
@@ -36,6 +45,11 @@ try {
   log('export calculator data from the master workbook');
   run('node backend/refresh-data.js');
   tryRun('git checkout -- frontend/src/assets/banners.js'); // drop deterministic banner re-encode
+
+  if (masterDataUnchanged()) {
+    log('master data unchanged — no timestamp, build, commit, deployment, or user update prompt');
+    process.exit(0);
+  }
 
   log('stamp the publish time');
   run('node scripts/auto-publish/stamp-status.mjs');
