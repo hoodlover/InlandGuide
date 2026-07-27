@@ -137,7 +137,7 @@ export async function renderPasteCardImage({
   y += 14;
   if (footerLeft) {
     ctx.fillStyle = '#ffffff';
-    ctx.font = '700 12px Arial';
+    ctx.font = '700 14px Arial';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
     ctx.fillText(footerLeft, left, y + logoHeight / 2, contentWidth - 165);
