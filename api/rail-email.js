@@ -2,10 +2,10 @@
 //
 // Required env var (Vercel > Project > Settings > Environment Variables):
 //   FORWARD_EMAIL_ALIAS_PASSWORD
-//     Generated alias password for ERD@hapagidt.com. Keep this server-side only.
+//     Generated alias password for cutoff@hapagidt.com. Keep this server-side only.
 
 const FORWARD_EMAIL_API = 'https://api.forwardemail.net/v1/emails';
-const FROM_ADDRESS = 'erd@hapagidt.com';
+const FROM_ADDRESS = 'cutoff@hapagidt.com';
 const TO_ADDRESS = 'QSCRail@hlag.com';
 const SUBJECT_PREFIX = 'ERD Cutoff Form has been submitted Booking ';
 const DUPLICATE_WINDOW_MS = 2 * 60 * 1000;
