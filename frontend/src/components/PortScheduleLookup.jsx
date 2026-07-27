@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import Combobox from './Combobox';
-import { getPorts, getVessels, getCities, getVesselMeta, getCutoff, getERD, getPortInfo, getCutTime, formatDate, pulledAt, refreshNeeded } from '../lib/cpkc';
+import { getPorts, getVessels, getCities, getVesselMeta, getCutoff, getERD, getPortInfo, getCutTime, formatDate, pulledAt, refreshNeeded, cityDisplay } from '../lib/cpkc';
 import { hlLogo } from '../assets/hlLogo';
 import { hlLogoOrange } from '../assets/hlLogoOrange';
 import { SalesforceIcon, OutlookIcon, TeamsIcon, TextIcon } from './BrandIcons';
 import ObieThinking from './ObieThinking';
 import { renderPasteCardImage } from '../lib/pasteCardImage';
+import { cardTitleFloat, cardTitleTable } from '../lib/pasteCardHtml';
 
 const EMPTY = { port: '', vessel: '', city: '' };
 
@@ -97,7 +98,7 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
   const handleCopyText = async () => {
     if (!results) return;
     const railTerminal = `${results.rail || 'Rail'}${results.terminal ? ' / ' + results.terminal : ''}`;
-    const top = `${results.city}    ${railTerminal}`;
+    const top = `${cityDisplay(results.city)}    ${railTerminal}`;
     const divider = '─'.repeat(Math.max(24, top.length));
     const text = [
       'Here are the ramp cuts you requested:',
@@ -108,6 +109,7 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
       `Earliest Receiving (ERD): ${results.erd}`,
       `Inland Cut-Off (LRD): ${results.cutoff}`,
       results.cutTime ? `Cut-Off Time: ${results.cutTime}` : null,
+      results.railPortCutoff ? `Rail Port Cut-Off: ${results.railPortCutoff}` : null,
       results.comments ? `Note: ${results.comments}` : null,
       '',
       `${info.name} — as published ${info.runDate}`,
@@ -132,8 +134,8 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
     const normalized = value => String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
     const showTerminal = results.terminal && normalized(results.terminal) !== normalized(cityName);
     const railTerminal = `${results.rail || 'Rail'}${showTerminal ? ' / ' + results.terminal : ''}`;
-    const titlePlain = `${results.city}    ${railTerminal}`;
-    const titleHtml = `${results.city}&nbsp;&nbsp;&nbsp;&nbsp;${railTerminal}`;
+    const cityText = cityDisplay(results.city);
+    const titlePlain = `${cityText}    ${railTerminal}`;
     const titleSize = titlePlain.length > 34 ? 15 : (titlePlain.length > 26 ? 17 : 20);
     const text = [
       'Here are the ramp cuts you requested:', '',
@@ -142,10 +144,11 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
       `Earliest Receiving (ERD): ${results.erd}`,
       `Inland Cut-Off (LRD): ${results.cutoff}`,
       results.cutTime ? `Cut-Off Time: ${results.cutTime}` : null,
+      results.railPortCutoff ? `Rail Port Cut-Off: ${results.railPortCutoff}` : null,
       results.comments ? `Note: ${results.comments}` : null,
       '', ''
     ].filter(v => v !== null).join('\n');
-    return { titlePlain, titleHtml, titleSize, titleLeft: results.city, titleRight: railTerminal, text };
+    return { titlePlain, titleSize, titleLeft: cityText, titleRight: railTerminal, text };
   };
 
   const cardRows = (row) =>
@@ -153,12 +156,13 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
     row('Earliest Receiving (ERD)', results.erd) +
     row('Inland Cut-Off (LRD)', results.cutoff) +
     (results.cutTime ? row('Cut-Off Time', results.cutTime) : '') +
+    (results.railPortCutoff ? row('Rail Port Cut-Off', results.railPortCutoff) : '') +
     (results.comments ? row('Note', results.comments) : '');
 
   // Salesforce card — div layout (no dashed cell guides; transparent logo on orange).
   const handleCopySalesforce = () => {
     if (!results) return;
-    const { titleHtml, titleSize, text } = cardParts();
+    const { titleLeft, titleRight, titleSize, text } = cardParts();
     const rowStyle = 'padding:9px 16px;border-bottom:1px solid #e2e8f0;overflow:hidden';
     const labelStyle = 'float:left;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;color:#000000';
     const valStyle = 'float:right;font-family:Arial,sans-serif;font-size:15px;font-weight:bold;color:#000000';
@@ -166,7 +170,7 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
     const html =
       `Here are the ramp cuts you requested:<br><br>` +
       `<div style="background:#EB6608;border:5px solid #002D72;border-radius:12px;max-width:470px;padding:22px;font-family:Arial,sans-serif">` +
-        `<div style="color:#ffffff;font-size:${titleSize}px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;text-shadow:0 2px 5px rgba(0,0,0,0.45);border-bottom:2px solid #ffffff;padding-bottom:8px;margin-bottom:16px">${titleHtml}</div>` +
+        cardTitleFloat(titleLeft, titleRight, titleSize) +
         `<div style="background:#ffffff;border-radius:8px;overflow:hidden">` + cardRows(row) + `</div>` +
         `<div style="color:#ffffff;font-size:11px;margin-top:10px">${info.name} — as published ${info.runDate}</div>` +
         `<div style="text-align:right;margin-top:8px"><img src="${hlLogo}" width="150" alt="Hapag-Lloyd" style="display:inline-block;width:150px;height:auto" /></div>` +
@@ -178,7 +182,7 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
   // Outlook & Teams card — table layout with bgcolor and the orange-baked logo.
   const handleCopyOutlook = () => {
     if (!results) return;
-    const { titleHtml, titleSize, text } = cardParts();
+    const { titleLeft, titleRight, titleSize, text } = cardParts();
     const rowLabel = 'padding:9px 16px;border-bottom:1px solid #e2e8f0;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;color:#000000;text-align:left';
     const rowVal = 'padding:9px 16px;border-bottom:1px solid #e2e8f0;font-family:Arial,sans-serif;font-size:15px;font-weight:bold;color:#000000;text-align:right';
     const row = (label, value) => `<tr><td bgcolor="#ffffff" style="${rowLabel}">${label}</td><td bgcolor="#ffffff" style="${rowVal}">${value}</td></tr>`;
@@ -186,7 +190,7 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
       `Here are the ramp cuts you requested:<br><br>` +
       `<table role="presentation" cellpadding="0" cellspacing="0" bgcolor="#EB6608" style="border-collapse:separate;background-color:#EB6608;border:5px solid #002D72;border-radius:12px;max-width:470px">` +
         `<tr><td bgcolor="#EB6608" style="background-color:#EB6608;padding:22px">` +
-          `<div style="font-family:Arial,sans-serif;color:#ffffff;font-size:${titleSize}px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;border-bottom:2px solid #ffffff;padding-bottom:8px;margin-bottom:16px">${titleHtml}</div>` +
+          cardTitleTable(titleLeft, titleRight, titleSize) +
           `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff" style="border-collapse:separate;background-color:#ffffff;border-radius:8px">` + cardRows(row) + `</table>` +
           `<div style="font-family:Arial,sans-serif;color:#ffffff;font-size:11px;margin-top:10px">${info.name} — as published ${info.runDate}</div>` +
           outlookLogoBlock() +
@@ -204,6 +208,7 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
       ['Earliest Receiving (ERD)', results.erd],
       ['Inland Cut-Off (LRD)', results.cutoff],
       ...(results.cutTime ? [['Cut-Off Time', results.cutTime]] : []),
+      ...(results.railPortCutoff ? [['Rail Port Cut-Off', results.railPortCutoff]] : []),
       ...(results.comments ? [['Note', results.comments]] : []),
     ];
     try {
@@ -270,7 +275,7 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
             <Combobox
               value={sel.city}
               onSelect={(v) => pick('city', v)}
-              options={cities.map(c => ({ value: c, label: c }))}
+              options={cities.map(c => ({ value: c, label: cityDisplay(c) }))}
               placeholder={sel.vessel ? 'Type or select a city…' : 'Select a vessel first'}
               disabled={!sel.vessel}
               required
@@ -318,7 +323,20 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
       <div>
         {results ? (
           <div className="bg-[#002D72] rounded-lg border border-[#002D72] shadow-sm p-6">
-            <h3 className="text-xl font-extrabold tracking-wide uppercase mb-4 pb-2 border-b-2 border-[#EB6608] text-white txt-shadow-heavy">{pasteProof ? 'Ready to Paste' : results.city}</h3>
+            <div className="mb-4 flex items-center justify-between gap-3 pb-2 border-b-2 border-[#EB6608]">
+              <h3 className="text-xl font-extrabold tracking-wide uppercase text-white txt-shadow-heavy">{pasteProof ? 'Ready to Paste' : cityDisplay(results.city)}</h3>
+              {/* Back to the result the copy came from — clears the paste proof only,
+                  so nothing is re-looked-up. */}
+              {pasteProof && (
+                <button
+                  type="button"
+                  onClick={() => setPasteProof(null)}
+                  className="shrink-0 whitespace-nowrap rounded-full border border-white/40 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white transition hover:bg-white/20 shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
+                >
+                  ← Results
+                </button>
+              )}
+            </div>
 
             {pasteProof ? (
               <section className="rounded-lg border-2 border-emerald-400 bg-white p-4 shadow-lg" aria-live="polite">
@@ -372,7 +390,7 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
         ) : noCutoff ? (
           <div className="bg-[#002D72] border border-[#002D72] rounded-lg p-6 text-center shadow-sm">
             <p className="text-white font-semibold">No published cut-off</p>
-            <p className="text-white/80 text-sm mt-1">{sel.vessel} has no listed cut-off for {sel.city} on this schedule — try another rail city.</p>
+            <p className="text-white/80 text-sm mt-1">{sel.vessel} has no listed cut-off for {cityDisplay(sel.city)} on this schedule — try another rail city.</p>
           </div>
         ) : (
           <div className="rounded-lg p-6 h-full flex flex-col items-center justify-center min-h-[32rem]">

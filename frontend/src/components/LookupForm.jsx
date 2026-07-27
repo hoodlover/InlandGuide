@@ -8,6 +8,7 @@ import Combobox from './Combobox';
 import { SalesforceIcon, OutlookIcon, TeamsIcon, TextIcon } from './BrandIcons';
 import ObieThinking from './ObieThinking';
 import { renderPasteCardImage } from '../lib/pasteCardImage';
+import { cardTitleFloat, cardTitleTable } from '../lib/pasteCardHtml';
 import { getUserName } from './NamePrompt';
 
 // Fire-and-forget usage log — must never affect the calculator, so errors are
@@ -65,7 +66,25 @@ function formatShortDate(iso) {
   return `${m}/${d}`;
 }
 
-const EMPTY_FORM = { pol: '', startCity: '', ssy: '', terminal: '', portCutDate: '', reefer: 'N', extraDays: '5' };
+// Terminal names like "Maher Terminal" / "APM Terminal / 174" already sit under a
+// row labelled Port, so the word "Terminal" is noise on screen. Drop it (and any
+// separator or punctuation it leaves behind), and close up an internal slash so
+// the name reads as one field ("APM/174") beside the dash-separated port and date.
+// Display only — the authoritative names in terminal-info.json are untouched.
+function stripTerminalWord(name) {
+  const cleaned = String(name || '')
+    .replace(/\bterminals?\b/gi, '')
+    .replace(/\s*\/\s*/g, '/')
+    .replace(/\s+([,;])/g, '$1')
+    .replace(/\s+/g, ' ')
+    .replace(/^[\s/,;-]+|[\s/,;-]+$/g, '')
+    .trim();
+  return cleaned || String(name || '');
+}
+
+// bookingNumber is captured but unused so far — it's the handle a future "forward
+// this lookup to the rail Outlook box" step would key on. Nothing reads it yet.
+const EMPTY_FORM = { pol: '', startCity: '', ssy: '', terminal: '', portCutDate: '', bookingNumber: '', reefer: 'N', extraDays: '5' };
 
 // Canadian ports are served by the separate published-schedule tool (the Canada
 // Rail Ramp Cuts tab), not the US calculator. Listing all four here lets a user
@@ -150,15 +169,24 @@ export default function LookupForm({ onCanadaPort }) {
   const showSSYField = requiresSSY && !terminals;
   // Loading terminal to show in the result: for terminal ports it's the chosen
   // terminal; for SSY ports it's the terminal the chosen service code maps to.
-  // Include the POL so the terminal is never shown without its port context.
+  // 'ALL' means the port has one terminal set, so there's nothing to name.
   const selTerminalName = allPol
     ? 'ALL'
     : (terminals
       ? (formData.terminal ? terminalLabel(formData.terminal) : '')
       : terminalForSSY(formData.pol, formData.ssy));
-  const selTerminalLabel = selTerminalName
-    ? (selTerminalName === 'ALL' ? formData.pol : `${formData.pol} / ${selTerminalName}`)
+  // Both the results panel and every copied card close with one combined line:
+  // "Port · Terminal · FCL Cut" → "USNYC · Maher · 7/27". Middle dots keep each
+  // field distinct without reading like a hyphenated name or date range.
+  // Label and value always match each other.
+  const portCutTerminal = selTerminalName && selTerminalName !== 'ALL'
+    ? stripTerminalWord(selTerminalName)
     : '';
+  const portCutJoin = ' · ';
+  const portCutLabel = ['Port', portCutTerminal && 'Terminal', 'FCL Cut']
+    .filter(Boolean).join(portCutJoin);
+  const portCutValue = [formData.pol, portCutTerminal, formatShortDate(formData.portCutDate)]
+    .filter(Boolean).join(portCutJoin);
 
   // Auto-select a sole POL service (normally ALL); explicit lists require a pick.
   useEffect(() => {
@@ -256,9 +284,6 @@ export default function LookupForm({ onCanadaPort }) {
     const topPlain = `${cityST}    ${railTerminal}`;
     const topHtml = `<b>${cityST}</b>&nbsp;&nbsp;&nbsp;&nbsp;<b>${railTerminal}</b>`;
     const divider = '─'.repeat(Math.max(24, topPlain.length));
-    // Port Cut Date shown short (e.g. 8/6) to match the rest of the result.
-    const cutDate = formatShortDate(formData.portCutDate);
-    const polTerm = selTerminalLabel;
 
     // Plain-text version (used when pasting into plain fields like Notepad).
     // Ramp Cuts (ERD/LRD) come first — they're the important part — then the port info.
@@ -273,9 +298,7 @@ export default function LookupForm({ onCanadaPort }) {
       `- Latest Return Date (LRD): ${results.lrd}`,
       `- Ramp Cut Time: ${results.rampCutTime}`,
       '',
-      `Port of Loading: ${formData.pol}`,
-      polTerm ? `POL Terminal: ${polTerm}` : null,
-      `Port Cut Date: ${cutDate}`,
+      `${portCutLabel}: ${portCutValue}`,
       divider,
       '',
       ''
@@ -294,9 +317,7 @@ export default function LookupForm({ onCanadaPort }) {
       `- Latest Return Date (LRD): <b>${results.lrd}</b>`,
       `- Ramp Cut Time: <b>${results.rampCutTime}</b>`,
       '',
-      `Port of Loading: <b>${formData.pol}</b>`,
-      polTerm ? `POL Terminal: <b>${polTerm}</b>` : null,
-      `Port Cut Date: <b>${cutDate}</b>`,
+      `${portCutLabel}: <b>${portCutValue}</b>`,
       divider,
       '',
       ''
@@ -343,26 +364,24 @@ export default function LookupForm({ onCanadaPort }) {
     const cityST = cityForResultTitle(formData.startCity, fullRailTerminal);
     const railTerminal = railTerminalForResultTitle(cityST, fullRailTerminal);
     const titlePlain = `${cityST}    ${railTerminal}`;
-    const titleHtml = `${cityST}&nbsp;&nbsp;&nbsp;&nbsp;${railTerminal}`;
     const titleSize = titlePlain.length > 34 ? 15 : (titlePlain.length > 26 ? 17 : 20);
-    const polTerm = selTerminalLabel;
     const text = [
       'Here are the ramp cuts you requested:', '',
       titlePlain,
       `Earliest Return Date (ERD): ${results.erd}`,
       `Latest Return Date (LRD): ${results.lrd}`,
       `Ramp Cut Time: ${results.rampCutTime}`,
-      polTerm ? `POL Terminal: ${polTerm}` : null,
+      `${portCutLabel}: ${portCutValue}`,
       '', ''
-    ].filter(v => v !== null).join('\n');
-    return { titlePlain, titleHtml, titleSize, titleLeft: cityST, titleRight: railTerminal, text, polTerm };
+    ].join('\n');
+    return { titlePlain, titleSize, titleLeft: cityST, titleRight: railTerminal, text };
   };
 
   // Salesforce card — div layout (SF shows no dashed cell guides; transparent
   // logo sits clean on the orange). Rail omitted (title already shows it).
   const handleCopySalesforce = () => {
     if (!results) return;
-    const { titleHtml, titleSize, text, polTerm } = cardParts();
+    const { titleLeft, titleRight, titleSize, text } = cardParts();
     const rowStyle = 'padding:9px 16px;border-bottom:1px solid #e2e8f0;overflow:hidden';
     const rowStyleLast = 'padding:9px 16px;overflow:hidden';
     const labelStyle = 'float:left;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;color:#000000';
@@ -372,12 +391,12 @@ export default function LookupForm({ onCanadaPort }) {
     const html =
       `Here are the ramp cuts you requested:<br><br>` +
       `<div style="background:#EB6608;border:5px solid #002D72;border-radius:12px;max-width:470px;padding:22px;font-family:Arial,sans-serif">` +
-        `<div style="color:#ffffff;font-size:${titleSize}px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;text-shadow:0 2px 5px rgba(0,0,0,0.45);border-bottom:2px solid #ffffff;padding-bottom:8px;margin-bottom:16px">${titleHtml}</div>` +
+        cardTitleFloat(titleLeft, titleRight, titleSize) +
         `<div style="background:#ffffff;border-radius:8px;overflow:hidden">` +
           row('Earliest Return Date (ERD)', results.erd) +
           row('Latest Return Date (LRD)', results.lrd) +
-          row('Ramp Cut Time', results.rampCutTime, polTerm ? rowStyle : rowStyleLast) +
-          (polTerm ? row('POL Terminal', polTerm, rowStyleLast) : '') +
+          row('Ramp Cut Time', results.rampCutTime) +
+          row(portCutLabel, portCutValue, rowStyleLast) +
         `</div>` +
         `<div style="text-align:right;margin-top:14px"><img src="${hlLogo}" width="150" alt="Hapag-Lloyd" style="display:inline-block;width:150px;height:auto" /></div>` +
       `</div>` +
@@ -389,7 +408,7 @@ export default function LookupForm({ onCanadaPort }) {
   // float/background) and the orange-baked logo (avoids a white box).
   const handleCopyOutlook = () => {
     if (!results) return;
-    const { titleHtml, titleSize, text, polTerm } = cardParts();
+    const { titleLeft, titleRight, titleSize, text } = cardParts();
     const rowLabel = 'padding:9px 16px;border-bottom:1px solid #e2e8f0;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;color:#000000;text-align:left';
     const rowVal = 'padding:9px 16px;border-bottom:1px solid #e2e8f0;font-family:Arial,sans-serif;font-size:15px;font-weight:bold;color:#000000;text-align:right';
     const row = (label, value) => `<tr><td bgcolor="#ffffff" style="${rowLabel}">${label}</td><td bgcolor="#ffffff" style="${rowVal}">${value}</td></tr>`;
@@ -397,12 +416,12 @@ export default function LookupForm({ onCanadaPort }) {
       `Here are the ramp cuts you requested:<br><br>` +
       `<table role="presentation" cellpadding="0" cellspacing="0" bgcolor="#EB6608" style="border-collapse:separate;background-color:#EB6608;border:5px solid #002D72;border-radius:12px;max-width:470px">` +
         `<tr><td bgcolor="#EB6608" style="background-color:#EB6608;padding:22px">` +
-          `<div style="font-family:Arial,sans-serif;color:#ffffff;font-size:${titleSize}px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;border-bottom:2px solid #ffffff;padding-bottom:8px;margin-bottom:16px">${titleHtml}</div>` +
+          cardTitleTable(titleLeft, titleRight, titleSize) +
           `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff" style="border-collapse:separate;background-color:#ffffff;border-radius:8px">` +
             row('Earliest Return Date (ERD)', results.erd) +
             row('Latest Return Date (LRD)', results.lrd) +
             row('Ramp Cut Time', results.rampCutTime) +
-            (polTerm ? row('POL Terminal', polTerm) : '') +
+            row(portCutLabel, portCutValue) +
           `</table>` +
           outlookLogoBlock() +
         `</td></tr>` +
@@ -415,12 +434,12 @@ export default function LookupForm({ onCanadaPort }) {
   // text and image flavors, so publish the finished branded card as image-only.
   const handleCopyPretty = async () => {
     if (!results) return;
-    const { titlePlain, titleLeft, titleRight, text, polTerm } = cardParts();
+    const { titlePlain, titleLeft, titleRight, text } = cardParts();
     const rows = [
       ['Earliest Return Date (ERD)', results.erd],
       ['Latest Return Date (LRD)', results.lrd],
       ['Ramp Cut Time', results.rampCutTime],
-      ...(polTerm ? [['POL Terminal', polTerm]] : []),
+      [portCutLabel, portCutValue],
     ];
     try {
       const image = await renderPasteCardImage({ title: titlePlain, titleLeft, titleRight, rows, logo: hlLogo });
@@ -558,6 +577,19 @@ export default function LookupForm({ onCanadaPort }) {
           </div>
 
           <div>
+            <label className="block text-xs font-semibold text-white mb-1 txt-shadow-soft">Booking Number <span className="font-normal normal-case opacity-90">(optional but helpful)</span></label>
+            <input
+              type="text"
+              name="bookingNumber"
+              value={formData.bookingNumber}
+              onChange={handleChange}
+              autoComplete="off"
+              placeholder="e.g. 12345678"
+              className="w-full min-w-0 px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-slate-400"
+            />
+          </div>
+
+          <div>
             <label className="block text-xs font-semibold text-white mb-1 txt-shadow-soft">Reefer Service</label>
             <div className="flex gap-4">
               <label className="flex items-center">
@@ -618,7 +650,20 @@ export default function LookupForm({ onCanadaPort }) {
       <div ref={resultsRef} className={results ? 'pb-32 md:pb-0' : ''}>
         {results ? (
           <div className="bg-[#002D72] rounded-lg border border-[#002D72] shadow-sm p-6">
-            <h3 className="text-xl font-extrabold tracking-wide uppercase mb-4 pb-2 border-b-2 border-[#EB6608] text-white txt-shadow-heavy">{pasteProof ? 'Ready to Paste' : 'Results'}</h3>
+            <div className="mb-4 flex items-center justify-between gap-3 pb-2 border-b-2 border-[#EB6608]">
+              <h3 className="text-xl font-extrabold tracking-wide uppercase text-white txt-shadow-heavy">{pasteProof ? 'Ready to Paste' : 'Results'}</h3>
+              {/* Back to the result the copy came from. Only clears the paste proof —
+                  no recalculation, so the lookup isn't counted twice in the stats. */}
+              {pasteProof && (
+                <button
+                  type="button"
+                  onClick={() => setPasteProof(null)}
+                  className="shrink-0 whitespace-nowrap rounded-full border border-white/40 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white transition hover:bg-white/20 shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
+                >
+                  ← Results
+                </button>
+              )}
+            </div>
 
             {pasteProof ? (
               <section className="rounded-lg border-2 border-emerald-400 bg-white p-4 shadow-lg" aria-live="polite">
@@ -639,7 +684,7 @@ export default function LookupForm({ onCanadaPort }) {
                   <ResultCard label="Latest Return Date (LRD)" value={results.lrd} />
                   <ResultCard label="Ramp Cut Time" value={results.rampCutTime} />
                   <RailCard railroad={getRail(results.rampMC, formData.startCity)} rampMC={results.rampMC} />
-                  {selTerminalLabel && <ResultCard label="POL Terminal" value={selTerminalLabel} />}
+                  <ResultCard label={portCutLabel} value={portCutValue} />
                 </div>
                 {getPortNote(formData.pol) && (
                   <p className="mt-3 text-xs italic text-amber-200/90 leading-snug">⚠ {getPortNote(formData.pol)}</p>

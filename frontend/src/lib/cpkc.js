@@ -74,6 +74,15 @@ export function getCities(slug) {
   return [...p.cities].sort((a, b) => (isUSCity(b) ? 1 : 0) - (isUSCity(a) ? 1 : 0));
 }
 
+// Display-only city aliases. The published schedules use the ramp's own town name,
+// which people don't always recognise, so hang the metro area off it on screen.
+// Keys stay the authoritative schedule names — data is never rewritten.
+const CITY_ALIASES = { 'Bensenville': 'Bensenville (Chicago)' };
+
+export function cityDisplay(city) {
+  return CITY_ALIASES[city] || city;
+}
+
 export function getVesselMeta(slug, vessel) {
   const p = port(slug);
   return p ? p.vessels.find(v => v.vessel === vessel) || null : null;

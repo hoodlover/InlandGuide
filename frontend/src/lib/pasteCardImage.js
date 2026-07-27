@@ -71,11 +71,12 @@ export async function renderPasteCardImage({ title, titleLeft = '', titleRight =
   ctx.font = `800 ${titleSize}px Arial`;
   ctx.textBaseline = 'top';
   if (hasTitleColumns) {
-    const center = left + contentWidth / 2;
-    ctx.textAlign = 'right';
-    ctx.fillText(titleLeft.toUpperCase(), center - 9, y);
+    // City hard left, rail / terminal hard right — the full card width apart, so
+    // the two read as separate columns instead of one centred phrase.
     ctx.textAlign = 'left';
-    ctx.fillText(titleRight.toUpperCase(), center + 9, y);
+    ctx.fillText(titleLeft.toUpperCase(), left, y);
+    ctx.textAlign = 'right';
+    ctx.fillText(titleRight.toUpperCase(), left + contentWidth, y);
     y += titleLineHeight;
   } else {
     ctx.textAlign = 'left';
