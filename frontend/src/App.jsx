@@ -843,8 +843,9 @@ function HelpModal({ onClose, showInstall = true }) {
     'Choose the Start City (rail ramp).',
     'If prompted, pick the SSY service code.',
     'Enter the Port Cut Date — e.g. 9, 8/9, or 8/9/2026.',
+    'Enter a Booking Number to add it to the result and send a copy to the Rail Box email.',
     'Choose Dry Container or Reefer.',
-    'Click Calculate, then Copy to Clipboard to paste into your email.',
+    'Click Calculate, then choose Copy formatted or Copy text.',
   ];
 
   const [joker, setJoker] = useState(() => {
