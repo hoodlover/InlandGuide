@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 
 // Type-to-filter dropdown (combobox). Filters options by substring as you type;
 // pick with mouse, Arrow keys + Enter, and close on Esc / click-away. Keeps a
@@ -13,6 +13,8 @@ export default function Combobox({ value, onSelect, options, placeholder, disabl
   const [activeIdx, setActiveIdx] = useState(0);
   const wrapRef = useRef(null);
   const inputRef = useRef(null);
+  const listRef = useRef(null);
+  const selectedOptionRef = useRef(null);
   const suppressFirstTouchClickRef = useRef(false);
 
   const selectedLabel = options.find(o => !isHeader(o) && o.value === value)?.label || '';
@@ -54,6 +56,14 @@ export default function Combobox({ value, onSelect, options, placeholder, disabl
     const selectedIdx = options.findIndex(o => !isHeader(o) && o.value === value);
     setActiveIdx(selectedIdx >= 0 ? selectedIdx : Math.max(0, firstSelectable()));
   };
+
+  // Reopening either combobox should begin at its current selection instead of
+  // jumping back to the first option. Align it to the top when the list has
+  // enough room to scroll; selections near the end remain fully visible.
+  useLayoutEffect(() => {
+    if (!open || !value || !listRef.current || !selectedOptionRef.current) return;
+    listRef.current.scrollTop = selectedOptionRef.current.offsetTop;
+  }, [open, value, selectedLabel]);
 
   useEffect(() => {
     const onDoc = (e) => {
@@ -100,7 +110,7 @@ export default function Combobox({ value, onSelect, options, placeholder, disabl
             openFullList();
           }
         }}
-        onFocus={(e) => { setOpen(true); const f = firstSelectable(); setActiveIdx(f < 0 ? 0 : f); e.target.select(); }}
+        onFocus={(e) => { openFullList(); e.target.select(); }}
         // Selecting an option leaves this input focused, so a second click does
         // not fire onFocus again. Reopen the full list on that repeat click.
         onClick={(e) => {
@@ -129,7 +139,7 @@ export default function Combobox({ value, onSelect, options, placeholder, disabl
         className="w-full px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-slate-400 bg-white disabled:bg-slate-400 disabled:border-slate-500 disabled:text-slate-600 disabled:placeholder-slate-600 disabled:cursor-not-allowed"
       />
       {open && !disabled && (
-        <ul className="absolute z-30 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-slate-200 bg-white shadow-lg text-left">
+        <ul ref={listRef} className="absolute z-30 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-slate-200 bg-white shadow-lg text-left">
           {filtered.length === 0 && (
             <li className="px-3 py-2 text-sm text-slate-400">No matches</li>
           )}
@@ -141,6 +151,7 @@ export default function Combobox({ value, onSelect, options, placeholder, disabl
             ) : (
               <li
                 key={o.value}
+                ref={o.value === value ? selectedOptionRef : undefined}
                 onMouseEnter={() => setActiveIdx(i)}
                 onMouseDown={(e) => { e.preventDefault(); choose(o); }}
                 className={`px-3 py-2 text-sm cursor-pointer ${i === activeIdx ? 'bg-slate-100' : ''} ${o.value === value ? 'font-semibold text-[#002D72]' : 'text-slate-800'}`}
