@@ -5,7 +5,7 @@
 //     Generated alias password for ERD@hapagidt.com. Keep this server-side only.
 
 const FORWARD_EMAIL_API = 'https://api.forwardemail.net/v1/emails';
-const FROM_ADDRESS = 'ERD@hapagidt.com';
+const FROM_ADDRESS = 'erd@hapagidt.com';
 const TO_ADDRESS = 'QSCRail@hlag.com';
 const SUBJECT_PREFIX = 'ERD Cutoff Form has been submitted Booking ';
 const DUPLICATE_WINDOW_MS = 2 * 60 * 1000;
@@ -54,7 +54,9 @@ function purgeExpired(map, now, maxAge) {
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const password = process.env.FORWARD_EMAIL_ALIAS_PASSWORD || process.env.FORWARD_EMAIL_PASSWORD;
+  const password = String(
+    process.env.FORWARD_EMAIL_ALIAS_PASSWORD || process.env.FORWARD_EMAIL_PASSWORD || ''
+  ).trim();
   if (!password) {
     return res.status(500).json({ error: 'Rail email is not configured yet.' });
   }
