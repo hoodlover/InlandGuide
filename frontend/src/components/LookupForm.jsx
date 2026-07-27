@@ -18,6 +18,8 @@ import { getUserName } from './NamePrompt';
 // lookup still logs immediately.
 const DUPLICATE_WINDOW_MS = 15 * 1000;
 let lastLogged = { key: '', at: 0 };
+const RAIL_EMAIL_DUPLICATE_WINDOW_MS = 2 * 60 * 1000;
+let lastRailEmail = { key: '', at: 0 };
 
 function logUsage(res) {
   const key = `${res.erd}|${res.lrd}`;
@@ -31,6 +33,27 @@ function logUsage(res) {
       body: JSON.stringify({ userName: getUserName(), erd: res.erd, lrd: res.lrd }),
     }).catch(() => {});
   } catch { /* ignore */ }
+}
+
+// A booking number turns the normal calculator submit into a silent QS Rail
+// submission. There is deliberately no second button or recipient-facing UI.
+// Suppress nervous re-clicks of the exact same booking/result combination.
+function emailRailCuts(bookingNumber, text) {
+  const booking = String(bookingNumber || '').trim();
+  if (!booking) return;
+  const key = `${booking.toUpperCase()}|${text}`;
+  const now = Date.now();
+  if (key === lastRailEmail.key && now - lastRailEmail.at < RAIL_EMAIL_DUPLICATE_WINDOW_MS) return;
+  lastRailEmail = { key, at: now };
+  try {
+    fetch('/api/rail-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookingNumber: booking, text }),
+    }).then(response => {
+      if (!response.ok) console.warn('[rail-email] submission was not accepted');
+    }).catch(() => {});
+  } catch { /* the offline build has no API */ }
 }
 
 // Flexible date entry:  "9" = 9th of THIS month · "8/9" = Aug 9 · "8/9/26" or "8/9/2026" = full.
@@ -82,8 +105,8 @@ function stripTerminalWord(name) {
   return cleaned || String(name || '');
 }
 
-// bookingNumber is captured but unused so far — it's the handle a future "forward
-// this lookup to the rail Outlook box" step would key on. Nothing reads it yet.
+// A booking number is optional for calculation. When present, a successful
+// submit also sends the plain-text result to the server-side rail email route.
 const EMPTY_FORM = { pol: '', startCity: '', ssy: '', terminal: '', portCutDate: '', bookingNumber: '', reefer: 'N', extraDays: '5' };
 
 // Canadian ports are served by the separate published-schedule tool (the Canada
@@ -188,6 +211,28 @@ export default function LookupForm({ onCanadaPort }) {
   const portCutValue = [formData.pol, portCutTerminal, formatShortDate(formData.portCutDate)]
     .filter(Boolean).join(portCutJoin);
 
+  const buildPlainResultsText = (result) => {
+    const railTerminal = getRailTerminal(result.rampMC, formData.startCity);
+    const cityST = cityForResultTitle(formData.startCity, railTerminal);
+    const topPlain = `${cityST}    ${railTerminal}`;
+    const divider = '─'.repeat(Math.max(24, topPlain.length));
+    return [
+      'Here are the ramp cuts you requested:',
+      '',
+      topPlain,
+      divider,
+      'Ramp Cuts:',
+      `- Earliest Return Date (ERD): ${result.erd}`,
+      `- Latest Return Date (LRD): ${result.lrd}`,
+      `- Ramp Cut Time: ${result.rampCutTime}`,
+      '',
+      `${portCutLabel}: ${portCutValue}`,
+      divider,
+      '',
+      ''
+    ].join('\n');
+  };
+
   // Auto-select a sole POL service (normally ALL); explicit lists require a pick.
   useEffect(() => {
     const list = formData.pol ? getPortServices(formData.pol) : [];
@@ -272,6 +317,7 @@ export default function LookupForm({ onCanadaPort }) {
     } else {
       setResults(res);
       logUsage(res);
+      emailRailCuts(formData.bookingNumber, buildPlainResultsText(res));
     }
   };
 
@@ -288,21 +334,7 @@ export default function LookupForm({ onCanadaPort }) {
     // Plain-text version (used when pasting into plain fields like Notepad).
     // Ramp Cuts (ERD/LRD) come first — they're the important part — then the port info.
     // Two trailing blank lines leave the cursor ready to type a goodbye.
-    const text = [
-      'Here are the ramp cuts you requested:',
-      '',
-      topPlain,
-      divider,
-      'Ramp Cuts:',
-      `- Earliest Return Date (ERD): ${results.erd}`,
-      `- Latest Return Date (LRD): ${results.lrd}`,
-      `- Ramp Cut Time: ${results.rampCutTime}`,
-      '',
-      `${portCutLabel}: ${portCutValue}`,
-      divider,
-      '',
-      ''
-    ].filter(v => v !== null).join('\n');
+    const text = buildPlainResultsText(results);
 
     // Rich version (Outlook/Gmail/Teams/Salesforce) — serif to match their system,
     // <br> so line breaks survive rich editors, and bolds the city, rail name, and

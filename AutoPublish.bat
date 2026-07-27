@@ -1,6 +1,6 @@
 @echo off
 REM ===================================================================
-REM   INLAND CUTOFF GUIDE - Scheduled auto-publish (9am / 3pm)
+REM   INLAND CUTOFF GUIDE - Scheduled auto-publish (hourly, 9am-3pm)
 REM   Reads the master workbook, rebuilds the guide, and pushes to
 REM   GitHub so Vercel redeploys. Run by Windows Task Scheduler while
 REM   you are logged in. Safe to double-click to publish right now.

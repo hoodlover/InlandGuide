@@ -1,4 +1,5 @@
-// Scheduled auto-publish orchestrator (run twice daily by AutoPublish.bat).
+// Scheduled auto-publish orchestrator (run hourly from 9am through 3pm by
+// AutoPublish.bat and Windows Task Scheduler).
 //
 // Regenerates the calculator data from the master workbook, stamps the publish
 // time, rebuilds the live + offline guides, and pushes to main so Vercel

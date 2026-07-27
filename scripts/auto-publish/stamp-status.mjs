@@ -4,7 +4,7 @@
 // live; the scheduled job has no browser, so this does the same thing locally:
 // hashes the workbook at EXCEL_PATH, counts the freshly-exported lanes, and
 // writes the current time as publishedAt. Because publishedAt always changes,
-// there is always something to commit, so every 9am/3pm run refreshes the
+// there is always something to commit, so every hourly 9am-3pm run refreshes the
 // "Rail data updated" stamp and redeploys.
 
 import { readFileSync, writeFileSync } from 'node:fs';
