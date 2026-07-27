@@ -1,6 +1,14 @@
 // Render the branded paste card to a PNG. Teams aggressively sanitizes pasted
 // HTML, so an image is the only reliable way to preserve the guide's exact card.
-export async function renderPasteCardImage({ title, titleLeft = '', titleRight = '', rows, logo, footer = '' }) {
+export async function renderPasteCardImage({
+  title,
+  titleLeft = '',
+  titleRight = '',
+  rows,
+  logo,
+  footer = '',
+  footerLeft = '',
+}) {
   // Clipboard destinations paste PNGs at their native pixel dimensions. A
   // 1.2x export keeps the card crisp without appearing oversized (40% smaller
   // than the previous 2x bitmap).
@@ -127,6 +135,13 @@ export async function renderPasteCardImage({ title, titleLeft = '', titleRight =
     img.src = logo;
   });
   y += 14;
+  if (footerLeft) {
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '700 12px Arial';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(footerLeft, left, y + logoHeight / 2, contentWidth - 165);
+  }
   ctx.drawImage(image, left + contentWidth - 150, y, 150, logoHeight);
 
   const blob = await new Promise((resolve, reject) => {

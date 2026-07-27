@@ -210,6 +210,8 @@ export default function LookupForm({ onCanadaPort }) {
     .filter(Boolean).join(portCutJoin);
   const portCutValue = [formData.pol, portCutTerminal, formatShortDate(formData.portCutDate)]
     .filter(Boolean).join(portCutJoin);
+  const bookingNumber = String(formData.bookingNumber || '').trim();
+  const bookingLabel = bookingNumber ? `Booking ${bookingNumber}` : '';
 
   const buildPlainResultsText = (result) => {
     const railTerminal = getRailTerminal(result.rampMC, formData.startCity);
@@ -227,10 +229,11 @@ export default function LookupForm({ onCanadaPort }) {
       `- Ramp Cut Time: ${result.rampCutTime}`,
       '',
       `${portCutLabel}: ${portCutValue}`,
+      bookingLabel || null,
       divider,
       '',
       ''
-    ].join('\n');
+    ].filter(value => value !== null).join('\n');
   };
 
   // Auto-select a sole POL service (normally ALL); explicit lists require a pick.
@@ -356,13 +359,13 @@ export default function LookupForm({ onCanadaPort }) {
     ].filter(v => v !== null).join('<br>') + `</div>`;
 
     setPasteProof({
-      heading: 'Plain copy ready to paste anywhere',
+      heading: 'Text copy ready to paste anywhere',
       format: 'text',
       content: text,
     });
     try {
       await navigator.clipboard.writeText(text);
-      setCopyMessage('✓ Plain copy ready!');
+      setCopyMessage('✓ Text copy ready!');
       setTimeout(() => setCopyMessage(''), 2000);
     } catch {
       setCopyMessage('Failed to copy');
@@ -404,8 +407,9 @@ export default function LookupForm({ onCanadaPort }) {
       `Latest Return Date (LRD): ${results.lrd}`,
       `Ramp Cut Time: ${results.rampCutTime}`,
       `${portCutLabel}: ${portCutValue}`,
+      bookingLabel || null,
       '', ''
-    ].join('\n');
+    ].filter(value => value !== null).join('\n');
     return { titlePlain, titleSize, titleLeft: cityST, titleRight: railTerminal, text };
   };
 
@@ -474,17 +478,24 @@ export default function LookupForm({ onCanadaPort }) {
       [portCutLabel, portCutValue],
     ];
     try {
-      const image = await renderPasteCardImage({ title: titlePlain, titleLeft, titleRight, rows, logo: hlLogo });
-      setPasteProof({ heading: 'Pretty copy ready to paste anywhere', format: 'image', content: image.dataUrl });
+      const image = await renderPasteCardImage({
+        title: titlePlain,
+        titleLeft,
+        titleRight,
+        rows,
+        logo: hlLogo,
+        footerLeft: bookingLabel,
+      });
+      setPasteProof({ heading: 'Formatted copy ready to paste anywhere', format: 'image', content: image.dataUrl });
       if (navigator.clipboard && window.ClipboardItem) {
         await navigator.clipboard.write([new ClipboardItem({
           'image/png': image.blob,
         })]);
       } else {
         await navigator.clipboard.writeText(text);
-        setPasteProof({ heading: 'Pretty copy unavailable — plain copy ready', format: 'text', content: text });
+        setPasteProof({ heading: 'Formatted copy unavailable — text copy ready', format: 'text', content: text });
       }
-      setCopyMessage('✓ Pretty copy ready!');
+      setCopyMessage('✓ Formatted copy ready!');
       setTimeout(() => setCopyMessage(''), 2000);
     } catch {
       setCopyMessage('Failed to copy');
@@ -682,7 +693,9 @@ export default function LookupForm({ onCanadaPort }) {
           )}
         </form>
 
-        <img src={trainMark} alt="" title={IDT_TITLE} className="mt-5 h-40 w-full rounded-xl object-cover object-[center_35%] shadow-[0_8px_18px_rgba(0,0,0,0.35)]" />
+        {!results && (
+          <img src={trainMark} alt="" title={IDT_TITLE} className="mt-5 h-40 w-full rounded-xl object-cover object-[center_35%] shadow-[0_8px_18px_rgba(0,0,0,0.35)]" />
+        )}
       </div>
 
       <div ref={resultsRef} className={results ? 'pb-32 md:pb-0' : ''}>
@@ -730,19 +743,19 @@ export default function LookupForm({ onCanadaPort }) {
               </>
             )}
 
-            <p className="mt-4 text-center text-xs text-white/70">Choose a copy style — then paste with Ctrl+V.</p>
+            <p className="mt-4 text-center text-xs text-white/70">Choose a copy format — then paste with Ctrl+V.</p>
             <div className="mt-2 flex flex-wrap items-center justify-center gap-2.5">
               <button
                 onClick={handleCopyPretty}
                 className="inline-flex items-center gap-2 px-4 py-1.5 text-sm bg-white text-slate-800 rounded-full hover:bg-slate-100 transition font-semibold shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
               >
-                <span aria-hidden="true">✨</span> Image
+                <span aria-hidden="true">✨</span> Copy formatted
               </button>
               <button
                 onClick={handleCopyResults}
                 className="inline-flex items-center gap-2 px-4 py-1.5 text-sm bg-white/10 border border-white/40 text-white rounded-full hover:bg-white/20 transition font-semibold shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
               >
-                <TextIcon /> Plain
+                <TextIcon /> Copy text
               </button>
             </div>
 

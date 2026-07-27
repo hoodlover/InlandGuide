@@ -118,10 +118,10 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
       ''
     ].filter(v => v !== null).join('\n');
 
-    setPasteProof({ heading: 'Plain copy ready to paste anywhere', format: 'text', content: text });
+    setPasteProof({ heading: 'Text copy ready to paste anywhere', format: 'text', content: text });
     try {
       await navigator.clipboard.writeText(text);
-      setCopyMessage('✓ Plain copy ready!');
+      setCopyMessage('✓ Text copy ready!');
       setTimeout(() => setCopyMessage(''), 2000);
     } catch {
       setCopyMessage('Failed to copy');
@@ -220,16 +220,16 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
         logo: hlLogo,
         footer: `${info.name} — as published ${info.runDate}`,
       });
-      setPasteProof({ heading: 'Pretty copy ready to paste anywhere', format: 'image', content: image.dataUrl });
+      setPasteProof({ heading: 'Formatted copy ready to paste anywhere', format: 'image', content: image.dataUrl });
       if (navigator.clipboard && window.ClipboardItem) {
         await navigator.clipboard.write([new ClipboardItem({
           'image/png': image.blob,
         })]);
       } else {
         await navigator.clipboard.writeText(text);
-        setPasteProof({ heading: 'Pretty copy unavailable — plain copy ready', format: 'text', content: text });
+        setPasteProof({ heading: 'Formatted copy unavailable — text copy ready', format: 'text', content: text });
       }
-      setCopyMessage('✓ Pretty copy ready!');
+      setCopyMessage('✓ Formatted copy ready!');
       setTimeout(() => setCopyMessage(''), 2000);
     } catch {
       setCopyMessage('Failed to copy');
@@ -365,19 +365,19 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
               </div>
             )}
 
-            <p className="mt-4 text-center text-xs text-white/70">Choose a copy style — then paste with Ctrl+V.</p>
+            <p className="mt-4 text-center text-xs text-white/70">Choose a copy format — then paste with Ctrl+V.</p>
             <div className="mt-2 flex flex-wrap items-center justify-center gap-2.5">
               <button
                 onClick={handleCopyPretty}
                 className="inline-flex items-center gap-2 px-4 py-1.5 text-sm bg-white text-slate-800 rounded-full hover:bg-slate-100 transition font-semibold shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
               >
-                <span aria-hidden="true">✨</span> Image
+                <span aria-hidden="true">✨</span> Copy formatted
               </button>
               <button
                 onClick={handleCopyText}
                 className="inline-flex items-center gap-2 px-4 py-1.5 text-sm bg-white/10 border border-white/40 text-white rounded-full hover:bg-white/20 transition font-semibold shadow-[0_6px_14px_rgba(0,0,0,0.45)]"
               >
-                <TextIcon /> Plain
+                <TextIcon /> Copy text
               </button>
             </div>
 

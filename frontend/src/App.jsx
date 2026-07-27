@@ -624,34 +624,91 @@ function ObieWalkOn() {
   );
 }
 
-// One-time-per-session nudge to pin/install the app (dismissible, auto-hides).
-function WebappReminder({ enabled = true }) {
-  const [show, setShow] = useState(false);
+// Keep secondary desktop actions available without turning the toolbar into a
+// row of equally prominent pills.
+function DesktopToolsMenu({ compact, onToggleCompact, onChangeName, onRefresh, onRequest }) {
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef(null);
 
   useEffect(() => {
-    if (!enabled) return;
-    try {
-      if (!sessionStorage.getItem('icg_webapp_reminder')) {
-        sessionStorage.setItem('icg_webapp_reminder', '1');
-        setShow(true);
-      }
-    } catch { /* sessionStorage may be unavailable */ }
-  }, [enabled]);
+    if (!open) return undefined;
+    const closeOnOutsideClick = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) setOpen(false);
+    };
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('mousedown', closeOnOutsideClick);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('mousedown', closeOnOutsideClick);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [open]);
 
-  useEffect(() => {
-    if (!show) return;
-    const t = setTimeout(() => setShow(false), 12000);
-    return () => clearTimeout(t);
-  }, [show]);
+  const run = (action) => {
+    setOpen(false);
+    action();
+  };
 
-  if (!enabled || !show) return null;
   return (
-    <div className="webapp-reminder">
-      <button className="wr-close" onClick={() => setShow(false)} aria-label="Dismiss">×</button>
-      <p className="wr-text">
-        <span>💡</span>
-        <span><b>Make it an app.</b> Pin this page (or use your browser&apos;s Install button) for one-click access.</span>
-      </p>
+    <div ref={menuRef} className="relative sm:ml-auto">
+      <button
+        type="button"
+        onClick={() => setOpen(current => !current)}
+        aria-expanded={open}
+        aria-haspopup="menu"
+        className="toolbar-pill-shadow inline-flex items-center justify-center gap-2 rounded-full bg-[#F8F3EA] px-3.5 py-1.5 text-xs font-semibold text-[#002D72] transition hover:bg-white dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+      >
+        <span aria-hidden="true">⚙</span>
+        Tools
+        <span aria-hidden="true" className={`text-[10px] transition-transform ${open ? 'rotate-180' : ''}`}>▼</span>
+      </button>
+      {open && (
+        <div
+          role="menu"
+          aria-label="Guide tools"
+          className="absolute right-0 top-full z-40 mt-2 w-60 overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 text-left shadow-2xl dark:border-slate-700 dark:bg-slate-800"
+        >
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => run(onChangeName)}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700"
+          >
+            <span aria-hidden="true">✎</span>
+            Change name
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => run(onToggleCompact)}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700"
+          >
+            <span aria-hidden="true">{compact ? '⤢' : '⤡'}</span>
+            {compact ? 'Switch to full view' : 'Switch to compact view'}
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => run(onRefresh)}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700"
+          >
+            <span aria-hidden="true">↻</span>
+            Refresh updated data
+          </button>
+          <div className="my-1 border-t border-slate-200 dark:border-slate-700" />
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => run(onRequest)}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-[#c95200] transition hover:bg-orange-50 dark:text-orange-300 dark:hover:bg-slate-700"
+          >
+            <span aria-hidden="true">💡</span>
+            Request a feature or change
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -1968,7 +2025,7 @@ export default function App() {
                 <span data-doviber-word="rail">Rail</span>{' '}
                 <span data-doviber-word="guide">Guide</span>
               </h1>
-              {!compactView && <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">ERD/LRD Rail Cut Off Lookup</p>}
+              {!compactView && <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">ERD/LRD Rail Cutoff Lookup</p>}
               {userName && (
                 <p className={`${compactView ? 'mt-0.5 text-xs' : 'mt-1 text-sm'} text-slate-600 dark:text-slate-300`}>
                   Welcome, <span className="font-semibold text-[#002D72] dark:text-white">{userName}</span>
@@ -2007,40 +2064,13 @@ export default function App() {
             </button>
           ))}
           {!mobileDevice && (
-            <>
-              <button
-                type="button"
-                onClick={() => setNameEditorOpen(true)}
-                title="Change the name used for calculation history"
-                className="toolbar-pill-shadow inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-xs font-normal rounded-full transition bg-[#F8F3EA] dark:bg-slate-800 text-[#002D72] dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700 sm:ml-auto"
-              >
-                <span aria-hidden="true" className="text-sm leading-none">✎</span>
-                Change name
-              </button>
-              <button
-                onClick={toggleCompact}
-                title={compact ? 'Switch to full view' : 'Switch to compact view'}
-                aria-label={compact ? 'Switch to full view' : 'Switch to compact view'}
-                className="toolbar-pill-shadow px-2.5 py-1.5 text-xs font-normal rounded-full transition bg-[#F8F3EA] dark:bg-slate-800 text-[#002D72] dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700"
-              >
-                {compact ? '⤢ Full view' : '⤡ Compact'}
-              </button>
-              <button
-                type="button"
-                onClick={refreshUpdatedData}
-                title="Reload the guide with the newest published database"
-                className="toolbar-pill-shadow px-2.5 py-1.5 text-xs font-normal rounded-full transition bg-emerald-700 text-white hover:bg-emerald-800"
-              >
-                ↻ Refresh Updated Data
-              </button>
-              <button
-                type="button"
-                onClick={() => setRequestOpen(true)}
-                className="toolbar-pill-shadow col-span-2 rounded-full bg-[#EB6608] px-2.5 py-1.5 text-xs font-normal text-white transition hover:bg-[#cf5a07] sm:col-auto"
-              >
-                💡 Request a Feature / Change
-              </button>
-            </>
+            <DesktopToolsMenu
+              compact={compact}
+              onToggleCompact={toggleCompact}
+              onChangeName={() => setNameEditorOpen(true)}
+              onRefresh={refreshUpdatedData}
+              onRequest={() => setRequestOpen(true)}
+            />
           )}
           {mobileDevice && (
             <button
@@ -2071,7 +2101,6 @@ export default function App() {
       {requestOpen && <FeatureRequestModal onClose={() => setRequestOpen(false)} />}
       {refreshOpen && <RefreshModal onClose={() => setRefreshOpen(false)} />}
 
-      <WebappReminder enabled={!pwaInstalled && !mobileDevice} />
       {jokerOn && !compactView && <ObieWalkOn />}
       {!mobileDevice && <RailTeamSurprise />}
       <DoviberSurprise />
