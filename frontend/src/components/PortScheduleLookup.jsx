@@ -313,7 +313,14 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
             <details className="mt-3 text-white/90 text-xs">
               <summary className="cursor-pointer font-semibold txt-shadow-soft">Schedule notes</summary>
               <ul className="list-disc pl-5 mt-2 space-y-1">
-                {info.notes.map((n, i) => <li key={i}>{n}</li>)}
+                {info.notes.map((note, i) => {
+                  const text = String(note).replace(/\brecieving\b/gi, 'receiving');
+                  return (
+                    <li key={i} className={/^Export receiving accepted/i.test(text) ? 'font-bold' : undefined}>
+                      {text}
+                    </li>
+                  );
+                })}
               </ul>
             </details>
           )}
