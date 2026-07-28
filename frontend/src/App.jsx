@@ -2033,7 +2033,7 @@ export default function App() {
             src={heroTop}
             alt="IDT Inland Cutoff Rail Guide"
             data-doviber-trigger
-            className="w-full aspect-[5.35/1] object-cover object-center block rounded-xl"
+            className="w-full aspect-[5.44/1] object-fill block rounded-xl"
           />
         </div>
       )}
