@@ -17,6 +17,14 @@ function formatPulled(iso) {
   return d.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
 }
 
+function cleanScheduleNote(note) {
+  return String(note).replace(/\brecieving\b/gi, 'receiving');
+}
+
+function isReceivingNote(note) {
+  return /^Export receiving accepted/i.test(cleanScheduleNote(note));
+}
+
 function outlookLogoBlock() {
   return `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" bgcolor="#EB6608" style="border-collapse:collapse;background-color:#EB6608;margin-top:12px">` +
     `<tr><td height="34" valign="middle" align="right" bgcolor="#EB6608" style="height:34px;padding:6px 0 4px;line-height:24px;mso-line-height-rule:exactly">` +
@@ -35,6 +43,7 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
   const vessels = sel.port ? getVessels(sel.port) : [];
   const cities = sel.port ? getCities(sel.port) : [];
   const info = sel.port ? getPortInfo(sel.port) : null;
+  const receivingNote = info?.notes?.find(isReceivingNote);
 
   // Reset downstream picks when an upstream selection changes.
   const pick = (field, value) => {
@@ -310,19 +319,24 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
           </div>
 
           {info?.notes?.length > 0 && (
-            <details className="mt-3 text-white/90 text-xs">
-              <summary className="cursor-pointer font-semibold txt-shadow-soft">Schedule notes</summary>
-              <ul className="list-disc pl-5 mt-2 space-y-1">
-                {info.notes.map((note, i) => {
-                  const text = String(note).replace(/\brecieving\b/gi, 'receiving');
-                  return (
-                    <li key={i} className={/^Export receiving accepted/i.test(text) ? 'font-bold' : undefined}>
-                      {text}
+            <>
+              <details className="peer mt-3 text-white/90 text-xs">
+                <summary className="cursor-pointer font-semibold txt-shadow-soft">Schedule notes</summary>
+                <ul className="list-disc pl-5 mt-2 space-y-1">
+                  {info.notes.map((note, i) => (
+                    <li key={i} className={isReceivingNote(note) ? 'font-bold' : undefined}>
+                      {cleanScheduleNote(note)}
                     </li>
-                  );
-                })}
-              </ul>
-            </details>
+                  ))}
+                </ul>
+              </details>
+              {receivingNote && (
+                <p className="peer-open:hidden mt-2 pl-5 text-xs font-bold text-white/90 txt-shadow-soft">
+                  <span className="-ml-3 mr-2" aria-hidden="true">•</span>
+                  {cleanScheduleNote(receivingNote)}
+                </p>
+              )}
+            </>
           )}
         </div>
       </div>

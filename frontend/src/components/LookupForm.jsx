@@ -597,7 +597,7 @@ export default function LookupForm({ onCanadaPort }) {
                 value={dateInput}
                 onChange={handleDateInput}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
+                  if (e.key === 'Enter' || (e.key === 'Tab' && !e.shiftKey)) {
                     e.preventDefault();
                     e.currentTarget.form?.elements.namedItem('bookingNumber')?.focus();
                   }
@@ -620,6 +620,7 @@ export default function LookupForm({ onCanadaPort }) {
                 title="Pick from calendar"
                 value={formData.portCutDate || ''}
                 onChange={handleDatePick}
+                tabIndex={-1}
                 className="absolute inset-y-0 right-0 w-10 cursor-pointer opacity-0"
               />
             </div>
@@ -633,7 +634,7 @@ export default function LookupForm({ onCanadaPort }) {
               value={formData.bookingNumber}
               onChange={handleChange}
               autoComplete="off"
-              placeholder="e.g. 12345678"
+              placeholder="e.g. 86753090"
               className="w-full min-w-0 px-3 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-slate-400"
             />
           </div>
