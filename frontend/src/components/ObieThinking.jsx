@@ -57,6 +57,7 @@ const AWAKE_MS = 180_000;   // dozes off after 3 minutes on screen
 const SETTLE_MS = 3_000;    // matches the 3s CSS shrink-to-corner transition
 const MUMBLE_MS = 240_000;  // sleep-talks about rail every 4 minutes
 const MUMBLE_HOLD_MS = 6_000;
+const TAP_TO_SLEEP_MS = 350;
 
 const pick = (list) => list[Math.floor(Math.random() * list.length)];
 
@@ -68,6 +69,7 @@ export default function ObieThinking() {
   const [sammiePhase, setSammiePhase] = useState('idle');
   const clickCountRef = useRef(0);
   const lastClickRef = useRef(0);
+  const sleepTimerRef = useRef(null);
   const sammieActiveRef = useRef(false);
   const sammieTimersRef = useRef([]);
 
@@ -105,6 +107,7 @@ export default function ObieThinking() {
   }, [settled]);
 
   useEffect(() => () => {
+    window.clearTimeout(sleepTimerRef.current);
     sammieTimersRef.current.forEach(window.clearTimeout);
   }, []);
 
@@ -133,14 +136,24 @@ export default function ObieThinking() {
     if (now - lastClickRef.current > 1200) clickCountRef.current = 0;
     lastClickRef.current = now;
     clickCountRef.current += 1;
+    window.clearTimeout(sleepTimerRef.current);
 
     if (clickCountRef.current >= 5) {
       clickCountRef.current = 0;
       startSammieRun();
+      return;
     }
+
+    // A short delay keeps the five-tap easter egg available while making a
+    // normal single tap put Obie to sleep.
+    sleepTimerRef.current = window.setTimeout(() => {
+      clickCountRef.current = 0;
+      setAsleep(true);
+    }, TAP_TO_SLEEP_MS);
   };
 
   const wake = () => {
+    window.clearTimeout(sleepTimerRef.current);
     setAsleep(false);
     setMumble('');
     clickCountRef.current = 0;
@@ -158,8 +171,9 @@ export default function ObieThinking() {
       <button
         type="button"
         onClick={asleep ? wake : handleObieClick}
-        aria-label="Obie, the Ops-Base Bot"
-        title={asleep ? undefined : 'Obie is listening'}
+        aria-label={asleep ? 'Wake Obie' : 'Put Obie to sleep'}
+        aria-describedby={asleep ? undefined : 'obie-sleep-hint'}
+        title={asleep ? 'Tap to wake Obie' : 'Tap to put Obie to sleep'}
         className={`obie-avatar ${asleep ? 'is-asleep' : 'is-awake'} cursor-pointer rounded-full bg-transparent p-0 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#EB6608]/70`}
       >
         {settled && (
@@ -181,6 +195,14 @@ export default function ObieThinking() {
           className={`relative z-10 h-auto w-full drop-shadow-2xl ${settled ? 'obie-sleep-bob' : 'obie-float'}`}
         />
       </button>
+
+      <span
+        id="obie-sleep-hint"
+        aria-hidden={asleep}
+        className={`pointer-events-none absolute bottom-2 right-2 rounded-full border border-slate-200/80 bg-white/75 px-2.5 py-1 text-[10px] font-medium tracking-wide text-slate-500 shadow-sm backdrop-blur-sm transition-opacity duration-300 dark:border-slate-600/80 dark:bg-slate-800/75 dark:text-slate-300 ${asleep ? 'opacity-0' : 'opacity-100'}`}
+      >
+        Tap Obie to sleep
+      </span>
 
       {!asleep && sammiePhase !== 'idle' && (
         <div className={`sammie-stage sammie-stage-${sammiePhase}`} aria-live="polite">

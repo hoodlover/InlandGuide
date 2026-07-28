@@ -305,7 +305,7 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
               </span>
             )}
             {pulledAt && (
-              <span className="text-[11px] text-white/85 txt-shadow-soft ml-1">last pulled: <span className="font-semibold">{formatPulled(pulledAt)}</span></span>
+              <span className="text-[11px] text-white/85 txt-shadow-soft ml-1">Last pulled: <span className="font-semibold">{formatPulled(pulledAt)}</span></span>
             )}
           </div>
 

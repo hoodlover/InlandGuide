@@ -9,6 +9,8 @@ import UpdateToast from './components/UpdateToast';
 import UsageStats from './components/UsageStats';
 import { bannerBottom, obBot } from './assets/banners';
 import { IDT_TITLE } from './lib/idt';
+import { masterUpdatedAt } from './lib/cutoff';
+import { pulledAt as railPulledAt } from './lib/cpkc';
 import truckScene from './assets/idt-truck-scene.webp';
 import heroTop from './assets/hero-top.webp';
 import darkModeBadge from './assets/dark-mode.webp';
@@ -705,7 +707,10 @@ function DesktopToolsMenu({ compact, onToggleCompact, onChangeName, onRefresh, o
             className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-[#c95200] transition hover:bg-orange-50 dark:text-orange-300 dark:hover:bg-slate-700"
           >
             <span aria-hidden="true">💡</span>
-            Request a feature or change
+            <span className="text-center leading-tight">
+              Request a feature<br />
+              or any change
+            </span>
           </button>
         </div>
       )}
@@ -1258,7 +1263,7 @@ const HUB_ICONS = {
   news: <><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" /><path d="M18 14h-8" /><path d="M15 18h-5" /><path d="M10 6h8v4h-8V6Z" /></>,
 };
 
-function HubCard({ icon, title, subtitle, onClick, href }) {
+function HubCard({ icon, title, subtitle, detail, onClick, href }) {
   const className = 'group flex w-full items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#EB6608]/60 hover:shadow-md dark:border-slate-600 dark:bg-slate-700 dark:hover:border-[#EB6608]/70';
   const body = (
     <>
@@ -1268,6 +1273,7 @@ function HubCard({ icon, title, subtitle, onClick, href }) {
       <span className="min-w-0 flex-1">
         <span className="block text-sm font-semibold text-[#002D72] dark:text-white">{title}</span>
         <span className="mt-0.5 block text-xs text-slate-500 dark:text-slate-300">{subtitle}</span>
+        {detail && <span className="mt-1 block text-[11px] font-medium text-[#0a4b9b] dark:text-blue-200">{detail}</span>}
       </span>
       <svg viewBox="0 0 24 24" className="h-4 w-4 flex-none text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-[#EB6608] dark:text-slate-400" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
     </>
@@ -1275,6 +1281,13 @@ function HubCard({ icon, title, subtitle, onClick, href }) {
   return href
     ? <a href={href} target="_blank" rel="noreferrer" className={className}>{body}</a>
     : <button type="button" onClick={onClick} className={className}>{body}</button>;
+}
+
+function formatHubActivity(value) {
+  if (!value) return 'Not available';
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return 'Not available';
+  return date.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
 }
 
 // Hidden managers hub — revealed by a secret gesture (tap the title 5×).
@@ -1290,6 +1303,10 @@ function RefreshModal({ onClose }) {
   const [clearingId, setClearingId] = useState(0);
   const [showPublishObie, setShowPublishObie] = useState(false);
   const [publishObieNudge, setPublishObieNudge] = useState(false);
+  const [hubActivity, setHubActivity] = useState({
+    railPulledAt,
+    masterCheckedAt: masterUpdatedAt,
+  });
   const verifiedMasterRef = useRef(null);
 
   useEffect(() => {
@@ -1314,6 +1331,10 @@ function RefreshModal({ onClose }) {
       });
       const data = await r.json().catch(() => ({}));
       if (r.ok && data.ok && data.verified) {
+        setHubActivity(current => ({
+          railPulledAt: data.activity?.railPulledAt || current.railPulledAt,
+          masterCheckedAt: data.activity?.masterCheckedAt || current.masterCheckedAt,
+        }));
         setStatus(null);
         setView('menu');
       }
@@ -1604,12 +1625,14 @@ function RefreshModal({ onClose }) {
             icon={HUB_ICONS.refresh}
             title="Update CP Rail & CN Rail ramp cuts"
             subtitle="Pull the latest published Canadian schedules"
+            detail={`Last pulled: ${formatHubActivity(hubActivity.railPulledAt)}`}
             onClick={triggerRefresh}
           />
           <HubCard
             icon={HUB_ICONS.publish}
             title="Publish from the SharePoint master"
             subtitle="Verify the workbook & update the live calculator"
+            detail={`Last checked: ${formatHubActivity(hubActivity.masterCheckedAt)}`}
             onClick={() => { setStatus(null); setDbResult(null); verifiedMasterRef.current = null; setView('database'); }}
           />
           <HubCard

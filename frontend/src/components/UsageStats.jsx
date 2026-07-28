@@ -8,15 +8,20 @@ const stamp = () => new Date().toISOString().slice(0, 10);
 
 // One sheet per section of the report, mirroring the on-screen dashboard.
 function exportExcel(data) {
+  const filterUser = data.filter.user || 'All users';
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
     ['Inland Cutoff Guide — usage report', ''],
     ['Exported (UTC)', new Date().toISOString().slice(0, 16).replace('T', ' ')],
+    ['Period', data.filter.periodLabel],
+    ['User', filterUser],
     [],
-    ['Total calculations', data.summary.total],
-    ['Unique users', data.summary.uniqueUsers],
-    ['Last 30 days', data.summary.last30],
-    ['Today', data.summary.today],
+    ['Calculations', data.summary.total],
+    ['Active users', data.summary.uniqueUsers],
+    ['Calculations per user', data.summary.avgPerUser],
+    ['Calculations per active day', data.summary.avgPerActiveDay],
+    ['Repeat users', data.summary.returningUsers],
+    ['Repeat-user rate', `${data.summary.repeatRate}%`],
   ]), 'Summary');
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(
     data.daily.map(d => ({ 'Day (UTC)': d.day, 'Calculations': d.count }))
@@ -34,6 +39,7 @@ function exportExcel(data) {
 // print dialog ready — the user picks "Save as PDF". No PDF library needed.
 function exportPdf(data) {
   const esc = (v) => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const filterUser = data.filter.user || 'All users';
   const rows = (items, cols) => items.map(item =>
     `<tr>${cols.map(c => `<td>${esc(item[c])}</td>`).join('')}</tr>`
   ).join('');
@@ -51,14 +57,14 @@ function exportPdf(data) {
     @media print { body { margin: 12mm; } }
   </style></head><body>
     <h1>Inland Cutoff Guide — usage report</h1>
-    <p class="sub">Exported ${new Date().toLocaleString()} · times shown in UTC</p>
+    <p class="sub">${esc(data.filter.periodLabel)} · ${esc(filterUser)} · exported ${new Date().toLocaleString()} · times shown in UTC</p>
     <div class="cards">
-      <div class="card"><div class="n">${esc(data.summary.total)}</div><div class="l">Total calcs</div></div>
-      <div class="card"><div class="n">${esc(data.summary.uniqueUsers)}</div><div class="l">Unique users</div></div>
-      <div class="card"><div class="n">${esc(data.summary.last30)}</div><div class="l">Last 30 days</div></div>
-      <div class="card"><div class="n">${esc(data.summary.today)}</div><div class="l">Today</div></div>
+      <div class="card"><div class="n">${esc(data.summary.total)}</div><div class="l">Calculations</div></div>
+      <div class="card"><div class="n">${esc(data.summary.uniqueUsers)}</div><div class="l">Active users</div></div>
+      <div class="card"><div class="n">${esc(data.summary.avgPerUser)}</div><div class="l">Calcs / user</div></div>
+      <div class="card"><div class="n">${esc(data.summary.repeatRate)}%</div><div class="l">Repeat-user rate</div></div>
     </div>
-    <h2>Calculations per day (last 30 days)</h2>
+    <h2>Calculations per day (${esc(data.filter.periodLabel.toLowerCase())})</h2>
     <table><thead><tr><th>Day</th><th>Calculations</th></tr></thead><tbody>${rows(data.daily, ['day', 'count'])}</tbody></table>
     <h2>Most active users</h2>
     <table><thead><tr><th>Name</th><th>Calculations</th><th>Last used</th></tr></thead><tbody>${rows(data.byUser, ['user_name', 'count', 'last_used'])}</tbody></table>
@@ -74,31 +80,61 @@ function exportPdf(data) {
   setTimeout(() => w.print(), 250);
 }
 
-function StatCard({ label, value }) {
+function StatCard({ label, value, detail }) {
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-600 dark:bg-slate-700">
       <div className="text-2xl font-semibold text-[#002D72] dark:text-white">{value}</div>
       <div className="mt-1 text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-300">{label}</div>
+      {detail && <div className="mt-1 text-[11px] text-slate-400 dark:text-slate-300">{detail}</div>}
     </div>
   );
 }
 
-function TrendBars({ daily }) {
+function fillDailyGaps(daily, rangeDays) {
+  if (!rangeDays || rangeDays === 'all') return daily;
+  const counts = new Map(daily.map((item) => [item.day, item.count]));
+  const result = [];
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  for (let offset = Number(rangeDays) - 1; offset >= 0; offset -= 1) {
+    const day = new Date(today);
+    day.setUTCDate(today.getUTCDate() - offset);
+    const key = day.toISOString().slice(0, 10);
+    result.push({ day: key, count: counts.get(key) || 0 });
+  }
+  return result;
+}
+
+function shortDay(value) {
+  const date = new Date(`${value}T00:00:00Z`);
+  return date.toLocaleDateString([], { month: 'short', day: 'numeric', timeZone: 'UTC' });
+}
+
+function TrendBars({ daily, rangeDays }) {
   if (!daily.length) return <p className="text-sm text-slate-500 dark:text-slate-300">No activity yet.</p>;
-  const max = Math.max(...daily.map((d) => d.count));
+  const series = fillDailyGaps(daily, rangeDays);
+  const max = Math.max(...series.map((d) => d.count), 1);
+  const middle = series[Math.floor((series.length - 1) / 2)]?.day;
   return (
-    <div className="flex h-28 items-end gap-1">
-      {daily.map((d) => (
-        <div key={d.day} className="group relative flex-1">
-          <div
-            className="w-full rounded-t bg-[#0a4b9b] transition-colors group-hover:bg-[#EB6608]"
-            style={{ height: `${Math.max((d.count / max) * 100, 4)}%` }}
-          />
-          <div className="pointer-events-none absolute bottom-full left-1/2 mb-1 hidden -translate-x-1/2 whitespace-nowrap rounded bg-slate-900 px-2 py-1 text-xs text-white group-hover:block">
-            {d.day}: {d.count}
+    <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 pb-2 pt-3 dark:border-slate-600 dark:bg-slate-700/50">
+      <div className="flex h-24 items-end gap-1 border-b border-slate-300 dark:border-slate-500">
+        {series.map((d) => (
+          <div key={d.day} className="group relative flex h-full flex-1 items-end">
+            <div
+              className={`w-full rounded-t transition-colors ${d.count ? 'min-h-[4px] bg-[#0a4b9b] group-hover:bg-[#EB6608]' : 'h-px bg-slate-300 dark:bg-slate-600'}`}
+              style={d.count ? { height: `${(d.count / max) * 100}%` } : undefined}
+            />
+            <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1 hidden -translate-x-1/2 whitespace-nowrap rounded bg-slate-900 px-2 py-1 text-xs text-white shadow-lg group-hover:block">
+              {shortDay(d.day)}: {d.count}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
+      <div className="mt-1 flex justify-between text-[10px] text-slate-400 dark:text-slate-300">
+        <span>{shortDay(series[0].day)}</span>
+        {series.length > 2 && <span>{shortDay(middle)}</span>}
+        {series.length > 1 && <span>{shortDay(series[series.length - 1].day)}</span>}
+      </div>
     </div>
   );
 }
@@ -108,13 +144,18 @@ const TH = 'py-2 text-left text-[11px] uppercase tracking-wide text-slate-500 da
 export default function UsageStats({ passphrase, onAuthExpired }) {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
+  const [rangeDays, setRangeDays] = useState(30);
+  const [selectedUser, setSelectedUser] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setError('');
     fetch('/api/stats', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ passphrase }),
+      body: JSON.stringify({ passphrase, rangeDays, user: selectedUser }),
     })
       .then(async (r) => {
         if (r.status === 401) { if (!cancelled) onAuthExpired?.(); return null; }
@@ -123,44 +164,89 @@ export default function UsageStats({ passphrase, onAuthExpired }) {
         return body;
       })
       .then((body) => { if (!cancelled && body) setData(body); })
-      .catch((e) => { if (!cancelled) setError(e?.message || 'Could not load usage stats.'); });
+      .catch((e) => { if (!cancelled) setError(e?.message || 'Could not load usage stats.'); })
+      .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
     // onAuthExpired is intentionally not a dependency — parents pass inline
     // arrows, and refetching on every parent render would hammer the API.
-  }, [passphrase]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [passphrase, rangeDays, selectedUser]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (error) return <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>;
+  if (error && !data) return <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>;
   if (!data) return <p className="py-6 text-center text-sm text-slate-500 dark:text-slate-300">Loading usage stats…</p>;
 
-  const { summary, daily, byUser, recent } = data;
+  const { summary, daily, byUser, recent, users, filter } = data;
+  const changeDetail = summary.changePct === null
+    ? 'All recorded activity'
+    : `${summary.changePct >= 0 ? '+' : ''}${summary.changePct}% vs prior period`;
 
   const exportBtn = 'rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-[#002D72] shadow-sm transition hover:border-[#EB6608] hover:text-[#EB6608] dark:border-slate-500 dark:bg-slate-700 dark:text-white';
+  const filterClass = 'min-w-0 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-[#0a4b9b] focus:outline-none focus:ring-2 focus:ring-[#0a4b9b]/20 dark:border-slate-500 dark:bg-slate-700 dark:text-white';
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-end gap-2">
-        <button type="button" onClick={() => exportExcel(data)} className={exportBtn}>
-          ⬇ Excel
-        </button>
-        <button type="button" onClick={() => exportPdf(data)} className={exportBtn}>
-          ⬇ PDF
-        </button>
+    <div className={`space-y-5 transition-opacity ${loading ? 'opacity-70' : ''}`} aria-busy={loading}>
+      <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-600 dark:bg-slate-700/50">
+        <div className="flex flex-wrap items-end gap-2">
+          <label className="min-w-[9rem] flex-1">
+            <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">Period</span>
+            <select
+              value={rangeDays}
+              onChange={(event) => setRangeDays(event.target.value === 'all' ? 'all' : Number(event.target.value))}
+              className={`${filterClass} w-full`}
+            >
+              <option value={7}>Last 7 days</option>
+              <option value={30}>Last 30 days</option>
+              <option value={90}>Last 90 days</option>
+              <option value="all">All time</option>
+            </select>
+          </label>
+          <label className="min-w-[12rem] flex-[1.4]">
+            <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">User</span>
+            <select value={selectedUser} onChange={(event) => setSelectedUser(event.target.value)} className={`${filterClass} w-full`}>
+              <option value="">All users</option>
+              {users.map((user) => <option key={user.user_name} value={user.user_name}>{user.user_name}</option>)}
+            </select>
+          </label>
+          {(rangeDays !== 30 || selectedUser) && (
+            <button
+              type="button"
+              onClick={() => { setRangeDays(30); setSelectedUser(''); }}
+              className="rounded-lg px-3 py-2 text-xs font-semibold text-[#0a4b9b] hover:bg-blue-50 dark:text-blue-200 dark:hover:bg-slate-700"
+            >
+              Reset
+            </button>
+          )}
+          <div className="ml-auto flex gap-2">
+            <button type="button" onClick={() => exportExcel(data)} className={exportBtn}>
+              ↓ Excel
+            </button>
+            <button type="button" onClick={() => exportPdf(data)} className={exportBtn}>
+              ↓ PDF
+            </button>
+          </div>
+        </div>
+        <p className="mt-2 text-xs text-slate-500 dark:text-slate-300">
+          Showing {filter.periodLabel.toLowerCase()} · {filter.user || 'all users'}{loading ? ' · updating…' : ''}
+        </p>
       </div>
+
+      {error && <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>}
+
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard label="Total calcs" value={summary.total} />
-        <StatCard label="Unique users" value={summary.uniqueUsers} />
-        <StatCard label="Last 30 days" value={summary.last30} />
-        <StatCard label="Today" value={summary.today} />
+        <StatCard label="Calculations" value={summary.total} detail={changeDetail} />
+        <StatCard label="Active users" value={summary.uniqueUsers} detail={`${summary.avgPerUser} calcs / user`} />
+        <StatCard label="Daily use" value={summary.avgPerActiveDay} detail={`${summary.activeDays} active ${summary.activeDays === 1 ? 'day' : 'days'}`} />
+        <StatCard label="Repeat users" value={summary.returningUsers} detail={`${summary.repeatRate}% used it more than once`} />
       </div>
 
       <section>
-        <h3 className="mb-2 text-sm font-semibold text-[#002D72] dark:text-white">Calculations per day (last 30 days)</h3>
-        <TrendBars daily={daily} />
+        <h3 className="mb-2 text-sm font-semibold text-[#002D72] dark:text-white">Calculations per day</h3>
+        <TrendBars daily={daily} rangeDays={filter.rangeDays} />
       </section>
 
       <section>
         <h3 className="mb-2 text-sm font-semibold text-[#002D72] dark:text-white">Most active users</h3>
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[30rem] text-sm">
           <thead>
             <tr className="border-b border-slate-200 dark:border-slate-600">
               <th className={TH}>Name</th>
@@ -178,11 +264,13 @@ export default function UsageStats({ passphrase, onAuthExpired }) {
             ))}
           </tbody>
         </table>
+        </div>
       </section>
 
       <section>
         <h3 className="mb-2 text-sm font-semibold text-[#002D72] dark:text-white">Recent activity</h3>
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[34rem] text-sm">
           <thead>
             <tr className="border-b border-slate-200 dark:border-slate-600">
               <th className={TH}>Time (UTC)</th>
@@ -202,6 +290,7 @@ export default function UsageStats({ passphrase, onAuthExpired }) {
             ))}
           </tbody>
         </table>
+        </div>
       </section>
     </div>
   );

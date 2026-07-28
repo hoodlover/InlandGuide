@@ -7,6 +7,31 @@
 //   GH_TOKEN            a GitHub token with Actions read/write on the repo
 // Optional overrides: GH_REPO (default "hoodlover/InlandGuide"),
 //   GH_WORKFLOW ("refresh-cpkc.yml"), GH_REF ("main").
+async function latestSuccessfulRun({ token, repo, workflow, ref }) {
+  if (!token) return '';
+  try {
+    const params = new URLSearchParams({ branch: ref, status: 'success', per_page: '1' });
+    const response = await fetch(
+      `https://api.github.com/repos/${repo}/actions/workflows/${encodeURIComponent(workflow)}/runs?${params}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/vnd.github+json',
+          'X-GitHub-Api-Version': '2022-11-28',
+          'User-Agent': 'icg-refresh',
+        },
+      }
+    );
+    if (!response.ok) return '';
+    const payload = await response.json();
+    const run = payload.workflow_runs?.[0];
+    return run?.updated_at || run?.run_started_at || run?.created_at || '';
+  } catch {
+    // Status is useful context, but it must never block manager access.
+    return '';
+  }
+}
+
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });
@@ -39,7 +64,15 @@ module.exports = async (req, res) => {
   // session can then reuse the passphrase to dispatch the refresh without
   // asking the manager to type it a second time.
   if (body.action === 'verify') {
-    res.status(200).json({ ok: true, verified: true });
+    const [railPulledAt, masterCheckedAt] = await Promise.all([
+      latestSuccessfulRun({ token: GH_TOKEN, repo: GH_REPO, workflow: GH_WORKFLOW, ref: GH_REF }),
+      latestSuccessfulRun({ token: GH_TOKEN, repo: GH_REPO, workflow: 'publish-master.yml', ref: GH_REF }),
+    ]);
+    res.status(200).json({
+      ok: true,
+      verified: true,
+      activity: { railPulledAt, masterCheckedAt },
+    });
     return;
   }
 
