@@ -77,7 +77,10 @@ export function getCities(slug) {
 // Display-only city aliases. The published schedules use the ramp's own town name,
 // which people don't always recognise, so hang the metro area off it on screen.
 // Keys stay the authoritative schedule names — data is never rewritten.
-const CITY_ALIASES = { 'Bensenville': 'Bensenville (Chicago)' };
+const CITY_ALIASES = {
+  'Bensenville': 'Bensenville (Chicago)',
+  'Vaughan': 'Vaughan (Toronto)',
+};
 
 export function cityDisplay(city) {
   return CITY_ALIASES[city] || city;
