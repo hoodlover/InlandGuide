@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-27",
-  "pulledAt": "2026-07-27T14:43:35.421Z",
+  "generatedAt": "2026-07-28",
+  "pulledAt": "2026-07-28T13:39:13.353Z",
   "ports": {
     "montreal": {
       "name": "Port of Montreal",
@@ -1431,8 +1431,8 @@
     "prince-rupert": {
       "name": "Prince Rupert",
       "rail": "CN",
-      "runDate": "Mon 27-Jul",
-      "generatedAt": "2026-07-27",
+      "runDate": "Tue 28-Jul",
+      "generatedAt": "2026-07-28",
       "cities": [
         "TORONTO (MALPORT)",
         "MONTREAL",
@@ -1473,50 +1473,6 @@
         "ARCADIA": "1600 hrs"
       },
       "vessels": [
-        {
-          "vessel": "EXPRESS ATHENS",
-          "terminal": "",
-          "eta": "",
-          "etd": "",
-          "railPortCutoff": "26-Jul",
-          "comments": "",
-          "cutoffs": {
-            "TORONTO (MALPORT)": "Fri, Jul-17",
-            "MONTREAL": "Thu, Jul-16",
-            "WINNIPEG": "Fri, Jul-17",
-            "SASKATOON": "Thu, Jul-16",
-            "REGINA": "Sat, Jul-18",
-            "CALGARY": "Sat, Jul-18",
-            "EDMONTON": "Sat, Jul-18",
-            "PRINCE GEORGE": "Wed, Jul-22",
-            "CHIPPEWA FALLS": "Sun, Jul-12",
-            "JOLIET": "Thu, Jul-16",
-            "INDIANAPOLIS": "Wed, Jul-15",
-            "CHICAGO": "Sat, Jul-18",
-            "DETROIT": "Fri, Jul-17",
-            "MEMPHIS": "Thu, Jul-16",
-            "NEW ORLEANS": "Thu, Jul-16",
-            "ARCADIA": "Fri, Jul-17"
-          },
-          "erds": {
-            "TORONTO (MALPORT)": "12-Jul",
-            "MONTREAL": "11-Jul",
-            "WINNIPEG": "12-Jul",
-            "SASKATOON": "11-Jul",
-            "REGINA": "13-Jul",
-            "CALGARY": "13-Jul",
-            "EDMONTON": "13-Jul",
-            "PRINCE GEORGE": "17-Jul",
-            "CHIPPEWA FALLS": "07-Jul",
-            "JOLIET": "11-Jul",
-            "INDIANAPOLIS": "10-Jul",
-            "CHICAGO": "13-Jul",
-            "DETROIT": "12-Jul",
-            "MEMPHIS": "11-Jul",
-            "NEW ORLEANS": "11-Jul",
-            "ARCADIA": "12-Jul"
-          }
-        },
         {
           "vessel": "XIN YING KOU",
           "terminal": "",
@@ -2046,7 +2002,7 @@
           }
         },
         {
-          "vessel": "STRATFORD",
+          "vessel": "RDO BRISBANE",
           "terminal": "",
           "eta": "",
           "etd": "",
