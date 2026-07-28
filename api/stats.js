@@ -38,14 +38,19 @@ module.exports = async (req, res) => {
     const requestedDays = body && body.rangeDays;
     const rangeDays = requestedDays === 'all'
       ? null
-      : ([7, 30, 90].includes(Number(requestedDays)) ? Number(requestedDays) : 30);
+      : ([1, 7, 30, 90].includes(Number(requestedDays)) ? Number(requestedDays) : 30);
+    const isToday = rangeDays === 1;
     const user = typeof body?.user === 'string' ? body.user.trim().slice(0, 100) : '';
     const filters = [];
     const args = [];
 
     if (rangeDays) {
-      filters.push("ts >= datetime('now', ?)");
-      args.push(`-${rangeDays} days`);
+      if (isToday) {
+        filters.push("ts >= datetime(date('now'))");
+      } else {
+        filters.push("ts >= datetime('now', ?)");
+        args.push(`-${rangeDays} days`);
+      }
     }
     if (user) {
       filters.push('user_name = ?');
@@ -53,7 +58,7 @@ module.exports = async (req, res) => {
     }
 
     const where = filters.length ? `WHERE ${filters.join(' AND ')}` : '';
-    const periodLabel = rangeDays ? `Last ${rangeDays} days` : 'All time';
+    const periodLabel = isToday ? 'Today' : (rangeDays ? `Last ${rangeDays} days` : 'All time');
     const emptySummary = {
       total: 0,
       uniqueUsers: 0,
@@ -82,8 +87,15 @@ module.exports = async (req, res) => {
     const previousFilters = [];
     const previousArgs = [];
     if (rangeDays) {
-      previousFilters.push("ts >= datetime('now', ?)", "ts < datetime('now', ?)");
-      previousArgs.push(`-${rangeDays * 2} days`, `-${rangeDays} days`);
+      if (isToday) {
+        previousFilters.push(
+          "ts >= datetime(date('now', '-1 day'))",
+          "ts < datetime(date('now'))"
+        );
+      } else {
+        previousFilters.push("ts >= datetime('now', ?)", "ts < datetime('now', ?)");
+        previousArgs.push(`-${rangeDays * 2} days`, `-${rangeDays} days`);
+      }
     }
     if (user) {
       previousFilters.push('user_name = ?');
