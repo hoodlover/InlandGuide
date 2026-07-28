@@ -2044,12 +2044,12 @@ export default function App() {
           {!mobileDevice && (
             <div>
               <h1 onClick={secretTap} className={`${compactView ? 'text-[1.15rem]' : 'text-[1.5rem]'} font-bold text-[#002D72] dark:text-white smallcaps txt-shadow-heavy select-none`}>
-                <span data-doviber-word="inland">Inland</span>{' '}
-                <span data-doviber-word="cutoff">Cutoff</span>{' '}
-                <span data-doviber-word="rail">Rail</span>{' '}
-                <span data-doviber-word="guide">Guide</span>
+                <span data-doviber-word="inland">The</span>{' '}
+                <span data-doviber-word="cutoff">Premier</span>{' '}
+                <span data-doviber-word="rail">Rail Cutoff</span>{' '}
+                <span data-doviber-word="guide">Tool</span>
               </h1>
-              {!compactView && <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">ERD/LRD Rail Cutoff Lookup</p>}
+              {!compactView && <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Built for Cutoffs. Built for Speed. Built by the Rail Team.</p>}
               {userName && (
                 <p className={`${compactView ? 'mt-0.5 text-xs' : 'mt-1 text-sm'} text-slate-600 dark:text-slate-300`}>
                   Welcome, <span className="font-semibold text-[#002D72] dark:text-white">{userName}</span>
