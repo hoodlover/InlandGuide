@@ -7,12 +7,17 @@ import NamePrompt, { getUserName } from './components/NamePrompt';
 import PwaInstallGate, { shouldShowInstallGate } from './components/PwaInstallGate';
 import UpdateToast from './components/UpdateToast';
 import UsageStats from './components/UsageStats';
-import { bannerBottom, obBot } from './assets/banners';
+import { obBot } from './assets/banners';
 import { IDT_TITLE } from './lib/idt';
 import { masterUpdatedAt } from './lib/cutoff';
 import { pulledAt as railPulledAt } from './lib/cpkc';
 import truckScene from './assets/idt-truck-scene.webp';
+import heroShipBanner from './assets/hero-ship-banner.webp';
+import heroShipOverlay from './assets/hero-ship-overlay.png';
 import heroTop from './assets/hero-top.webp';
+import heroTrainCleanPlate from './assets/hero-train-clean-plate.png';
+import heroNsTrainOverlay from './assets/hero-ns-train-overlay.png';
+import heroCpTrainOverlay from './assets/hero-cp-train-overlay.png';
 import darkModeBadge from './assets/dark-mode.webp';
 import lightModeBadge from './assets/light-mode.webp';
 import opsHubBadge from './assets/ops-hub.webp';
@@ -2029,12 +2034,43 @@ export default function App() {
       {/* Banner constrained to just past the content edges (~5% wider each side). */}
       {!compactView && (
         <div className="w-full max-w-[70rem] mx-auto px-4 pt-4">
-          <img
-            src={heroTop}
-            alt="IDT Inland Cutoff Rail Guide"
-            data-doviber-trigger
-            className="w-full aspect-[5.44/1] object-fill block rounded-xl"
-          />
+          <div className="hero-train-stage" data-doviber-trigger>
+            <img
+              src={heroTop}
+              alt="IDT Inland Cutoff Rail Guide"
+              className="hero-train-banner"
+            />
+            <img
+              src={heroTrainCleanPlate}
+              alt=""
+              aria-hidden="true"
+              className="hero-train-clean-plate"
+            />
+            <img
+              src={heroNsTrainOverlay}
+              alt=""
+              aria-hidden="true"
+              className="hero-train-overlay hero-train-overlay--ns"
+            />
+            <img
+              src={heroCpTrainOverlay}
+              alt=""
+              aria-hidden="true"
+              className="hero-train-overlay hero-train-overlay--cp"
+            />
+            <img
+              src={heroNsTrainOverlay}
+              alt=""
+              aria-hidden="true"
+              className="hero-train-overlay hero-train-overlay--ns hero-train-resting hero-train-resting--ns"
+            />
+            <img
+              src={heroCpTrainOverlay}
+              alt=""
+              aria-hidden="true"
+              className="hero-train-overlay hero-train-overlay--cp hero-train-resting hero-train-resting--cp"
+            />
+          </div>
         </div>
       )}
 
@@ -2134,11 +2170,19 @@ export default function App() {
       </div>
       {!compactView && (
       <div className="w-full max-w-[70rem] mx-auto px-4 mt-1 mb-4">
-        <img
-          src={bannerBottom}
-          alt="Hapag-Lloyd IDT Ops Base"
-          className="w-full h-auto block rounded-xl"
-        />
+        <div className="hero-ship-stage">
+          <img
+            src={heroShipBanner}
+            alt="Hapag-Lloyd IDT Inland Cutoff Rail Guide"
+            className="hero-ship-banner"
+          />
+          <img
+            src={heroShipOverlay}
+            alt=""
+            aria-hidden="true"
+            className="hero-ship-overlay"
+          />
+        </div>
       </div>
       )}
     </div>

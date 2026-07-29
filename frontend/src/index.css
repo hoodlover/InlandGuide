@@ -1142,3 +1142,167 @@ textarea {
 @media (max-width: 640px) {
   .sammie-bot { width: clamp(9rem, 39vw, 13rem); }
 }
+
+.hero-ship-stage {
+  position: relative;
+  aspect-ratio: 75 / 11;
+  overflow: hidden;
+  border-radius: .75rem;
+}
+
+.hero-ship-banner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+
+.hero-ship-overlay {
+  position: absolute;
+  z-index: 1;
+  left: 49.7%;
+  bottom: -8%;
+  width: 18.5%;
+  height: auto;
+  pointer-events: none;
+  transform: translateX(-50%);
+  transform-origin: 50% 88%;
+  will-change: transform, opacity;
+  animation: hero-ship-approach 10s ease-in-out 3 forwards;
+}
+
+.hero-train-stage {
+  position: relative;
+  aspect-ratio: 2172 / 399;
+  overflow: hidden;
+  border-radius: .75rem;
+}
+
+.hero-train-banner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+
+.hero-train-clean-plate {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 38%;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to right, transparent 68%, #000 78%);
+  mask-image: linear-gradient(to right, transparent 68%, #000 78%);
+}
+
+.hero-train-overlay {
+  position: absolute;
+  z-index: 2;
+  height: auto;
+  pointer-events: none;
+  transform-origin: 62% 80%;
+  will-change: transform, opacity;
+  animation: hero-train-approach 10s ease-in-out 3 forwards;
+}
+
+.hero-train-overlay--ns {
+  top: 44%;
+  left: 67%;
+  width: 24%;
+  --train-shift-x: 7%;
+  --train-shift-y: 5%;
+}
+
+.hero-train-overlay--cp {
+  top: 42.5%;
+  left: 73.5%;
+  width: 29.5%;
+  --train-shift-x: 6%;
+  --train-shift-y: 5.5%;
+  animation-delay: 1s;
+}
+
+.hero-train-resting {
+  opacity: 0;
+  transform: translate(0, 0) scale(.96);
+  will-change: opacity;
+}
+
+.hero-train-resting--ns {
+  animation: hero-train-resting 30s linear forwards;
+}
+
+.hero-train-resting--cp {
+  animation: hero-train-resting 31s linear forwards;
+}
+
+@keyframes hero-train-resting {
+  0%, 99.9% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes hero-train-approach {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(.96);
+  }
+  7% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 1;
+    transform: translate(var(--train-shift-x), var(--train-shift-y)) scale(1.12);
+  }
+  90% {
+    opacity: 0;
+    transform: translate(var(--train-shift-x), var(--train-shift-y)) scale(1.12);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(.96);
+  }
+}
+
+@keyframes hero-ship-approach {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(0) scale(.96);
+  }
+  6% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(5%) scale(1.12);
+  }
+  90% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(5%) scale(1.12);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(0) scale(.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-ship-overlay,
+  .hero-train-overlay:not(.hero-train-resting) {
+    display: none;
+    animation: none;
+  }
+
+  .hero-train-resting {
+    display: block;
+    opacity: 1;
+    animation: none;
+  }
+}
