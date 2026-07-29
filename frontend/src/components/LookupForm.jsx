@@ -108,6 +108,9 @@ function stripTerminalWord(name) {
 // A booking number is optional for calculation. When present, a successful
 // submit also sends the plain-text result to the server-side rail email route.
 const EMPTY_FORM = { pol: '', startCity: '', ssy: '', terminal: '', portCutDate: '', bookingNumber: '', reefer: 'N', extraDays: '5' };
+// Temporarily keep this adjustment out of both the UI and the calculation.
+// Set to true to restore the existing city-specific field and logic.
+const EXTRA_TRANSIT_DAYS_ENABLED = false;
 
 // Canadian ports are served by the separate published-schedule tool (the Canada
 // Rail Ramp Cuts tab), not the US calculator. Listing all four here lets a user
@@ -252,7 +255,7 @@ export default function LookupForm({ onCanadaPort }) {
       if (name === 'pol') { next.startCity = ''; next.ssy = ''; next.terminal = ''; }
       // SSY/terminal choices are POL-level, so selecting a city must preserve a
       // choice the user may already have made immediately after selecting POL.
-      if (name === 'startCity') { next.extraDays = defaultExtraDays(value); }
+      if (EXTRA_TRANSIT_DAYS_ENABLED && name === 'startCity') { next.extraDays = defaultExtraDays(value); }
       return next;
     });
   };
@@ -313,7 +316,7 @@ export default function LookupForm({ onCanadaPort }) {
       : formData.ssy;
     const res = calculateERDLRD(
       formData.pol, formData.startCity, ssyArg, formData.portCutDate, formData.reefer,
-      cityNeedsExtraDays(formData.startCity) ? formData.extraDays : 0
+      EXTRA_TRANSIT_DAYS_ENABLED && cityNeedsExtraDays(formData.startCity) ? formData.extraDays : 0
     );
     if (res.error) {
       setError(res.error);
@@ -542,7 +545,7 @@ export default function LookupForm({ onCanadaPort }) {
             />
           </div>
 
-          {cityNeedsExtraDays(formData.startCity) && (
+          {EXTRA_TRANSIT_DAYS_ENABLED && cityNeedsExtraDays(formData.startCity) && (
             <div>
               <label className="block text-xs font-semibold text-white mb-1 txt-shadow-soft">Extra Transit Days *</label>
               <select

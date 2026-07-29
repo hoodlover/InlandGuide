@@ -374,9 +374,9 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
             ) : (
               <div className="bg-white divide-y divide-slate-200 rounded-lg px-4 shadow-md">
                 <Row label="Vessel" value={results.vessel} />
+                <Row label="Earliest Receiving (ERD)" value={results.erd} strong />
                 <Row label="Inland Cut-Off (LRD)" value={results.cutoff} strong />
                 {results.cutTime && <Row label="Cut-Off Time" value={results.cutTime} />}
-                <Row label="Earliest Receiving (ERD)" value={results.erd} strong />
                 {results.rail && <Row label="Rail" value={results.rail} />}
                 {results.terminal && <Row label="Terminal" value={results.terminal} />}
                 {results.eta && <Row label="Vessel ETA" value={results.eta} />}
