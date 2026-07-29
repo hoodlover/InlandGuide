@@ -1195,8 +1195,8 @@ textarea {
   object-fit: cover;
   object-position: center 38%;
   pointer-events: none;
-  -webkit-mask-image: linear-gradient(to right, transparent 68%, #000 78%);
-  mask-image: linear-gradient(to right, transparent 68%, #000 78%);
+  -webkit-mask-image: linear-gradient(to right, transparent 74%, #000 78%);
+  mask-image: linear-gradient(to right, transparent 74%, #000 78%);
 }
 
 .hero-train-overlay {
@@ -1206,7 +1206,7 @@ textarea {
   pointer-events: none;
   transform-origin: 62% 88%;
   will-change: transform, opacity;
-  animation: hero-train-approach 27s linear 3 forwards;
+  animation: hero-train-approach 27s linear 6 forwards;
 }
 
 .hero-train-overlay--ns {
@@ -1233,11 +1233,11 @@ textarea {
 }
 
 .hero-train-resting--ns {
-  animation: hero-train-resting 27s linear 3 forwards;
+  animation: hero-train-resting 27s linear 6 forwards;
 }
 
 .hero-train-resting--cp {
-  animation: hero-train-resting 27s linear 1s 3 forwards;
+  animation: hero-train-resting 27s linear 1s 6 forwards;
 }
 
 @keyframes hero-train-resting {
@@ -1255,8 +1255,13 @@ textarea {
     transform: translate(0, 0) scale(.96);
     animation-timing-function: ease-in-out;
   }
-  3% {
+  6% {
     opacity: 1;
+    transform: translate(0, 0) scale(.96);
+  }
+  10% {
+    opacity: 1;
+    transform: translate(0, 0) scale(.96);
   }
   40% {
     opacity: 1;
@@ -1277,8 +1282,13 @@ textarea {
     opacity: 0;
     transform: translateX(-50%) translateY(0) scale(.96);
   }
-  6% {
+  10% {
     opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(.96);
+  }
+  14% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(.96);
   }
   78% {
     opacity: 1;
