@@ -1223,30 +1223,10 @@ textarea {
   width: 29.5%;
   --train-shift-x: 9%;
   --train-shift-y: 8%;
-  animation-delay: 1s;
 }
 
 .hero-train-resting {
-  opacity: 0;
-  transform: translate(0, 0) scale(.96);
-  will-change: opacity;
-}
-
-.hero-train-resting--ns {
-  animation: hero-train-resting 27s linear 6 forwards;
-}
-
-.hero-train-resting--cp {
-  animation: hero-train-resting 27s linear 1s 6 forwards;
-}
-
-@keyframes hero-train-resting {
-  0%, 43.9% {
-    opacity: 0;
-  }
-  44%, 100% {
-    opacity: 1;
-  }
+  display: none;
 }
 
 @keyframes hero-train-approach {
