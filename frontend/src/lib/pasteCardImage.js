@@ -5,6 +5,7 @@ export async function renderPasteCardImage({
   titleLeft = '',
   titleRight = '',
   rows,
+  notes = [],
   logo,
   footer = '',
   footerLeft = '',
@@ -50,9 +51,31 @@ export async function renderPasteCardImage({
   const titleLineHeight = titleSize + 5;
   const titleHeight = (hasTitleColumns ? 1 : titleLines.length) * titleLineHeight + 10;
   const rowHeight = 42;
+  const noteLineHeight = 15;
+  const noteLines = [];
+  if (notes.length) {
+    probe.font = '11px Arial';
+    const maxNoteWidth = contentWidth - 32;
+    notes.forEach(note => {
+      const words = String(note).trim().split(/\s+/).filter(Boolean);
+      let line = '•';
+      words.forEach(word => {
+        const next = line === '•' ? `• ${word}` : `${line} ${word}`;
+        if (line !== '•' && probe.measureText(next).width > maxNoteWidth) {
+          noteLines.push(line);
+          line = `  ${word}`;
+        } else {
+          line = next;
+        }
+      });
+      if (line !== '•') noteLines.push(line);
+    });
+  }
+  const notesHeight = noteLines.length ? 34 + noteLines.length * noteLineHeight : 0;
   const footerHeight = footer ? 25 : 0;
   const logoHeight = 24;
-  const height = border + padding + titleHeight + 16 + rows.length * rowHeight + footerHeight + 14 + logoHeight + padding + border;
+  const height = border + padding + titleHeight + 16 + rows.length * rowHeight +
+    (notesHeight ? notesHeight + 10 : 0) + footerHeight + 14 + logoHeight + padding + border;
 
   const canvas = document.createElement('canvas');
   canvas.width = width * scale;
@@ -117,6 +140,25 @@ export async function renderPasteCardImage({
     ctx.fillText(String(value), left + contentWidth - 16, rowY + rowHeight / 2);
   });
   y += rows.length * rowHeight;
+
+  if (notesHeight) {
+    y += 10;
+    ctx.fillStyle = '#ffffff';
+    roundedRect(left, y, contentWidth, notesHeight, 8);
+    ctx.fill();
+
+    ctx.fillStyle = '#000000';
+    ctx.font = '700 12px Arial';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText('Schedule Notes', left + 16, y + 10);
+
+    ctx.font = '11px Arial';
+    noteLines.forEach((noteLine, index) => {
+      ctx.fillText(noteLine, left + 16, y + 28 + index * noteLineHeight);
+    });
+    y += notesHeight;
+  }
 
   if (footer) {
     y += 10;

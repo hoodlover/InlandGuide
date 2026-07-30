@@ -9,6 +9,7 @@ import { renderPasteCardImage } from '../lib/pasteCardImage';
 import { cardTitleFloat, cardTitleTable } from '../lib/pasteCardHtml';
 
 const EMPTY = { port: '', vessel: '', city: '' };
+const COPY_SCHEDULE_NOTES_PORTS = new Set(['montreal', 'metro-vancouver', 'saint-john']);
 
 // ISO timestamp -> "Jul 12, 2026, 3:04 PM"
 function formatPulled(iso) {
@@ -23,6 +24,15 @@ function cleanScheduleNote(note) {
 
 function isReceivingNote(note) {
   return /^Export receiving accepted/i.test(cleanScheduleNote(note));
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 function outlookLogoBlock() {
@@ -44,6 +54,20 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
   const cities = sel.port ? getCities(sel.port) : [];
   const info = sel.port ? getPortInfo(sel.port) : null;
   const receivingNote = info?.notes?.find(isReceivingNote);
+  const copiedScheduleNotes = COPY_SCHEDULE_NOTES_PORTS.has(sel.port)
+    ? (info?.notes || []).map(cleanScheduleNote)
+    : [];
+
+  const scheduleNotesHtml = () => {
+    if (!copiedScheduleNotes.length) return '';
+    const items = copiedScheduleNotes
+      .map(note => `<li style="margin:0 0 4px">${escapeHtml(note)}</li>`)
+      .join('');
+    return `<div style="background:#ffffff;border-radius:8px;margin-top:10px;padding:12px 16px;font-family:Arial,sans-serif;color:#000000">` +
+      `<div style="font-size:13px;font-weight:bold;margin-bottom:6px">Schedule Notes</div>` +
+      `<ul style="margin:0;padding-left:18px;font-size:11px;line-height:1.35">${items}</ul>` +
+      `</div>`;
+  };
 
   // Reset downstream picks when an upstream selection changes.
   const pick = (field, value) => {
@@ -120,6 +144,9 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
       results.cutTime ? `Cut-Off Time: ${results.cutTime}` : null,
       results.railPortCutoff ? `Rail Port Cut-Off: ${results.railPortCutoff}` : null,
       results.comments ? `Note: ${results.comments}` : null,
+      ...(copiedScheduleNotes.length
+        ? ['', 'Schedule Notes:', ...copiedScheduleNotes.map(note => `• ${note}`)]
+        : []),
       '',
       `${info.name} — as published ${info.runDate}`,
       divider,
@@ -155,6 +182,9 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
       results.cutTime ? `Cut-Off Time: ${results.cutTime}` : null,
       results.railPortCutoff ? `Rail Port Cut-Off: ${results.railPortCutoff}` : null,
       results.comments ? `Note: ${results.comments}` : null,
+      ...(copiedScheduleNotes.length
+        ? ['', 'Schedule Notes:', ...copiedScheduleNotes.map(note => `• ${note}`)]
+        : []),
       '', ''
     ].filter(v => v !== null).join('\n');
     return { titlePlain, titleSize, titleLeft: cityText, titleRight: railTerminal, text };
@@ -181,6 +211,7 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
       `<div style="background:#EB6608;border:5px solid #002D72;border-radius:12px;max-width:470px;padding:22px;font-family:Arial,sans-serif">` +
         cardTitleFloat(titleLeft, titleRight, titleSize) +
         `<div style="background:#ffffff;border-radius:8px;overflow:hidden">` + cardRows(row) + `</div>` +
+        scheduleNotesHtml() +
         `<div style="color:#ffffff;font-size:11px;margin-top:10px">${info.name} — as published ${info.runDate}</div>` +
         `<div style="text-align:right;margin-top:8px"><img src="${hlLogo}" width="150" alt="Hapag-Lloyd" style="display:inline-block;width:150px;height:auto" /></div>` +
       `</div>` +
@@ -201,6 +232,7 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
         `<tr><td bgcolor="#EB6608" style="background-color:#EB6608;padding:22px">` +
           cardTitleTable(titleLeft, titleRight, titleSize) +
           `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff" style="border-collapse:separate;background-color:#ffffff;border-radius:8px">` + cardRows(row) + `</table>` +
+          scheduleNotesHtml() +
           `<div style="font-family:Arial,sans-serif;color:#ffffff;font-size:11px;margin-top:10px">${info.name} — as published ${info.runDate}</div>` +
           outlookLogoBlock() +
         `</td></tr>` +
@@ -226,6 +258,7 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
         titleLeft,
         titleRight,
         rows,
+        notes: copiedScheduleNotes,
         logo: hlLogo,
         footer: `${info.name} — as published ${info.runDate}`,
       });
