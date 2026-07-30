@@ -1892,7 +1892,7 @@
     "rampMC": "IOWAIN 010",
     "rampCutTime": 0.4583333333333333,
     "transit": 9,
-    "window": 3,
+    "window": 6,
     "ssyAdjustment": 0,
     "reefer": "N",
     "windowReefer": 0
