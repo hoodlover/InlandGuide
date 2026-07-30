@@ -6,7 +6,7 @@ import { hlLogo } from '../assets/hlLogo';
 import { hlLogoOrange } from '../assets/hlLogoOrange';
 import Combobox from './Combobox';
 import { SalesforceIcon, OutlookIcon, TeamsIcon, TextIcon } from './BrandIcons';
-import ObieThinking from './ObieThinking';
+import ObieThinking, { SAMMIE_SURPRISE_EVENT } from './ObieThinking';
 import { renderPasteCardImage } from '../lib/pasteCardImage';
 import { cardTitleFloat, cardTitleTable } from '../lib/pasteCardHtml';
 import { getUserName } from './NamePrompt';
@@ -698,7 +698,13 @@ export default function LookupForm({ onCanadaPort }) {
         </form>
 
         {!results && (
-          <img src={trainMark} alt="" title={IDT_TITLE} className="mt-5 h-40 w-full rounded-xl object-cover object-[center_35%] shadow-[0_8px_18px_rgba(0,0,0,0.35)]" />
+          <img
+            src={trainMark}
+            alt="Hapag-Lloyd train"
+            title={IDT_TITLE}
+            onDoubleClick={() => window.dispatchEvent(new Event(SAMMIE_SURPRISE_EVENT))}
+            className="mt-5 h-40 w-full rounded-xl object-cover object-[center_35%] shadow-[0_8px_18px_rgba(0,0,0,0.35)]"
+          />
         )}
       </div>
 

@@ -57,7 +57,7 @@ const AWAKE_MS = 180_000;   // dozes off after 3 minutes on screen
 const SETTLE_MS = 3_000;    // matches the 3s CSS shrink-to-corner transition
 const MUMBLE_MS = 240_000;  // sleep-talks about rail every 4 minutes
 const MUMBLE_HOLD_MS = 6_000;
-const TAP_TO_SLEEP_MS = 350;
+export const SAMMIE_SURPRISE_EVENT = 'icg-sammie-surprise';
 
 const pick = (list) => list[Math.floor(Math.random() * list.length)];
 
@@ -67,9 +67,6 @@ export default function ObieThinking() {
   const [settled, setSettled] = useState(false);   // true once the shrink finishes
   const [mumble, setMumble] = useState('');
   const [sammiePhase, setSammiePhase] = useState('idle');
-  const clickCountRef = useRef(0);
-  const lastClickRef = useRef(0);
-  const sleepTimerRef = useRef(null);
   const sammieActiveRef = useRef(false);
   const sammieTimersRef = useRef([]);
 
@@ -107,7 +104,6 @@ export default function ObieThinking() {
   }, [settled]);
 
   useEffect(() => () => {
-    window.clearTimeout(sleepTimerRef.current);
     sammieTimersRef.current.forEach(window.clearTimeout);
   }, []);
 
@@ -131,32 +127,22 @@ export default function ObieThinking() {
     }, delay));
   };
 
-  const handleObieClick = () => {
-    const now = Date.now();
-    if (now - lastClickRef.current > 1200) clickCountRef.current = 0;
-    lastClickRef.current = now;
-    clickCountRef.current += 1;
-    window.clearTimeout(sleepTimerRef.current);
-
-    if (clickCountRef.current >= 5) {
-      clickCountRef.current = 0;
+  useEffect(() => {
+    const handleSammieSurprise = () => {
+      setAsleep(false);
+      setSettled(false);
+      setMumble('');
       startSammieRun();
-      return;
-    }
+    };
+    window.addEventListener(SAMMIE_SURPRISE_EVENT, handleSammieSurprise);
+    return () => window.removeEventListener(SAMMIE_SURPRISE_EVENT, handleSammieSurprise);
+  }, []);
 
-    // A short delay keeps the five-tap easter egg available while making a
-    // normal single tap put Obie to sleep.
-    sleepTimerRef.current = window.setTimeout(() => {
-      clickCountRef.current = 0;
-      setAsleep(true);
-    }, TAP_TO_SLEEP_MS);
-  };
+  const handleObieClick = () => setAsleep(true);
 
   const wake = () => {
-    window.clearTimeout(sleepTimerRef.current);
     setAsleep(false);
     setMumble('');
-    clickCountRef.current = 0;
   };
 
   return (

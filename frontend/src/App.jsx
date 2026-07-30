@@ -305,11 +305,11 @@ function RailTeamSurprise() {
 
   useEffect(() => {
     const timers = [];
-    const gesture = { step: 0, last: 0 };
+    const gesture = { count: 0, last: 0 };
     let running = false;
 
     const resetGesture = () => {
-      gesture.step = 0;
+      gesture.count = 0;
       gesture.last = 0;
     };
 
@@ -334,42 +334,27 @@ function RailTeamSurprise() {
       }, 8600));
     };
 
-    const isTypingTarget = (target) => target instanceof HTMLElement && (
-      ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable
+    const isInteractiveTarget = (target) => target instanceof HTMLElement && (
+      ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'A'].includes(target.tagName) || target.isContentEditable
     );
 
     const onKeyDown = (event) => {
-      if (event.code !== 'Space' || isTypingTarget(event.target)) return;
+      if (event.code !== 'Space' || event.repeat || isInteractiveTarget(event.target)) return;
       const now = Date.now();
       if (now - gesture.last > 2500) resetGesture();
 
       event.preventDefault();
-      gesture.step = gesture.step === 0 || gesture.step === 1 ? gesture.step + 1 : 1;
+      gesture.count += 1;
       gesture.last = now;
-    };
-
-    const onContextMenu = (event) => {
-      const now = Date.now();
-      if (now - gesture.last > 2500) resetGesture();
-
-      if (gesture.step === 2 || gesture.step === 3) {
-        event.preventDefault();
-        gesture.step += 1;
-        gesture.last = now;
-        if (gesture.step === 4) {
-          resetGesture();
-          startSurprise();
-        }
-      } else {
+      if (gesture.count >= 4) {
         resetGesture();
+        startSurprise();
       }
     };
 
     window.addEventListener('keydown', onKeyDown);
-    window.addEventListener('contextmenu', onContextMenu);
     return () => {
       window.removeEventListener('keydown', onKeyDown);
-      window.removeEventListener('contextmenu', onContextMenu);
       timers.forEach(window.clearTimeout);
     };
   }, []);

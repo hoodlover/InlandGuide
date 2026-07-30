@@ -277,7 +277,7 @@ textarea {
 .obie-out { transform: translateX(-130%); opacity: 0; pointer-events: none; }
 .obie-in { transform: translateX(0); opacity: 1; }
 
-/* Secret Space, Space, right-click, right-click rail-team celebration. */
+/* Secret four-spacebar rail-team celebration. */
 .rail-team-stage {
   position: fixed;
   inset: 0;
@@ -952,7 +952,7 @@ textarea {
   100% { opacity: 0; transform: translate(90px, -30px) scale(2.1); }
 }
 
-/* Five-click Obie easter egg: Sammie Bot rolls in, greets Obie, then burns out. */
+/* Double-click USA train-image easter egg: Sammie Bot greets Obie, then burns out. */
 .sammie-stage {
   position: fixed;
   inset: 0;
