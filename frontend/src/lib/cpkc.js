@@ -6,6 +6,7 @@
 import schedules from '../data/cpkc-schedules.json';
 
 const ERD_DAYS_BEFORE = 5;
+const RAIL_ORDER = { CPKC: 0, CN: 1 };
 const MONTHS = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -15,7 +16,12 @@ export const pulledAt = schedules.pulledAt || '';
 
 // [{ slug, name, rail }] for the port picker.
 export function getPorts() {
-  return Object.entries(schedules.ports || {}).map(([slug, p]) => ({ slug, name: p.name || slug, rail: p.rail || '' }));
+  return Object.entries(schedules.ports || {})
+    .map(([slug, p]) => ({ slug, name: p.name || slug, rail: p.rail || '' }))
+    .sort((a, b) => {
+      const railDelta = (RAIL_ORDER[a.rail.toUpperCase()] ?? 2) - (RAIL_ORDER[b.rail.toUpperCase()] ?? 2);
+      return railDelta || a.name.localeCompare(b.name, 'en', { sensitivity: 'base' });
+    });
 }
 
 function port(slug) {
