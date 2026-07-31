@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-07-31",
-  "pulledAt": "2026-07-31T19:09:24.987Z",
+  "pulledAt": "2026-07-31T19:53:14.526Z",
   "ports": {
     "montreal": {
       "name": "Port of Montreal",
@@ -347,6 +347,996 @@
             "Minneapolis": "Sat 15-Aug 12:00",
             "Bensenville": "Sun 16-Aug 17:00",
             "Detroit": "Sat 15-Aug 15:00"
+          }
+        }
+      ]
+    },
+    "montreal-racine": {
+      "name": "Montreal — Racine",
+      "rail": "CN",
+      "runDate": "Fri 31-Jul",
+      "generatedAt": "2026-07-31",
+      "cities": [
+        "Toronto (Brampton)",
+        "Chicago",
+        "Detroit",
+        "Indianapolis",
+        "Duluth",
+        "Winnipeg",
+        "Calgary",
+        "Edmonton",
+        "Saskatoon",
+        "Regina",
+        "Vancouver"
+      ],
+      "notes": [
+        "Subject to change without notice/ Sujet aux changements sans préavis",
+        "Please contact Cargocool-Intl@cn.ca for Reefer shipments moving in CN’s Genset service"
+      ],
+      "cutTimes": {},
+      "vessels": [
+        {
+          "vessel": "CMA CGM PARANAGUA",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "30-Jul",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Wed, Aug-26",
+            "Chicago": "Sun, Aug-23",
+            "Detroit": "Sun, Aug-23",
+            "Indianapolis": "Mon, Aug-17",
+            "Duluth": "Sat, Aug-15",
+            "Winnipeg": "Thu, Aug-20",
+            "Calgary": "Tue, Aug-18",
+            "Edmonton": "Wed, Aug-19",
+            "Saskatoon": "Mon, Aug-17",
+            "Regina": "Fri, Aug-14",
+            "Vancouver": "Mon, Aug-17"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Aug-22",
+            "Chicago": "Aug-18",
+            "Detroit": "Aug-18",
+            "Indianapolis": "Aug-12",
+            "Duluth": "Aug-10",
+            "Winnipeg": "Aug-15",
+            "Calgary": "Aug-13",
+            "Edmonton": "Aug-14",
+            "Saskatoon": "Aug-12",
+            "Regina": "Aug-09",
+            "Vancouver": "Aug-12"
+          }
+        },
+        {
+          "vessel": "ARICA EXPRESS",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "04-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Sun, Aug-02",
+            "Chicago": "Sat, Aug-01",
+            "Detroit": "Sat, Aug-01",
+            "Indianapolis": "Mon, Jul-27",
+            "Duluth": "Thu, Jul-23",
+            "Winnipeg": "Tue, Jul-28",
+            "Calgary": "Sun, Jul-26",
+            "Edmonton": "Mon, Jul-27",
+            "Saskatoon": "Sat, Jul-25",
+            "Regina": "Wed, Jul-22",
+            "Vancouver": "Sat, Jul-25"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Jul-29",
+            "Chicago": "Jul-27",
+            "Detroit": "Jul-27",
+            "Indianapolis": "Jul-22",
+            "Duluth": "Jul-18",
+            "Winnipeg": "Jul-23",
+            "Calgary": "Jul-21",
+            "Edmonton": "Jul-22",
+            "Saskatoon": "Jul-20",
+            "Regina": "Jul-17",
+            "Vancouver": "Jul-20"
+          }
+        },
+        {
+          "vessel": "VOLGA MAERSK",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "09-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Sat, Aug-08",
+            "Chicago": "Wed, Aug-05",
+            "Detroit": "Wed, Aug-05",
+            "Indianapolis": "Fri, Jul-31",
+            "Duluth": "Tue, Jul-28",
+            "Winnipeg": "Sat, Aug-01",
+            "Calgary": "Thu, Jul-30",
+            "Edmonton": "Sat, Aug-01",
+            "Saskatoon": "Thu, Jul-30",
+            "Regina": "Mon, Jul-27",
+            "Vancouver": "Thu, Jul-30"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Aug-04",
+            "Chicago": "Jul-31",
+            "Detroit": "Jul-31",
+            "Indianapolis": "Jul-26",
+            "Duluth": "Jul-23",
+            "Winnipeg": "Jul-27",
+            "Calgary": "Jul-25",
+            "Edmonton": "Jul-27",
+            "Saskatoon": "Jul-25",
+            "Regina": "Jul-22",
+            "Vancouver": "Jul-25"
+          }
+        },
+        {
+          "vessel": "MOMBASA EXPRESS",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "09-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Sat, Aug-08",
+            "Chicago": "Wed, Aug-05",
+            "Detroit": "Wed, Aug-05",
+            "Indianapolis": "Fri, Jul-31",
+            "Duluth": "Tue, Jul-28",
+            "Winnipeg": "Sat, Aug-01",
+            "Calgary": "Thu, Jul-30",
+            "Edmonton": "Sat, Aug-01",
+            "Saskatoon": "Thu, Jul-30",
+            "Regina": "Mon, Jul-27",
+            "Vancouver": "Thu, Jul-30"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Aug-04",
+            "Chicago": "Jul-31",
+            "Detroit": "Jul-31",
+            "Indianapolis": "Jul-26",
+            "Duluth": "Jul-23",
+            "Winnipeg": "Jul-27",
+            "Calgary": "Jul-25",
+            "Edmonton": "Jul-27",
+            "Saskatoon": "Jul-25",
+            "Regina": "Jul-22",
+            "Vancouver": "Jul-25"
+          }
+        },
+        {
+          "vessel": "EM KEA",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "12-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Tue, Aug-11",
+            "Chicago": "Sun, Aug-09",
+            "Detroit": "Sun, Aug-09",
+            "Indianapolis": "Mon, Aug-03",
+            "Duluth": "Fri, Jul-31",
+            "Winnipeg": "Thu, Aug-06",
+            "Calgary": "Sun, Aug-02",
+            "Edmonton": "Tue, Aug-04",
+            "Saskatoon": "Sun, Aug-02",
+            "Regina": "Thu, Jul-30",
+            "Vancouver": "Sun, Aug-02"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Aug-07",
+            "Chicago": "Aug-04",
+            "Detroit": "Aug-04",
+            "Indianapolis": "Jul-29",
+            "Duluth": "Jul-26",
+            "Winnipeg": "Aug-01",
+            "Calgary": "Jul-28",
+            "Edmonton": "Jul-30",
+            "Saskatoon": "Jul-28",
+            "Regina": "Jul-25",
+            "Vancouver": "Jul-28"
+          }
+        },
+        {
+          "vessel": "DACHAN BAY EXPRESS",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "16-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Sat, Aug-15",
+            "Chicago": "Wed, Aug-12",
+            "Detroit": "Wed, Aug-12",
+            "Indianapolis": "Fri, Aug-07",
+            "Duluth": "Tue, Aug-04",
+            "Winnipeg": "Sat, Aug-08",
+            "Calgary": "Thu, Aug-06",
+            "Edmonton": "Sat, Aug-08",
+            "Saskatoon": "Thu, Aug-06",
+            "Regina": "Mon, Aug-03",
+            "Vancouver": "Thu, Aug-06"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Aug-11",
+            "Chicago": "Aug-07",
+            "Detroit": "Aug-07",
+            "Indianapolis": "Aug-02",
+            "Duluth": "Jul-30",
+            "Winnipeg": "Aug-03",
+            "Calgary": "Aug-01",
+            "Edmonton": "Aug-03",
+            "Saskatoon": "Aug-01",
+            "Regina": "Jul-29",
+            "Vancouver": "Aug-01"
+          }
+        },
+        {
+          "vessel": "VISTULA MAERSK",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "19-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Tue, Aug-18",
+            "Chicago": "Sun, Aug-16",
+            "Detroit": "Sun, Aug-16",
+            "Indianapolis": "Mon, Aug-10",
+            "Duluth": "Fri, Aug-07",
+            "Winnipeg": "Thu, Aug-13",
+            "Calgary": "Sun, Aug-09",
+            "Edmonton": "Tue, Aug-11",
+            "Saskatoon": "Sun, Aug-09",
+            "Regina": "Thu, Aug-06",
+            "Vancouver": "Sun, Aug-09"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Aug-14",
+            "Chicago": "Aug-11",
+            "Detroit": "Aug-11",
+            "Indianapolis": "Aug-05",
+            "Duluth": "Aug-02",
+            "Winnipeg": "Aug-08",
+            "Calgary": "Aug-04",
+            "Edmonton": "Aug-06",
+            "Saskatoon": "Aug-04",
+            "Regina": "Aug-01",
+            "Vancouver": "Aug-04"
+          }
+        },
+        {
+          "vessel": "JAKARTA EXPRESS",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "24-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Sun, Aug-23",
+            "Chicago": "Fri, Aug-21",
+            "Detroit": "Fri, Aug-21",
+            "Indianapolis": "Mon, Aug-17",
+            "Duluth": "Wed, Aug-12",
+            "Winnipeg": "Tue, Aug-18",
+            "Calgary": "Thu, Aug-13",
+            "Edmonton": "Sun, Aug-16",
+            "Saskatoon": "Fri, Aug-14",
+            "Regina": "Tue, Aug-11",
+            "Vancouver": "Fri, Aug-14"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Aug-19",
+            "Chicago": "Aug-16",
+            "Detroit": "Aug-16",
+            "Indianapolis": "Aug-12",
+            "Duluth": "Aug-07",
+            "Winnipeg": "Aug-13",
+            "Calgary": "Aug-08",
+            "Edmonton": "Aug-11",
+            "Saskatoon": "Aug-09",
+            "Regina": "Aug-06",
+            "Vancouver": "Aug-09"
+          }
+        },
+        {
+          "vessel": "LIVORNO EXPRESS",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "30-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Sat, Aug-29",
+            "Chicago": "Wed, Aug-26",
+            "Detroit": "Wed, Aug-26",
+            "Indianapolis": "Fri, Aug-21",
+            "Duluth": "Tue, Aug-18",
+            "Winnipeg": "Sat, Aug-22",
+            "Calgary": "Thu, Aug-20",
+            "Edmonton": "Sat, Aug-22",
+            "Saskatoon": "Thu, Aug-20",
+            "Regina": "Mon, Aug-17",
+            "Vancouver": "Thu, Aug-20"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Aug-25",
+            "Chicago": "Aug-21",
+            "Detroit": "Aug-21",
+            "Indianapolis": "Aug-16",
+            "Duluth": "Aug-13",
+            "Winnipeg": "Aug-17",
+            "Calgary": "Aug-15",
+            "Edmonton": "Aug-17",
+            "Saskatoon": "Aug-15",
+            "Regina": "Aug-12",
+            "Vancouver": "Aug-15"
+          }
+        }
+      ]
+    },
+    "montreal-cast": {
+      "name": "Montreal — Cast",
+      "rail": "CN",
+      "runDate": "Fri 31-Jul",
+      "generatedAt": "2026-07-31",
+      "cities": [
+        "Toronto (Brampton)",
+        "Chicago",
+        "Detroit",
+        "Indianapolis",
+        "Winnipeg",
+        "Calgary",
+        "Edmonton",
+        "Saskatoon",
+        "Regina",
+        "Vancouver"
+      ],
+      "notes": [
+        "Subject to change without notice/ Sujet aux changements sans préavis",
+        "Please contact Cargocool-Intl@cn.ca for Reefer shipments moving in CN’s Genset service"
+      ],
+      "cutTimes": {},
+      "vessels": [
+        {
+          "vessel": "CMA CGM BALBOA",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "01-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Thu, Jul-30",
+            "Chicago": "Wed, Jul-29",
+            "Detroit": "Wed, Jul-29",
+            "Indianapolis": "Fri, Jul-24",
+            "Winnipeg": "Sun, Jul-26",
+            "Calgary": "Thu, Jul-23",
+            "Edmonton": "Fri, Jul-24",
+            "Saskatoon": "Wed, Jul-22",
+            "Regina": "Mon, Jul-20",
+            "Vancouver": "Wed, Jul-22"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Jul-26",
+            "Chicago": "Jul-24",
+            "Detroit": "Jul-24",
+            "Indianapolis": "Jul-19",
+            "Winnipeg": "Jul-21",
+            "Calgary": "Jul-18",
+            "Edmonton": "Jul-19",
+            "Saskatoon": "Fri, Jul-17",
+            "Regina": "Wed, Jul-15",
+            "Vancouver": "Jul-17"
+          }
+        },
+        {
+          "vessel": "LIVERPOOL EXPRESS",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "02-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Sat, Aug-01",
+            "Chicago": "Wed, Jul-29",
+            "Detroit": "Wed, Jul-29",
+            "Indianapolis": "Fri, Jul-24",
+            "Winnipeg": "Sun, Jul-26",
+            "Calgary": "Thu, Jul-23",
+            "Edmonton": "Sat, Jul-25",
+            "Saskatoon": "Thu, Jul-23",
+            "Regina": "Mon, Jul-20",
+            "Vancouver": "Thu, Jul-23"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Jul-28",
+            "Chicago": "Jul-24",
+            "Detroit": "Jul-24",
+            "Indianapolis": "Jul-19",
+            "Winnipeg": "Jul-21",
+            "Calgary": "Jul-18",
+            "Edmonton": "Jul-20",
+            "Saskatoon": "Sat, Jul-18",
+            "Regina": "Wed, Jul-15",
+            "Vancouver": "Jul-18"
+          }
+        },
+        {
+          "vessel": "CMA CGM KAILAS",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "08-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Thu, Aug-06",
+            "Chicago": "Wed, Aug-05",
+            "Detroit": "Wed, Aug-05",
+            "Indianapolis": "Fri, Jul-31",
+            "Winnipeg": "Sun, Aug-02",
+            "Calgary": "Thu, Jul-30",
+            "Edmonton": "Fri, Jul-31",
+            "Saskatoon": "Wed, Jul-29",
+            "Regina": "Mon, Jul-27",
+            "Vancouver": "Wed, Jul-29"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Aug-02",
+            "Chicago": "Jul-31",
+            "Detroit": "Jul-31",
+            "Indianapolis": "Jul-26",
+            "Winnipeg": "Jul-28",
+            "Calgary": "Jul-25",
+            "Edmonton": "Jul-26",
+            "Saskatoon": "Fri, Jul-24",
+            "Regina": "Wed, Jul-22",
+            "Vancouver": "Jul-24"
+          }
+        },
+        {
+          "vessel": "DETROIT EXPRESS",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "10-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Sun, Aug-09",
+            "Chicago": "Fri, Aug-07",
+            "Detroit": "Fri, Aug-07",
+            "Indianapolis": "Mon, Aug-03",
+            "Winnipeg": "Mon, Aug-03",
+            "Calgary": "Thu, Jul-30",
+            "Edmonton": "Sun, Aug-02",
+            "Saskatoon": "Fri, Jul-31",
+            "Regina": "Fri, Jul-31",
+            "Vancouver": "Fri, Jul-31"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Aug-05",
+            "Chicago": "Aug-02",
+            "Detroit": "Aug-02",
+            "Indianapolis": "Jul-29",
+            "Winnipeg": "Jul-29",
+            "Calgary": "Jul-25",
+            "Edmonton": "Jul-28",
+            "Saskatoon": "Sun, Jul-26",
+            "Regina": "Sun, Jul-26",
+            "Vancouver": "Jul-26"
+          }
+        },
+        {
+          "vessel": "CMA CGM SURABAYA",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "15-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Thu, Aug-13",
+            "Chicago": "Wed, Aug-12",
+            "Detroit": "Wed, Aug-12",
+            "Indianapolis": "Fri, Aug-07",
+            "Winnipeg": "Sun, Aug-09",
+            "Calgary": "Thu, Aug-06",
+            "Edmonton": "Fri, Aug-07",
+            "Saskatoon": "Wed, Aug-05",
+            "Regina": "Mon, Aug-03",
+            "Vancouver": "Wed, Aug-05"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Aug-09",
+            "Chicago": "Aug-07",
+            "Detroit": "Aug-07",
+            "Indianapolis": "Aug-02",
+            "Winnipeg": "Aug-04",
+            "Calgary": "Aug-01",
+            "Edmonton": "Aug-02",
+            "Saskatoon": "Fri, Jul-31",
+            "Regina": "Wed, Jul-29",
+            "Vancouver": "Jul-31"
+          }
+        },
+        {
+          "vessel": "MONTREAL EXPRESS",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "17-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Sun, Aug-16",
+            "Chicago": "Fri, Aug-14",
+            "Detroit": "Fri, Aug-14",
+            "Indianapolis": "Mon, Aug-10",
+            "Winnipeg": "Mon, Aug-10",
+            "Calgary": "Thu, Aug-06",
+            "Edmonton": "Sun, Aug-09",
+            "Saskatoon": "Fri, Aug-07",
+            "Regina": "Fri, Aug-07",
+            "Vancouver": "Fri, Aug-07"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Aug-12",
+            "Chicago": "Aug-09",
+            "Detroit": "Aug-09",
+            "Indianapolis": "Aug-05",
+            "Winnipeg": "Aug-05",
+            "Calgary": "Aug-01",
+            "Edmonton": "Aug-04",
+            "Saskatoon": "Sun, Aug-02",
+            "Regina": "Sun, Aug-02",
+            "Vancouver": "Aug-02"
+          }
+        },
+        {
+          "vessel": "ONTARIO EXPRESS",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "20-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Wed, Aug-19",
+            "Chicago": "Sun, Aug-16",
+            "Detroit": "Sun, Aug-16",
+            "Indianapolis": "Mon, Aug-10",
+            "Winnipeg": "Fri, Aug-14",
+            "Calgary": "Tue, Aug-11",
+            "Edmonton": "Wed, Aug-12",
+            "Saskatoon": "Mon, Aug-10",
+            "Regina": "Mon, Aug-10",
+            "Vancouver": "Mon, Aug-10"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Aug-15",
+            "Chicago": "Aug-11",
+            "Detroit": "Aug-11",
+            "Indianapolis": "Aug-05",
+            "Winnipeg": "Aug-09",
+            "Calgary": "Aug-06",
+            "Edmonton": "Aug-07",
+            "Saskatoon": "Wed, Aug-05",
+            "Regina": "Wed, Aug-05",
+            "Vancouver": "Aug-05"
+          }
+        },
+        {
+          "vessel": "CMA CGM HOMERE",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "22-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Thu, Aug-20",
+            "Chicago": "Wed, Aug-19",
+            "Detroit": "Wed, Aug-19",
+            "Indianapolis": "Fri, Aug-14",
+            "Winnipeg": "Sun, Aug-16",
+            "Calgary": "Thu, Aug-13",
+            "Edmonton": "Fri, Aug-14",
+            "Saskatoon": "Wed, Aug-12",
+            "Regina": "Mon, Aug-10",
+            "Vancouver": "Wed, Aug-12"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Aug-16",
+            "Chicago": "Aug-14",
+            "Detroit": "Aug-14",
+            "Indianapolis": "Aug-09",
+            "Winnipeg": "Aug-11",
+            "Calgary": "Aug-08",
+            "Edmonton": "Aug-09",
+            "Saskatoon": "Fri, Aug-07",
+            "Regina": "Wed, Aug-05",
+            "Vancouver": "Aug-07"
+          }
+        },
+        {
+          "vessel": "OOCL MONTREAL",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "24-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Sun, Aug-23",
+            "Chicago": "Fri, Aug-21",
+            "Detroit": "Fri, Aug-21",
+            "Indianapolis": "Mon, Aug-17",
+            "Winnipeg": "Mon, Aug-17",
+            "Calgary": "Thu, Aug-13",
+            "Edmonton": "Sun, Aug-16",
+            "Saskatoon": "Fri, Aug-14",
+            "Regina": "Fri, Aug-14",
+            "Vancouver": "Fri, Aug-14"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Aug-19",
+            "Chicago": "Aug-16",
+            "Detroit": "Aug-16",
+            "Indianapolis": "Aug-12",
+            "Winnipeg": "Aug-12",
+            "Calgary": "Aug-08",
+            "Edmonton": "Aug-11",
+            "Saskatoon": "Sun, Aug-09",
+            "Regina": "Sun, Aug-09",
+            "Vancouver": "Aug-09"
+          }
+        },
+        {
+          "vessel": "CMA CGM ARISTOTE",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "29-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Thu, Aug-27",
+            "Chicago": "Wed, Aug-26",
+            "Detroit": "Wed, Aug-26",
+            "Indianapolis": "Fri, Aug-21",
+            "Winnipeg": "Sun, Aug-23",
+            "Calgary": "Thu, Aug-20",
+            "Edmonton": "Fri, Aug-21",
+            "Saskatoon": "Wed, Aug-19",
+            "Regina": "Mon, Aug-17",
+            "Vancouver": "Wed, Aug-19"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Aug-23",
+            "Chicago": "Aug-21",
+            "Detroit": "Aug-21",
+            "Indianapolis": "Aug-16",
+            "Winnipeg": "Aug-18",
+            "Calgary": "Aug-15",
+            "Edmonton": "Aug-16",
+            "Saskatoon": "Fri, Aug-14",
+            "Regina": "Wed, Aug-12",
+            "Vancouver": "Aug-14"
+          }
+        },
+        {
+          "vessel": "GENOA EXPRESS",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "31-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Sun, Aug-30",
+            "Chicago": "Fri, Aug-28",
+            "Detroit": "Fri, Aug-28",
+            "Indianapolis": "Mon, Aug-24",
+            "Winnipeg": "Mon, Aug-24",
+            "Calgary": "Thu, Aug-20",
+            "Edmonton": "Sun, Aug-23",
+            "Saskatoon": "Fri, Aug-21",
+            "Regina": "Fri, Aug-21",
+            "Vancouver": "Fri, Aug-21"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Aug-26",
+            "Chicago": "Aug-23",
+            "Detroit": "Aug-23",
+            "Indianapolis": "Aug-19",
+            "Winnipeg": "Aug-19",
+            "Calgary": "Aug-15",
+            "Edmonton": "Aug-18",
+            "Saskatoon": "Sun, Aug-16",
+            "Regina": "Sun, Aug-16",
+            "Vancouver": "Aug-16"
+          }
+        }
+      ]
+    },
+    "montreal-viau": {
+      "name": "Montreal — Viau",
+      "rail": "CN",
+      "runDate": "Fri 31-Jul",
+      "generatedAt": "2026-07-31",
+      "cities": [
+        "Toronto (Brampton)",
+        "Chicago",
+        "Detroit",
+        "Indianapolis",
+        "Winnipeg",
+        "Calgary",
+        "Edmonton",
+        "Saskatoon",
+        "Regina",
+        "Vancouver"
+      ],
+      "notes": [
+        "Subject to change without notice/ Sujet aux changements sans préavis",
+        "Please contact Cargocool-Intl@cn.ca for Reefer shipments moving in CN’s Genset service"
+      ],
+      "cutTimes": {},
+      "vessels": [
+        {
+          "vessel": "MSC ANGELA",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "05-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Tue, Aug-04",
+            "Chicago": "Sun, Aug-02",
+            "Detroit": "Sun, Aug-02",
+            "Indianapolis": "Mon, Jul-27",
+            "Winnipeg": "Wed, Jul-29",
+            "Calgary": "Sun, Jul-26",
+            "Edmonton": "Tue, Jul-28",
+            "Saskatoon": "Sun, Jul-26",
+            "Regina": "Sun, Jul-26",
+            "Vancouver": "Sun, Jul-26"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Jul-29",
+            "Chicago": "Jul-28",
+            "Detroit": "Jul-28",
+            "Indianapolis": "Jul-22",
+            "Winnipeg": "Jul-24",
+            "Calgary": "Jul-21",
+            "Edmonton": "Jul-23",
+            "Saskatoon": "Jul-21",
+            "Regina": "Jul-21",
+            "Vancouver": "Jul-21"
+          }
+        },
+        {
+          "vessel": "MSC JORDAN III",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "12-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Tue, Aug-11",
+            "Chicago": "Sun, Aug-09",
+            "Detroit": "Sun, Aug-09",
+            "Indianapolis": "Mon, Aug-03",
+            "Winnipeg": "Wed, Aug-05",
+            "Calgary": "Sun, Aug-02",
+            "Edmonton": "Tue, Aug-04",
+            "Saskatoon": "Sun, Aug-02",
+            "Regina": "Sun, Aug-02",
+            "Vancouver": "Sun, Aug-02"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Aug-05",
+            "Chicago": "Aug-04",
+            "Detroit": "Aug-04",
+            "Indianapolis": "Jul-29",
+            "Winnipeg": "Jul-31",
+            "Calgary": "Jul-28",
+            "Edmonton": "Jul-30",
+            "Saskatoon": "Jul-28",
+            "Regina": "Jul-28",
+            "Vancouver": "Jul-28"
+          }
+        },
+        {
+          "vessel": "MSC WEST V",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "13-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Wed, Aug-12",
+            "Chicago": "Sun, Aug-09",
+            "Detroit": "Sun, Aug-09",
+            "Indianapolis": "Mon, Aug-03",
+            "Winnipeg": "Fri, Aug-07",
+            "Calgary": "Tue, Aug-04",
+            "Edmonton": "Wed, Aug-05",
+            "Saskatoon": "Mon, Aug-03",
+            "Regina": "Mon, Aug-03",
+            "Vancouver": "Mon, Aug-03"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Aug-06",
+            "Chicago": "Aug-04",
+            "Detroit": "Aug-04",
+            "Indianapolis": "Jul-29",
+            "Winnipeg": "Aug-02",
+            "Calgary": "Jul-30",
+            "Edmonton": "Jul-31",
+            "Saskatoon": "Jul-29",
+            "Regina": "Jul-29",
+            "Vancouver": "Jul-29"
+          }
+        },
+        {
+          "vessel": "MSC ANNICK",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "13-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Wed, Sep-09",
+            "Chicago": "Sun, Sep-06",
+            "Detroit": "Sun, Sep-06",
+            "Indianapolis": "Mon, Aug-31",
+            "Winnipeg": "Fri, Sep-04",
+            "Calgary": "Tue, Sep-01",
+            "Edmonton": "Wed, Sep-02",
+            "Saskatoon": "Mon, Aug-31",
+            "Regina": "Mon, Aug-31",
+            "Vancouver": "Mon, Aug-31"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Sep-03",
+            "Chicago": "Sep-01",
+            "Detroit": "Sep-01",
+            "Indianapolis": "Aug-26",
+            "Winnipeg": "Aug-30",
+            "Calgary": "Aug-27",
+            "Edmonton": "Aug-28",
+            "Saskatoon": "Aug-26",
+            "Regina": "Aug-26",
+            "Vancouver": "Aug-26"
+          }
+        },
+        {
+          "vessel": "MSC RENAISSANCE III",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "20-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Wed, Sep-16",
+            "Chicago": "Sun, Sep-13",
+            "Detroit": "Sun, Sep-13",
+            "Indianapolis": "Mon, Sep-07",
+            "Winnipeg": "Fri, Sep-11",
+            "Calgary": "Tue, Sep-08",
+            "Edmonton": "Wed, Sep-09",
+            "Saskatoon": "Mon, Sep-07",
+            "Regina": "Mon, Sep-07",
+            "Vancouver": "Mon, Sep-07"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Sep-10",
+            "Chicago": "Sep-08",
+            "Detroit": "Sep-08",
+            "Indianapolis": "Sep-02",
+            "Winnipeg": "Sep-06",
+            "Calgary": "Sep-03",
+            "Edmonton": "Sep-04",
+            "Saskatoon": "Sep-02",
+            "Regina": "Sep-02",
+            "Vancouver": "Sep-02"
+          }
+        },
+        {
+          "vessel": "MSC MATILDE V",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "26-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Tue, Aug-25",
+            "Chicago": "Sun, Aug-23",
+            "Detroit": "Sun, Aug-23",
+            "Indianapolis": "Mon, Aug-17",
+            "Winnipeg": "Wed, Aug-19",
+            "Calgary": "Sun, Aug-16",
+            "Edmonton": "Tue, Aug-18",
+            "Saskatoon": "Sun, Aug-16",
+            "Regina": "Sun, Aug-16",
+            "Vancouver": "Sun, Aug-16"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Aug-19",
+            "Chicago": "Aug-18",
+            "Detroit": "Aug-18",
+            "Indianapolis": "Aug-12",
+            "Winnipeg": "Aug-14",
+            "Calgary": "Aug-11",
+            "Edmonton": "Aug-13",
+            "Saskatoon": "Aug-11",
+            "Regina": "Aug-11",
+            "Vancouver": "Aug-11"
+          }
+        },
+        {
+          "vessel": "MSC ARUSHI R",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "27-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Wed, Aug-26",
+            "Chicago": "Sun, Aug-23",
+            "Detroit": "Sun, Aug-23",
+            "Indianapolis": "Mon, Aug-17",
+            "Winnipeg": "Fri, Aug-21",
+            "Calgary": "Tue, Aug-18",
+            "Edmonton": "Wed, Aug-19",
+            "Saskatoon": "Mon, Aug-17",
+            "Regina": "Mon, Aug-17",
+            "Vancouver": "Mon, Aug-17"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Aug-20",
+            "Chicago": "Aug-18",
+            "Detroit": "Aug-18",
+            "Indianapolis": "Aug-12",
+            "Winnipeg": "Aug-16",
+            "Calgary": "Aug-13",
+            "Edmonton": "Aug-14",
+            "Saskatoon": "Aug-12",
+            "Regina": "Aug-12",
+            "Vancouver": "Aug-12"
+          }
+        },
+        {
+          "vessel": "MSC ENGLAND",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "28-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Thu, Aug-27",
+            "Chicago": "Tue, Aug-25",
+            "Detroit": "Tue, Aug-25",
+            "Indianapolis": "Fri, Aug-21",
+            "Winnipeg": "Fri, Aug-21",
+            "Calgary": "Tue, Aug-18",
+            "Edmonton": "Thu, Aug-20",
+            "Saskatoon": "Tue, Aug-18",
+            "Regina": "Tue, Aug-18",
+            "Vancouver": "Tue, Aug-18"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Aug-21",
+            "Chicago": "Aug-20",
+            "Detroit": "Aug-20",
+            "Indianapolis": "Aug-16",
+            "Winnipeg": "Aug-16",
+            "Calgary": "Aug-13",
+            "Edmonton": "Aug-15",
+            "Saskatoon": "Aug-13",
+            "Regina": "Aug-13",
+            "Vancouver": "Aug-13"
           }
         }
       ]

@@ -6,6 +6,27 @@
     "url": "https://www.cpkcr.com/content/dam/cpkc/documents/english/pdfs/port-schedules/port-of-montreal.pdf"
   },
   {
+    "slug": "montreal-racine",
+    "name": "Montreal — Racine",
+    "rail": "CN",
+    "parser": "cn",
+    "url": "https://www.cn.ca/-/media/files/customer-centre/port-cutoffs/racine-cutoff.pdf"
+  },
+  {
+    "slug": "montreal-cast",
+    "name": "Montreal — Cast",
+    "rail": "CN",
+    "parser": "cn",
+    "url": "https://www.cn.ca/-/media/files/customer-centre/port-cutoffs/cast-cutoff.pdf"
+  },
+  {
+    "slug": "montreal-viau",
+    "name": "Montreal — Viau",
+    "rail": "CN",
+    "parser": "cn",
+    "url": "https://www.cn.ca/-/media/files/customer-centre/port-cutoffs/viau-cutoff.pdf"
+  },
+  {
     "slug": "metro-vancouver",
     "name": "Port of Metro Vancouver",
     "rail": "CPKC",
