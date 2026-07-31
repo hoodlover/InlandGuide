@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-30",
-  "pulledAt": "2026-07-30T15:10:23.311Z",
+  "generatedAt": "2026-07-31",
+  "pulledAt": "2026-07-31T15:20:10.830Z",
   "ports": {
     "montreal": {
       "name": "Port of Montreal",
@@ -1533,8 +1533,8 @@
     "prince-rupert": {
       "name": "Prince Rupert",
       "rail": "CN",
-      "runDate": "Thu 30-Jul",
-      "generatedAt": "2026-07-30",
+      "runDate": "Fri 31-Jul",
+      "generatedAt": "2026-07-31",
       "cities": [
         "TORONTO (MALPORT)",
         "MONTREAL",
@@ -2277,6 +2277,50 @@
             "MEMPHIS": "15-Aug",
             "NEW ORLEANS": "16-Aug",
             "ARCADIA": "16-Aug"
+          }
+        },
+        {
+          "vessel": "CSCL SOUTH CHINA SEA",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "02-Sep",
+          "comments": "",
+          "cutoffs": {
+            "TORONTO (MALPORT)": "Sun, Aug-23",
+            "MONTREAL": "Mon, Aug-24",
+            "WINNIPEG": "Wed, Aug-26",
+            "SASKATOON": "Mon, Aug-24",
+            "REGINA": "Sat, Aug-22",
+            "CALGARY": "Tue, Aug-25",
+            "EDMONTON": "Sat, Aug-29",
+            "PRINCE GEORGE": "Sat, Aug-29",
+            "CHIPPEWA FALLS": "Thu, Aug-20",
+            "JOLIET": "Tue, Aug-25",
+            "INDIANAPOLIS": "Sat, Aug-22",
+            "CHICAGO": "Tue, Aug-25",
+            "DETROIT": "Mon, Aug-24",
+            "MEMPHIS": "Mon, Aug-24",
+            "NEW ORLEANS": "Fri, Aug-21",
+            "ARCADIA": "Tue, Aug-25"
+          },
+          "erds": {
+            "TORONTO (MALPORT)": "18-Aug",
+            "MONTREAL": "19-Aug",
+            "WINNIPEG": "21-Aug",
+            "SASKATOON": "19-Aug",
+            "REGINA": "17-Aug",
+            "CALGARY": "20-Aug",
+            "EDMONTON": "24-Aug",
+            "PRINCE GEORGE": "24-Aug",
+            "CHIPPEWA FALLS": "15-Aug",
+            "JOLIET": "20-Aug",
+            "INDIANAPOLIS": "17-Aug",
+            "CHICAGO": "20-Aug",
+            "DETROIT": "19-Aug",
+            "MEMPHIS": "19-Aug",
+            "NEW ORLEANS": "16-Aug",
+            "ARCADIA": "20-Aug"
           }
         }
       ]
