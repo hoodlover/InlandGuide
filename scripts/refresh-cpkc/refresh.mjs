@@ -34,7 +34,9 @@ const DATETIME_RE = /^[A-Z][a-z]{2}\s+\d{1,2}-[A-Z][a-z]{2}\s+\d{1,2}:\d{2}$/;
 
 // CN date formats: cut-off cells "Fri, Jul-03"; ERD / port-cutoff cells "28-Jun".
 const CN_CUT_RE = /^[A-Za-z]{3},\s*[A-Za-z]{3}-\d{1,2}$/;
-const CN_ERD_RE = /^\d{1,2}-[A-Za-z]{3}$/;
+// CN varies the compact date order by sheet: Prince Rupert uses "25-Jul",
+// while Centerm uses "Jul-25". Both appear in ERD and port-cutoff cells.
+const CN_ERD_RE = /^(?:\d{1,2}-[A-Za-z]{3}|[A-Za-z]{3}-\d{1,2})$/;
 const WEEKDAY_RE = /^(Mon|Tue|Wed|Thu|Fri|Sat|Sun)$/;
 
 async function loadPages(data) {
@@ -253,11 +255,18 @@ function parseCN(pages, port) {
     }
 
     // Destination names sit in the band just above the sub-header, over the columns.
-    const destItems = rows
+    // Use the single row that contains one destination label per cut/ERD pair.
+    // Some CN sheets (notably Centerm) place "PORT CUT-OFF / DATE LIMITE"
+    // fragments in the same vertical band; flattening the whole band mistakes
+    // those labels for extra destinations and can shift every ERD column.
+    const destRow = rows
       .filter(r => r.y > sub.y && r.y < sub.y + 45)
-      .flatMap(r => r.items)
-      .filter(it => it.x > cutCols[0] - 90)
-      .sort((a, b) => a.x - b.x);
+      .map(r => ({
+        ...r,
+        items: r.items.filter(it => it.x > cutCols[0] - 90).sort((a, b) => a.x - b.x),
+      }))
+      .find(r => r.items.length === cutCols.length);
+    const destItems = destRow ? destRow.items : [];
     if (destItems.length !== cutCols.length) {
       throw new Error(`[${slug}] found ${destItems.length} destinations for ${cutCols.length} columns`);
     }

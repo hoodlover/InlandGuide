@@ -23,5 +23,12 @@
     "rail": "CN",
     "parser": "cn",
     "url": "https://www.cn.ca/-/media/files/customer-centre/port-cutoffs/princerupert-cutoff-erd.pdf"
+  },
+  {
+    "slug": "centerm",
+    "name": "Centerm",
+    "rail": "CN",
+    "parser": "cn",
+    "url": "https://www.cn.ca/-/media/files/customer-centre/port-cutoffs/centerm-cutoff-erd.pdf"
   }
 ]
