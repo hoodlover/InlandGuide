@@ -585,19 +585,6 @@
     "windowReefer": 0
   },
   {
-    "pol": "USCHS",
-    "ssy": "ALL",
-    "name": "DALLAS, TX",
-    "loccode": "USDAL",
-    "rampMC": "UNIONP 081",
-    "rampCutTime": 0.7083333333333334,
-    "transit": 9,
-    "window": 2,
-    "ssyAdjustment": 0,
-    "reefer": "N",
-    "windowReefer": 0
-  },
-  {
     "pol": "USHOU",
     "ssy": "ALL",
     "name": "DENVER, CO",
@@ -1630,7 +1617,7 @@
     "name": "DETROIT, MI",
     "loccode": "USDET",
     "rampMC": "NORFOL 101",
-    "rampCutTime": 0.7083333333333334,
+    "rampCutTime": 0.6041666666666666,
     "transit": 5,
     "window": 2,
     "ssyAdjustment": 0,
@@ -1643,7 +1630,7 @@
     "name": "DETROIT, MI",
     "loccode": "USDET",
     "rampMC": "NORFOL 101",
-    "rampCutTime": 0.7083333333333334,
+    "rampCutTime": 0.6041666666666666,
     "transit": 7,
     "window": 2,
     "ssyAdjustment": 0,
