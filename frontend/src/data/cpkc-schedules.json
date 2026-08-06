@@ -1,12 +1,12 @@
 {
   "generatedAt": "2026-08-06",
-  "pulledAt": "2026-08-06T14:43:00.884Z",
+  "pulledAt": "2026-08-06T15:13:49.022Z",
   "ports": {
     "montreal": {
       "name": "Port of Montreal",
       "rail": "CPKC",
-      "runDate": "Mon 3-Aug",
-      "generatedAt": "2026-08-03",
+      "runDate": "Thu 6-Aug",
+      "generatedAt": "2026-08-06",
       "cities": [
         "Vancouver",
         "Edmonton",
@@ -84,25 +84,6 @@
           }
         },
         {
-          "vessel": "ARICA EXPRESS",
-          "terminal": "Racine",
-          "eta": "Mon 3-Aug",
-          "etd": "Wed 5-Aug",
-          "railPortCutoff": "Mon 3-Aug",
-          "comments": "",
-          "cutoffs": {
-            "Vancouver": "Mon 27-Jul 18:30",
-            "Edmonton": "Mon 27-Jul 17:00",
-            "Calgary": "Mon 27-Jul 23:00",
-            "Regina": "Tue 28-Jul 17:00",
-            "Winnipeg": "Tue 28-Jul 15:00",
-            "Vaughan": "Sat 1-Aug 13:00",
-            "Minneapolis": "Wed 29-Jul 12:00",
-            "Bensenville": "Thu 30-Jul 17:00",
-            "Detroit": "Thu 30-Jul 15:00"
-          }
-        },
-        {
           "vessel": "MOMBASA EXPRESS",
           "terminal": "Racine",
           "eta": "Mon 10-Aug",
@@ -138,6 +119,25 @@
             "Minneapolis": "Wed 12-Aug 12:00",
             "Bensenville": "Thu 13-Aug 17:00",
             "Detroit": "Thu 13-Aug 15:00"
+          }
+        },
+        {
+          "vessel": "JAKARTA EXPRESS",
+          "terminal": "Racine",
+          "eta": "Mon 24-Aug",
+          "etd": "Wed 26-Aug",
+          "railPortCutoff": "Mon 24-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Vancouver": "Mon 17-Aug 18:30",
+            "Edmonton": "Mon 17-Aug 17:00",
+            "Calgary": "Mon 17-Aug 23:00",
+            "Regina": "Tue 18-Aug 17:00",
+            "Winnipeg": "Tue 18-Aug 15:00",
+            "Vaughan": "Sat 22-Aug 13:00",
+            "Minneapolis": "Wed 19-Aug 12:00",
+            "Bensenville": "Thu 20-Aug 17:00",
+            "Detroit": "Thu 20-Aug 15:00"
           }
         },
         {
@@ -179,6 +179,25 @@
           }
         },
         {
+          "vessel": "MSC WEST V",
+          "terminal": "Viau",
+          "eta": "Fri 14-Aug",
+          "etd": "Sun 16-Aug",
+          "railPortCutoff": "Wed 12-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Vancouver": "Fri 7-Aug 18:30",
+            "Edmonton": "Fri 7-Aug 17:00",
+            "Calgary": "Fri 7-Aug 23:00",
+            "Regina": "Fri 7-Aug 17:00",
+            "Winnipeg": "Fri 7-Aug 15:00",
+            "Vaughan": "Mon 10-Aug 13:00",
+            "Minneapolis": "Fri 7-Aug 12:00",
+            "Bensenville": "Sun 9-Aug 17:00",
+            "Detroit": "Sat 8-Aug 15:00"
+          }
+        },
+        {
           "vessel": "CMA CGM SURABAYA",
           "terminal": "Cast",
           "eta": "Fri 14-Aug",
@@ -189,7 +208,7 @@
             "Vancouver": "Fri 7-Aug 18:30",
             "Edmonton": "Sun 9-Aug 17:00",
             "Calgary": "Sun 9-Aug 23:00",
-            "Regina": "Mon 10-Aug 17:00",
+            "Regina": "Mon 10-Aug 00:00",
             "Winnipeg": "Mon 10-Aug 15:00",
             "Vaughan": "Wed 12-Aug 13:00",
             "Minneapolis": "Sun 9-Aug 12:00",
@@ -198,22 +217,22 @@
           }
         },
         {
-          "vessel": "MSC WEST V",
-          "terminal": "Viau",
-          "eta": "Tue 18-Aug",
-          "etd": "Thu 20-Aug",
-          "railPortCutoff": "Sun 16-Aug",
+          "vessel": "ONTARIO EXPRESS",
+          "terminal": "Cast",
+          "eta": "Fri 21-Aug",
+          "etd": "Sun 23-Aug",
+          "railPortCutoff": "Fri 21-Aug",
           "comments": "",
           "cutoffs": {
-            "Vancouver": "Tue 11-Aug 18:30",
-            "Edmonton": "Tue 11-Aug 17:00",
-            "Calgary": "Tue 11-Aug 23:00",
-            "Regina": "Tue 11-Aug 00:00",
-            "Winnipeg": "Tue 11-Aug 15:00",
-            "Vaughan": "Fri 14-Aug 13:00",
-            "Minneapolis": "Tue 11-Aug 12:00",
-            "Bensenville": "Thu 13-Aug 17:00",
-            "Detroit": "Thu 13-Aug 15:00"
+            "Vancouver": "Wed 12-Aug 18:30",
+            "Edmonton": "Fri 14-Aug 15:00",
+            "Calgary": "Fri 14-Aug 23:00",
+            "Regina": "Sat 15-Aug 18:00",
+            "Winnipeg": "Sat 15-Aug 16:00",
+            "Vaughan": "Wed 19-Aug 13:00",
+            "Minneapolis": "Sun 16-Aug 12:00",
+            "Bensenville": "Tue 18-Aug 17:00",
+            "Detroit": "Tue 18-Aug 15:00"
           }
         },
         {
@@ -236,30 +255,11 @@
           }
         },
         {
-          "vessel": "CMA CGM ARISTOTE",
-          "terminal": "Cast",
-          "eta": "Fri 28-Aug",
-          "etd": "Sun 30-Aug",
-          "railPortCutoff": "Fri 28-Aug",
-          "comments": "CGA service",
-          "cutoffs": {
-            "Vancouver": "Fri 21-Aug 18:30",
-            "Edmonton": "Sun 23-Aug 15:00",
-            "Calgary": "Sun 23-Aug 23:00",
-            "Regina": "Mon 24-Aug 18:00",
-            "Winnipeg": "Mon 24-Aug 16:00",
-            "Vaughan": "Wed 26-Aug 13:00",
-            "Minneapolis": "Sun 23-Aug 12:00",
-            "Bensenville": "Tue 25-Aug 17:00",
-            "Detroit": "Tue 25-Aug 15:00"
-          }
-        },
-        {
           "vessel": "VOLGA MAERSK",
           "terminal": "Racine",
-          "eta": "Mon 10-Aug",
-          "etd": "Wed 12-Aug",
-          "railPortCutoff": "Mon 10-Aug",
+          "eta": "Sun 9-Aug",
+          "etd": "Tue 11-Aug",
+          "railPortCutoff": "Sun 9-Aug",
           "comments": "",
           "cutoffs": {
             "Vancouver": "Mon 3-Aug 18:30",
@@ -267,7 +267,7 @@
             "Calgary": "Tue 4-Aug 23:00",
             "Regina": "Wed 5-Aug 17:00",
             "Winnipeg": "Wed 5-Aug 15:00",
-            "Vaughan": "Fri 7-Aug 13:00",
+            "Vaughan": "Thu 6-Aug 13:00",
             "Minneapolis": "Wed 5-Aug 12:00",
             "Bensenville": "Thu 6-Aug 17:00",
             "Detroit": "Thu 6-Aug 15:00"
@@ -1357,8 +1357,8 @@
     "metro-vancouver": {
       "name": "Port of Metro Vancouver",
       "rail": "CPKC",
-      "runDate": "Mon 3-Aug",
-      "generatedAt": "2026-08-03",
+      "runDate": "Thu 6-Aug",
+      "generatedAt": "2026-08-06",
       "cities": [
         "Lachine",
         "Vaughan",
@@ -1424,43 +1424,43 @@
         {
           "vessel": "YM MASCULINITY",
           "terminal": "Deltaport",
-          "eta": "Mon 24-Aug",
+          "eta": "Sun 23-Aug",
           "etd": "",
-          "railPortCutoff": "Thu 20-Aug",
+          "railPortCutoff": "Wed 19-Aug",
           "comments": "",
           "cutoffs": {
-            "Lachine": "Fri 14-Aug 21:00",
-            "Vaughan": "Fri 14-Aug 22:00",
-            "Winnipeg": "Sun 16-Aug 15:00",
-            "Regina": "Sun 16-Aug 17:00",
-            "Calgary": "Tue 18-Aug 16:00",
-            "Edmonton": "Mon 17-Aug 17:00",
-            "Vancouver": "Wed 19-Aug 02:00",
-            "Detroit": "Thu 13-Aug 06:00",
-            "Jeffersonville": "Sun 9-Aug 12:00",
-            "Bensenville": "Fri 14-Aug 20:00",
-            "Minneapolis": "Sun 16-Aug 12:00"
+            "Lachine": "Thu 13-Aug 21:00",
+            "Vaughan": "Thu 13-Aug 23:00",
+            "Winnipeg": "Sat 15-Aug 15:00",
+            "Regina": "Sat 15-Aug 17:00",
+            "Calgary": "Mon 17-Aug 08:00",
+            "Edmonton": "Sun 16-Aug 17:00",
+            "Vancouver": "Tue 18-Aug 01:00",
+            "Detroit": "Wed 12-Aug 15:00",
+            "Jeffersonville": "Sat 8-Aug 12:00",
+            "Bensenville": "Thu 13-Aug 20:00",
+            "Minneapolis": "Sat 15-Aug 12:00"
           }
         },
         {
           "vessel": "ONE MAESTRO",
           "terminal": "Deltaport",
-          "eta": "Mon 31-Aug",
+          "eta": "Fri 28-Aug",
           "etd": "",
-          "railPortCutoff": "Thu 27-Aug",
+          "railPortCutoff": "Mon 24-Aug",
           "comments": "",
           "cutoffs": {
-            "Lachine": "Fri 21-Aug 21:00",
-            "Vaughan": "Fri 21-Aug 22:00",
-            "Winnipeg": "Sun 23-Aug 15:00",
-            "Regina": "Sun 23-Aug 14:00",
-            "Calgary": "Tue 25-Aug 16:00",
-            "Edmonton": "Mon 24-Aug 17:00",
-            "Vancouver": "Wed 26-Aug 02:00",
-            "Detroit": "Thu 20-Aug 06:00",
-            "Jeffersonville": "Sun 16-Aug 12:00",
-            "Bensenville": "Fri 21-Aug 20:00",
-            "Minneapolis": "Sun 23-Aug 12:00"
+            "Lachine": "Tue 18-Aug 21:00",
+            "Vaughan": "Tue 18-Aug 23:00",
+            "Winnipeg": "Thu 20-Aug 15:00",
+            "Regina": "Thu 20-Aug 17:00",
+            "Calgary": "Sat 22-Aug 08:00",
+            "Edmonton": "Fri 21-Aug 17:00",
+            "Vancouver": "Sun 23-Aug 01:00",
+            "Detroit": "Mon 17-Aug 15:00",
+            "Jeffersonville": "Thu 13-Aug 12:00",
+            "Bensenville": "Tue 18-Aug 20:00",
+            "Minneapolis": "Thu 20-Aug 12:00"
           }
         },
         {
@@ -1487,89 +1487,68 @@
         {
           "vessel": "HMM PRIDE",
           "terminal": "Deltaport",
-          "eta": "Mon 17-Aug",
+          "eta": "Tue 18-Aug",
           "etd": "",
-          "railPortCutoff": "Sun 16-Aug",
+          "railPortCutoff": "Mon 17-Aug",
           "comments": "",
           "cutoffs": {
-            "Lachine": "Sun 9-Aug 21:00",
-            "Vaughan": "Sun 9-Aug 23:00",
-            "Winnipeg": "Mon 10-Aug 15:00",
-            "Regina": "Mon 10-Aug 17:00",
-            "Calgary": "Thu 13-Aug 08:00",
-            "Edmonton": "Wed 12-Aug 17:00",
-            "Vancouver": "Fri 14-Aug 01:00",
+            "Lachine": "Mon 10-Aug 21:00",
+            "Vaughan": "Mon 10-Aug 23:00",
+            "Winnipeg": "Tue 11-Aug 15:00",
+            "Regina": "Tue 11-Aug 17:00",
+            "Calgary": "Fri 14-Aug 08:00",
+            "Edmonton": "Thu 13-Aug 17:00",
+            "Vancouver": "Sat 15-Aug 01:00",
             "Detroit": "Sat 8-Aug 15:00",
             "Jeffersonville": "Sat 1-Aug 12:00",
-            "Bensenville": "Mon 10-Aug 20:00",
-            "Minneapolis": "Mon 10-Aug 12:00"
+            "Bensenville": "Tue 11-Aug 20:00",
+            "Minneapolis": "Tue 11-Aug 12:00"
           }
         },
         {
           "vessel": "YM WONDERLAND",
           "terminal": "Deltaport",
-          "eta": "Sun 23-Aug",
+          "eta": "Mon 24-Aug",
           "etd": "",
-          "railPortCutoff": "Sat 22-Aug",
+          "railPortCutoff": "Sun 23-Aug",
           "comments": "correct service- FP2",
           "cutoffs": {
-            "Lachine": "Sat 15-Aug 21:00",
-            "Vaughan": "Sat 15-Aug 23:00",
-            "Winnipeg": "Sun 16-Aug 15:00",
-            "Regina": "Sun 16-Aug 17:00",
-            "Calgary": "Wed 19-Aug 08:00",
-            "Edmonton": "Tue 18-Aug 17:00",
-            "Vancouver": "Thu 20-Aug 01:00",
-            "Detroit": "Fri 14-Aug 15:00",
-            "Jeffersonville": "Sun 9-Aug 12:00",
-            "Bensenville": "Sun 16-Aug 20:00",
-            "Minneapolis": "Sun 16-Aug 12:00"
+            "Lachine": "Sun 16-Aug 21:00",
+            "Vaughan": "Sun 16-Aug 23:00",
+            "Winnipeg": "Mon 17-Aug 15:00",
+            "Regina": "Mon 17-Aug 17:00",
+            "Calgary": "Thu 20-Aug 08:00",
+            "Edmonton": "Wed 19-Aug 17:00",
+            "Vancouver": "Fri 21-Aug 01:00",
+            "Detroit": "Sat 15-Aug 15:00",
+            "Jeffersonville": "Mon 10-Aug 12:00",
+            "Bensenville": "Mon 17-Aug 20:00",
+            "Minneapolis": "Mon 17-Aug 12:00"
           }
         },
         {
           "vessel": "ONE MILANO",
           "terminal": "Deltaport",
-          "eta": "Sun 30-Aug",
+          "eta": "Wed 2-Sep",
           "etd": "",
-          "railPortCutoff": "Sat 29-Aug",
+          "railPortCutoff": "Tue 1-Sep",
           "comments": "",
           "cutoffs": {
-            "Lachine": "Sat 22-Aug 21:00",
-            "Vaughan": "Sat 22-Aug 23:00",
-            "Winnipeg": "Sun 23-Aug 15:00",
-            "Regina": "Sun 23-Aug 17:00",
-            "Calgary": "Wed 26-Aug 08:00",
-            "Edmonton": "Tue 25-Aug 17:00",
-            "Vancouver": "Thu 27-Aug 01:00",
-            "Detroit": "Fri 21-Aug 15:00",
-            "Jeffersonville": "Sun 16-Aug 12:00",
-            "Bensenville": "Sun 23-Aug 20:00",
-            "Minneapolis": "Sun 23-Aug 12:00"
+            "Lachine": "Tue 25-Aug 21:00",
+            "Vaughan": "Tue 25-Aug 23:00",
+            "Winnipeg": "Wed 26-Aug 15:00",
+            "Regina": "Wed 26-Aug 17:00",
+            "Calgary": "Sat 29-Aug 08:00",
+            "Edmonton": "Fri 28-Aug 17:00",
+            "Vancouver": "Sun 30-Aug 01:00",
+            "Detroit": "Mon 24-Aug 15:00",
+            "Jeffersonville": "Wed 19-Aug 12:00",
+            "Bensenville": "Wed 26-Aug 20:00",
+            "Minneapolis": "Wed 26-Aug 12:00"
           }
         },
         {
           "vessel": "YM WEALTH",
-          "terminal": "Deltaport",
-          "eta": "Thu 13-Aug",
-          "etd": "",
-          "railPortCutoff": "Wed 12-Aug",
-          "comments": "",
-          "cutoffs": {
-            "Lachine": "Sun 2-Aug 14:45",
-            "Vaughan": "Sun 2-Aug 23:00",
-            "Winnipeg": "Fri 7-Aug 15:00",
-            "Regina": "Fri 7-Aug 17:00",
-            "Calgary": "Sun 9-Aug 08:00",
-            "Edmonton": "Fri 7-Aug 17:00",
-            "Vancouver": "Mon 10-Aug 01:00",
-            "Detroit": "Sat 1-Aug 15:00",
-            "Jeffersonville": "Tue 28-Jul 12:00",
-            "Bensenville": "Mon 3-Aug 20:00",
-            "Minneapolis": "Fri 7-Aug 12:00"
-          }
-        },
-        {
-          "vessel": "YM MOBILITY",
           "terminal": "Deltaport",
           "eta": "Fri 21-Aug",
           "etd": "",
@@ -1581,7 +1560,7 @@
             "Winnipeg": "Sat 15-Aug 15:00",
             "Regina": "Sat 15-Aug 04:00",
             "Calgary": "Mon 17-Aug 08:00",
-            "Edmonton": "Sat 15-Aug 15:00",
+            "Edmonton": "Sat 15-Aug 17:00",
             "Vancouver": "Tue 18-Aug 01:00",
             "Detroit": "Wed 12-Aug 15:00",
             "Jeffersonville": "Sat 8-Aug 00:00",
@@ -1590,66 +1569,45 @@
           }
         },
         {
+          "vessel": "YM MOBILITY",
+          "terminal": "Deltaport",
+          "eta": "Thu 27-Aug",
+          "etd": "",
+          "railPortCutoff": "Wed 26-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Lachine": "Wed 19-Aug 21:00",
+            "Vaughan": "Wed 19-Aug 23:00",
+            "Winnipeg": "Fri 21-Aug 15:00",
+            "Regina": "Fri 21-Aug 17:00",
+            "Calgary": "Sun 23-Aug 08:00",
+            "Edmonton": "Fri 21-Aug 16:00",
+            "Vancouver": "Mon 24-Aug 01:00",
+            "Detroit": "Tue 18-Aug 15:00",
+            "Jeffersonville": "Fri 14-Aug 12:00",
+            "Bensenville": "Thu 20-Aug 20:00",
+            "Minneapolis": "Fri 21-Aug 12:00"
+          }
+        },
+        {
           "vessel": "YM COSMOS",
           "terminal": "Deltaport",
-          "eta": "Wed 26-Aug",
+          "eta": "Fri 28-Aug",
           "etd": "",
-          "railPortCutoff": "Tue 25-Aug",
+          "railPortCutoff": "Thu 27-Aug",
           "comments": "",
           "cutoffs": {
-            "Lachine": "Tue 18-Aug 21:00",
-            "Vaughan": "Tue 18-Aug 23:00",
-            "Winnipeg": "Thu 20-Aug 15:00",
-            "Regina": "Thu 20-Aug 17:00",
-            "Calgary": "Sat 22-Aug 08:00",
-            "Edmonton": "Thu 20-Aug 16:00",
-            "Vancouver": "Sun 23-Aug 01:00",
-            "Detroit": "Mon 17-Aug 15:00",
-            "Jeffersonville": "Thu 13-Aug 12:00",
-            "Bensenville": "Wed 19-Aug 20:00",
-            "Minneapolis": "Thu 20-Aug 12:00"
-          }
-        },
-        {
-          "vessel": "HYUNDAI SUPREME",
-          "terminal": "Deltaport",
-          "eta": "Sun 30-Aug",
-          "etd": "",
-          "railPortCutoff": "Sat 29-Aug",
-          "comments": "",
-          "cutoffs": {
-            "Lachine": "Sat 22-Aug 14:45",
-            "Vaughan": "Sat 22-Aug 23:00",
-            "Winnipeg": "Mon 24-Aug 15:00",
-            "Regina": "Mon 24-Aug 17:00",
-            "Calgary": "Wed 26-Aug 08:00",
-            "Edmonton": "Mon 24-Aug 08:00",
-            "Vancouver": "Thu 27-Aug 01:00",
-            "Detroit": "Fri 21-Aug 15:00",
-            "Jeffersonville": "Mon 17-Aug 12:00",
-            "Bensenville": "Sun 23-Aug 20:00",
-            "Minneapolis": "Mon 24-Aug 12:00"
-          }
-        },
-        {
-          "vessel": "BRIGHTON",
-          "terminal": "Deltaport",
-          "eta": "Tue 1-Sep",
-          "etd": "",
-          "railPortCutoff": "Mon 31-Aug",
-          "comments": "",
-          "cutoffs": {
-            "Lachine": "Mon 24-Aug 21:00",
-            "Vaughan": "Mon 24-Aug 23:00",
-            "Winnipeg": "Wed 26-Aug 16:00",
-            "Regina": "Wed 26-Aug 17:00",
-            "Calgary": "Fri 28-Aug 08:00",
-            "Edmonton": "Wed 26-Aug 16:00",
-            "Vancouver": "Sat 29-Aug 01:00",
-            "Detroit": "Sat 22-Aug 15:00",
-            "Jeffersonville": "Wed 19-Aug 12:00",
-            "Bensenville": "Tue 25-Aug 20:00",
-            "Minneapolis": "Wed 26-Aug 12:00"
+            "Lachine": "Thu 20-Aug 21:00",
+            "Vaughan": "Thu 20-Aug 23:00",
+            "Winnipeg": "Sat 22-Aug 15:00",
+            "Regina": "Sat 22-Aug 04:00",
+            "Calgary": "Mon 24-Aug 08:00",
+            "Edmonton": "Sat 22-Aug 15:00",
+            "Vancouver": "Tue 25-Aug 01:00",
+            "Detroit": "Wed 19-Aug 15:00",
+            "Jeffersonville": "Sat 15-Aug 00:00",
+            "Bensenville": "Fri 21-Aug 20:00",
+            "Minneapolis": "Sat 22-Aug 12:00"
           }
         },
         {
@@ -1658,7 +1616,7 @@
           "eta": "Tue 11-Aug",
           "etd": "",
           "railPortCutoff": "Tue 11-Aug",
-          "comments": "calling Vanterm",
+          "comments": "",
           "cutoffs": {
             "Lachine": "Mon 3-Aug 21:00",
             "Vaughan": "Mon 3-Aug 23:00",
@@ -1676,22 +1634,22 @@
         {
           "vessel": "OOCL OAKLAND",
           "terminal": "Deltaport",
-          "eta": "Mon 17-Aug",
+          "eta": "Tue 18-Aug",
           "etd": "",
-          "railPortCutoff": "Mon 17-Aug",
+          "railPortCutoff": "Tue 18-Aug",
           "comments": "",
           "cutoffs": {
-            "Lachine": "Mon 10-Aug 21:00",
-            "Vaughan": "Mon 10-Aug 23:00",
-            "Winnipeg": "Wed 12-Aug 15:00",
-            "Regina": "Wed 12-Aug 17:00",
-            "Calgary": "Fri 14-Aug 08:00",
-            "Edmonton": "Thu 13-Aug 17:00",
-            "Vancouver": "Sat 15-Aug 01:00",
+            "Lachine": "Tue 11-Aug 21:00",
+            "Vaughan": "Tue 11-Aug 23:00",
+            "Winnipeg": "Thu 13-Aug 15:00",
+            "Regina": "Thu 13-Aug 17:00",
+            "Calgary": "Sat 15-Aug 08:00",
+            "Edmonton": "Fri 14-Aug 17:00",
+            "Vancouver": "Sun 16-Aug 01:00",
             "Detroit": "Sat 8-Aug 15:00",
-            "Jeffersonville": "Mon 17-Aug 12:00",
-            "Bensenville": "Tue 11-Aug 20:00",
-            "Minneapolis": "Wed 12-Aug 12:00"
+            "Jeffersonville": "Tue 18-Aug 12:00",
+            "Bensenville": "Wed 12-Aug 20:00",
+            "Minneapolis": "Thu 13-Aug 12:00"
           }
         },
         {
@@ -1737,27 +1695,6 @@
           }
         },
         {
-          "vessel": "GSL ALEXANDRA",
-          "terminal": "Centerm",
-          "eta": "Wed 5-Aug",
-          "etd": "",
-          "railPortCutoff": "Mon 3-Aug",
-          "comments": "",
-          "cutoffs": {
-            "Lachine": "Sun 26-Jul 21:00",
-            "Vaughan": "Sun 26-Jul 23:00",
-            "Winnipeg": "Tue 28-Jul 15:00",
-            "Regina": "Tue 28-Jul 17:00",
-            "Calgary": "Wed 29-Jul 08:00",
-            "Edmonton": "Tue 28-Jul 17:00",
-            "Vancouver": "Wed 29-Jul 01:00",
-            "Detroit": "Wed 22-Jul 15:00",
-            "Jeffersonville": "Mon 20-Jul 00:00",
-            "Bensenville": "Sun 26-Jul 20:00",
-            "Minneapolis": "Mon 27-Jul 12:00"
-          }
-        },
-        {
           "vessel": "MAERSK SHEERNESS",
           "terminal": "Centerm",
           "eta": "Wed 12-Aug",
@@ -1773,7 +1710,7 @@
             "Edmonton": "Tue 4-Aug 17:00",
             "Vancouver": "Wed 5-Aug 01:00",
             "Detroit": "Wed 29-Jul 15:00",
-            "Jeffersonville": "Mon 27-Jul 12:00",
+            "Jeffersonville": "Mon 27-Jul 00:00",
             "Bensenville": "Sun 2-Aug 20:00",
             "Minneapolis": "Mon 3-Aug 12:00"
           }
@@ -1815,7 +1752,7 @@
             "Edmonton": "Tue 18-Aug 17:00",
             "Vancouver": "Wed 19-Aug 01:00",
             "Detroit": "Wed 12-Aug 15:00",
-            "Jeffersonville": "Mon 10-Aug 00:00",
+            "Jeffersonville": "Mon 10-Aug 12:00",
             "Bensenville": "Sun 16-Aug 20:00",
             "Minneapolis": "Mon 17-Aug 12:00"
           }
@@ -1828,7 +1765,7 @@
           "railPortCutoff": "Mon 31-Aug",
           "comments": "",
           "cutoffs": {
-            "Lachine": "Sun 23-Aug 14:45",
+            "Lachine": "Sun 23-Aug 21:00",
             "Vaughan": "Sun 23-Aug 23:00",
             "Winnipeg": "Tue 25-Aug 15:00",
             "Regina": "Tue 25-Aug 17:00",
@@ -1836,9 +1773,30 @@
             "Edmonton": "Tue 25-Aug 17:00",
             "Vancouver": "Wed 26-Aug 01:00",
             "Detroit": "Wed 19-Aug 15:00",
-            "Jeffersonville": "Mon 17-Aug 12:00",
+            "Jeffersonville": "Mon 17-Aug 00:00",
             "Bensenville": "Sun 23-Aug 20:00",
             "Minneapolis": "Mon 24-Aug 12:00"
+          }
+        },
+        {
+          "vessel": "TSINGTAO EXPRESS",
+          "terminal": "Centerm",
+          "eta": "Wed 9-Sep",
+          "etd": "",
+          "railPortCutoff": "Mon 7-Sep",
+          "comments": "",
+          "cutoffs": {
+            "Lachine": "Sun 30-Aug 14:45",
+            "Vaughan": "Sun 30-Aug 23:00",
+            "Winnipeg": "Tue 1-Sep 15:00",
+            "Regina": "Tue 1-Sep 17:00",
+            "Calgary": "Wed 2-Sep 08:00",
+            "Edmonton": "Tue 1-Sep 17:00",
+            "Vancouver": "Wed 2-Sep 01:00",
+            "Detroit": "Wed 26-Aug 15:00",
+            "Jeffersonville": "Mon 24-Aug 12:00",
+            "Bensenville": "Sun 30-Aug 20:00",
+            "Minneapolis": "Mon 31-Aug 12:00"
           }
         },
         {
@@ -1947,36 +1905,36 @@
           }
         },
         {
-          "vessel": "MSC PINA",
+          "vessel": "MSC MEXICO V",
           "terminal": "Deltaport",
-          "eta": "Mon 3-Aug",
+          "eta": "Sun 9-Aug",
           "etd": "",
-          "railPortCutoff": "Sun 2-Aug",
+          "railPortCutoff": "Sat 8-Aug",
           "comments": "",
           "cutoffs": {
-            "Lachine": "Sat 25-Jul 21:00",
-            "Vaughan": "Sat 25-Jul 23:00",
-            "Winnipeg": "Sun 26-Jul 15:00",
-            "Regina": "Sun 26-Jul 17:00",
-            "Calgary": "Wed 29-Jul 08:00",
-            "Edmonton": "Tue 28-Jul 17:00",
-            "Vancouver": "Thu 30-Jul 01:00",
-            "Detroit": "Fri 24-Jul 15:00",
-            "Jeffersonville": "Sun 19-Jul 12:00",
-            "Bensenville": "Sun 26-Jul 20:00",
-            "Minneapolis": "Sun 26-Jul 12:00"
+            "Lachine": "Tue 4-Aug 21:00",
+            "Vaughan": "Tue 4-Aug 23:00",
+            "Winnipeg": "Wed 5-Aug 15:00",
+            "Regina": "Wed 5-Aug 17:00",
+            "Calgary": "Wed 5-Aug 08:00",
+            "Edmonton": "Tue 4-Aug 17:00",
+            "Vancouver": "Thu 6-Aug 01:00",
+            "Detroit": "Mon 3-Aug 15:00",
+            "Jeffersonville": "Wed 29-Jul 12:00",
+            "Bensenville": "Wed 5-Aug 20:00",
+            "Minneapolis": "Wed 5-Aug 12:00"
           }
         },
         {
-          "vessel": "MSC MEXICO V",
+          "vessel": "EXPRESS ROME",
           "terminal": "Deltaport",
           "eta": "Wed 12-Aug",
           "etd": "",
           "railPortCutoff": "Tue 11-Aug",
           "comments": "",
           "cutoffs": {
-            "Lachine": "Tue 4-Aug 21:00",
-            "Vaughan": "Tue 4-Aug 23:00",
+            "Lachine": "Thu 6-Aug 21:00",
+            "Vaughan": "Thu 6-Aug 23:00",
             "Winnipeg": "Wed 5-Aug 15:00",
             "Regina": "Wed 5-Aug 17:00",
             "Calgary": "Sat 8-Aug 08:00",
@@ -1989,66 +1947,66 @@
           }
         },
         {
-          "vessel": "EXPRESS ROME",
-          "terminal": "Deltaport",
-          "eta": "Fri 14-Aug",
-          "etd": "",
-          "railPortCutoff": "Thu 13-Aug",
-          "comments": "",
-          "cutoffs": {
-            "Lachine": "Thu 6-Aug 21:00",
-            "Vaughan": "Thu 6-Aug 23:00",
-            "Winnipeg": "Fri 7-Aug 15:00",
-            "Regina": "Fri 7-Aug 17:00",
-            "Calgary": "Mon 10-Aug 08:00",
-            "Edmonton": "Sun 9-Aug 17:00",
-            "Vancouver": "Tue 11-Aug 01:00",
-            "Detroit": "Mon 3-Aug 15:00",
-            "Jeffersonville": "Wed 29-Jul 12:00",
-            "Bensenville": "Fri 7-Aug 20:00",
-            "Minneapolis": "Fri 7-Aug 12:00"
-          }
-        },
-        {
           "vessel": "MSC DENISSE X",
           "terminal": "Deltaport",
-          "eta": "Mon 17-Aug",
+          "eta": "Sat 22-Aug",
           "etd": "",
-          "railPortCutoff": "Sun 16-Aug",
+          "railPortCutoff": "Fri 21-Aug",
           "comments": "",
           "cutoffs": {
-            "Lachine": "Sun 9-Aug 21:00",
-            "Vaughan": "Sun 9-Aug 23:00",
-            "Winnipeg": "Mon 10-Aug 15:00",
-            "Regina": "Mon 10-Aug 17:00",
-            "Calgary": "Thu 13-Aug 08:00",
-            "Edmonton": "Wed 12-Aug 17:00",
-            "Vancouver": "Fri 14-Aug 01:00",
-            "Detroit": "Sat 8-Aug 15:00",
-            "Jeffersonville": "Mon 3-Aug 12:00",
-            "Bensenville": "Mon 10-Aug 20:00",
-            "Minneapolis": "Mon 10-Aug 12:00"
+            "Lachine": "Fri 14-Aug 21:00",
+            "Vaughan": "Fri 14-Aug 23:00",
+            "Winnipeg": "Sat 15-Aug 15:00",
+            "Regina": "Sat 15-Aug 17:00",
+            "Calgary": "Tue 18-Aug 08:00",
+            "Edmonton": "Mon 17-Aug 17:00",
+            "Vancouver": "Wed 19-Aug 01:00",
+            "Detroit": "Thu 13-Aug 15:00",
+            "Jeffersonville": "Sat 8-Aug 12:00",
+            "Bensenville": "Sat 15-Aug 20:00",
+            "Minneapolis": "Sat 15-Aug 12:00"
           }
         },
         {
           "vessel": "MSC IVANA",
           "terminal": "Deltaport",
-          "eta": "Sat 29-Aug",
+          "eta": "Fri 28-Aug",
           "etd": "",
-          "railPortCutoff": "Fri 28-Aug",
+          "railPortCutoff": "Thu 27-Aug",
           "comments": "",
           "cutoffs": {
-            "Lachine": "Fri 21-Aug 18:00",
-            "Vaughan": "Fri 21-Aug 23:00",
-            "Winnipeg": "Sat 22-Aug 15:00",
-            "Regina": "Sat 22-Aug 17:00",
-            "Calgary": "Tue 25-Aug 08:00",
-            "Edmonton": "Mon 24-Aug 17:00",
-            "Vancouver": "Wed 26-Aug 01:00",
-            "Detroit": "Thu 20-Aug 15:00",
-            "Jeffersonville": "Sat 15-Aug 12:00",
-            "Bensenville": "Sat 22-Aug 16:00",
-            "Minneapolis": "Sat 22-Aug 12:00"
+            "Lachine": "Thu 20-Aug 21:00",
+            "Vaughan": "Thu 20-Aug 23:00",
+            "Winnipeg": "Fri 21-Aug 15:00",
+            "Regina": "Fri 21-Aug 17:00",
+            "Calgary": "Mon 24-Aug 08:00",
+            "Edmonton": "Sun 23-Aug 17:00",
+            "Vancouver": "Tue 25-Aug 01:00",
+            "Detroit": "Wed 19-Aug 15:00",
+            "Jeffersonville": "Fri 14-Aug 12:00",
+            "Bensenville": "Fri 21-Aug 20:00",
+            "Minneapolis": "Fri 21-Aug 12:00"
+          }
+        },
+        {
+          "vessel": "MSC SOLA",
+          "terminal": "Deltaport",
+          "eta": "Sun 30-Aug",
+          "etd": "",
+          "railPortCutoff": "Sat 29-Aug",
+          "comments": "",
+          "cutoffs": {
+            "Lachine": "Sat 22-Aug 14:45",
+            "Vaughan": "Sat 22-Aug 23:00",
+            "Winnipeg": "Sun 23-Aug 15:00",
+            "Regina": "Sun 23-Aug 17:00",
+            "Calgary": "Wed 26-Aug 08:00",
+            "Edmonton": "Tue 25-Aug 17:00",
+            "Vancouver": "Thu 27-Aug 01:00",
+            "Detroit": "Fri 21-Aug 15:00",
+            "Jeffersonville": "Sun 16-Aug 12:00",
+            "Bensenville": "Sun 23-Aug 20:00",
+            "Minneapolis": "Sun 23-Aug 12:00"
           }
         },
         {
@@ -2180,18 +2138,18 @@
         {
           "vessel": "CMA CGM BYBLOS",
           "terminal": "Vanterm",
-          "eta": "Wed 12-Aug",
+          "eta": "Fri 14-Aug",
           "etd": "",
-          "railPortCutoff": "Tue 11-Aug",
+          "railPortCutoff": "Thu 13-Aug",
           "comments": "",
           "cutoffs": {
             "Lachine": "Tue 4-Aug 21:00",
             "Vaughan": "Tue 4-Aug 23:00",
             "Winnipeg": "Thu 6-Aug 15:00",
             "Regina": "Thu 6-Aug 17:00",
-            "Calgary": "Fri 7-Aug 22:00",
+            "Calgary": "Sun 9-Aug 22:00",
             "Edmonton": "Thu 6-Aug 17:00",
-            "Vancouver": "Sat 8-Aug 07:00",
+            "Vancouver": "Mon 10-Aug 07:00",
             "Detroit": "Sat 1-Aug 15:00",
             "Jeffersonville": "Tue 28-Jul 12:00",
             "Bensenville": "Tue 4-Aug 20:00",
@@ -2241,6 +2199,27 @@
           }
         },
         {
+          "vessel": "CYPRESS",
+          "terminal": "Vanterm",
+          "eta": "Wed 2-Sep",
+          "etd": "",
+          "railPortCutoff": "Tue 1-Sep",
+          "comments": "",
+          "cutoffs": {
+            "Lachine": "Tue 25-Aug 21:00",
+            "Vaughan": "Tue 25-Aug 23:00",
+            "Winnipeg": "Thu 27-Aug 20:00",
+            "Regina": "Thu 27-Aug 17:00",
+            "Calgary": "Fri 28-Aug 18:00",
+            "Edmonton": "Thu 27-Aug 16:00",
+            "Vancouver": "Sat 29-Aug 19:00",
+            "Detroit": "Sat 22-Aug 15:00",
+            "Jeffersonville": "Tue 18-Aug 12:00",
+            "Bensenville": "Tue 25-Aug 16:00",
+            "Minneapolis": "Wed 26-Aug 12:00"
+          }
+        },
+        {
           "vessel": "EVER SHINE",
           "terminal": "Vanterm",
           "eta": "Fri 7-Aug",
@@ -2285,22 +2264,22 @@
         {
           "vessel": "EVER EAGLE",
           "terminal": "Vanterm",
-          "eta": "Sat 29-Aug",
+          "eta": "Fri 28-Aug",
           "etd": "",
-          "railPortCutoff": "Fri 28-Aug",
+          "railPortCutoff": "Thu 27-Aug",
           "comments": "",
           "cutoffs": {
-            "Lachine": "Fri 21-Aug 21:00",
-            "Vaughan": "Fri 21-Aug 23:00",
-            "Winnipeg": "Sat 22-Aug 15:00",
-            "Regina": "Sat 22-Aug 14:00",
-            "Calgary": "Mon 24-Aug 22:00",
-            "Edmonton": "Sat 22-Aug 17:00",
-            "Vancouver": "Tue 25-Aug 07:00",
-            "Detroit": "Wed 19-Aug 15:00",
-            "Jeffersonville": "Sat 15-Aug 12:00",
-            "Bensenville": "Fri 21-Aug 20:00",
-            "Minneapolis": "Sat 22-Aug 12:00"
+            "Lachine": "Thu 20-Aug 21:00",
+            "Vaughan": "Thu 20-Aug 23:00",
+            "Winnipeg": "Fri 21-Aug 15:00",
+            "Regina": "Fri 21-Aug 17:00",
+            "Calgary": "Sun 23-Aug 22:00",
+            "Edmonton": "Fri 21-Aug 17:00",
+            "Vancouver": "Mon 24-Aug 07:00",
+            "Detroit": "Tue 18-Aug 15:00",
+            "Jeffersonville": "Fri 14-Aug 12:00",
+            "Bensenville": "Thu 20-Aug 20:00",
+            "Minneapolis": "Fri 21-Aug 12:00"
           }
         },
         {
@@ -2344,14 +2323,35 @@
             "Bensenville": "Thu 20-Aug 20:00",
             "Minneapolis": "Fri 21-Aug 12:00"
           }
+        },
+        {
+          "vessel": "MAERSK YOSEMITE",
+          "terminal": "FSD",
+          "eta": "Fri 18-Sep",
+          "etd": "",
+          "railPortCutoff": "Wed 16-Sep",
+          "comments": "",
+          "cutoffs": {
+            "Lachine": "Thu 10-Sep 21:00",
+            "Vaughan": "Fri 11-Sep 19:00",
+            "Winnipeg": "Sat 12-Sep 15:30",
+            "Regina": "Sat 12-Sep 14:00",
+            "Calgary": "Sun 13-Sep 18:00",
+            "Edmonton": "Sat 12-Sep 15:00",
+            "Vancouver": "",
+            "Detroit": "Sat 5-Sep 15:00",
+            "Jeffersonville": "",
+            "Bensenville": "Thu 10-Sep 20:00",
+            "Minneapolis": "Fri 11-Sep 12:00"
+          }
         }
       ]
     },
     "saint-john": {
       "name": "Port of Saint John",
       "rail": "CPKC",
-      "runDate": "Mon 3-Aug",
-      "generatedAt": "2026-08-03",
+      "runDate": "Thu 6-Aug",
+      "generatedAt": "2026-08-06",
       "cities": [
         "Vancouver",
         "Edmonton",
@@ -2372,32 +2372,12 @@
       ],
       "vessels": [
         {
-          "vessel": "YANTIAN EXPRESS",
-          "terminal": "St John",
-          "eta": "Sun 2-Aug",
-          "etd": "Tue 4-Aug",
-          "railPortCutoff": "Sat 1-Aug",
-          "comments": "",
-          "cutoffs": {
-            "Vancouver": "Wed 22-Jul 20:30",
-            "Edmonton": "Wed 22-Jul 17:00",
-            "Calgary": "Wed 22-Jul 23:00",
-            "Regina": "Thu 23-Jul 17:00",
-            "Winnipeg": "Thu 23-Jul 15:00",
-            "Vaughan": "Mon 27-Jul 17:00",
-            "Minneapolis": "Fri 24-Jul 12:00",
-            "Bensenville": "Sat 25-Jul 17:00",
-            "Detroit": "Sat 25-Jul 15:00",
-            "Lachine": "Mon 27-Jul 17:00"
-          }
-        },
-        {
           "vessel": "NINGO EXPRESS",
           "terminal": "St John",
           "eta": "Sun 9-Aug",
           "etd": "Tue 11-Aug",
           "railPortCutoff": "Sat 8-Aug",
-          "comments": "AL3/802",
+          "comments": "",
           "cutoffs": {
             "Vancouver": "Wed 29-Jul 20:30",
             "Edmonton": "Wed 29-Jul 17:00",
@@ -2417,7 +2397,7 @@
           "eta": "Sun 16-Aug",
           "etd": "Tue 18-Aug",
           "railPortCutoff": "Sat 15-Aug",
-          "comments": "",
+          "comments": "AL3/802",
           "cutoffs": {
             "Vancouver": "Wed 5-Aug 20:30",
             "Edmonton": "Wed 5-Aug 17:00",
@@ -2452,32 +2432,12 @@
           }
         },
         {
-          "vessel": "SFL HAWAII",
-          "terminal": "St John",
-          "eta": "Mon 3-Aug",
-          "etd": "Mon 3-Aug",
-          "railPortCutoff": "Sun 2-Aug",
-          "comments": "",
-          "cutoffs": {
-            "Vancouver": "Thu 23-Jul 20:30",
-            "Edmonton": "Thu 23-Jul 17:00",
-            "Calgary": "Thu 23-Jul 23:00",
-            "Regina": "Fri 24-Jul 17:00",
-            "Winnipeg": "Fri 24-Jul 15:00",
-            "Vaughan": "Tue 28-Jul 17:00",
-            "Minneapolis": "Sat 25-Jul 12:00",
-            "Bensenville": "Sun 26-Jul 17:00",
-            "Detroit": "Sat 25-Jul 15:00",
-            "Lachine": "Tue 28-Jul 17:00"
-          }
-        },
-        {
           "vessel": "PORTO GERMENO",
           "terminal": "St John",
           "eta": "Mon 10-Aug",
           "etd": "Mon 10-Aug",
           "railPortCutoff": "Sun 9-Aug",
-          "comments": "803",
+          "comments": "",
           "cutoffs": {
             "Vancouver": "Thu 30-Jul 20:30",
             "Edmonton": "Thu 30-Jul 17:00",
@@ -2497,7 +2457,7 @@
           "eta": "Mon 17-Aug",
           "etd": "Mon 17-Aug",
           "railPortCutoff": "Sun 16-Aug",
-          "comments": "",
+          "comments": "803",
           "cutoffs": {
             "Vancouver": "Wed 5-Aug 20:30",
             "Edmonton": "Wed 5-Aug 17:00",
