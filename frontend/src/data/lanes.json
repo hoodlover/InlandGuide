@@ -2199,9 +2199,9 @@
   {
     "pol": "USSAV",
     "ssy": "ALL",
-    "name": "GAINESVILLE",
+    "name": "GAINESVILLE, GA",
     "loccode": "USGVL",
-    "rampMC": "BLUER 023 ",
+    "rampMC": "BLUER 023",
     "rampCutTime": 0.5833333333333334,
     "transit": 3,
     "window": 3,
