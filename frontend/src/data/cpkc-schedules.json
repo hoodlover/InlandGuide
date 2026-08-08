@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-08-07",
-  "pulledAt": "2026-08-07T14:13:26.827Z",
+  "pulledAt": "2026-08-08T13:45:45.259Z",
   "ports": {
     "montreal": {
       "name": "Port of Montreal",
@@ -2715,6 +2715,50 @@
           }
         },
         {
+          "vessel": "MSC DENISSE X",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "14-Aug",
+          "comments": "",
+          "cutoffs": {
+            "TORONTO (MALPORT)": "Fri, Aug-07",
+            "MONTREAL": "Thu, Aug-06",
+            "WINNIPEG": "Fri, Aug-07",
+            "SASKATOON": "Thu, Aug-06",
+            "REGINA": "Sat, Aug-01",
+            "CALGARY": "Sat, Aug-08",
+            "EDMONTON": "Sat, Aug-08",
+            "PRINCE GEORGE": "Mon, Aug-10",
+            "CHIPPEWA FALLS": "Sun, Aug-02",
+            "JOLIET": "Thu, Aug-06",
+            "INDIANAPOLIS": "Mon, Aug-03",
+            "CHICAGO": "Thu, Aug-06",
+            "DETROIT": "Mon, Aug-03",
+            "MEMPHIS": "Mon, Aug-03",
+            "NEW ORLEANS": "Tue, Aug-04",
+            "ARCADIA": "Thu, Aug-06"
+          },
+          "erds": {
+            "TORONTO (MALPORT)": "02-Aug",
+            "MONTREAL": "01-Aug",
+            "WINNIPEG": "02-Aug",
+            "SASKATOON": "01-Aug",
+            "REGINA": "27-Jul",
+            "CALGARY": "03-Aug",
+            "EDMONTON": "03-Aug",
+            "PRINCE GEORGE": "05-Aug",
+            "CHIPPEWA FALLS": "28-Jul",
+            "JOLIET": "01-Aug",
+            "INDIANAPOLIS": "29-Jul",
+            "CHICAGO": "01-Aug",
+            "DETROIT": "29-Jul",
+            "MEMPHIS": "29-Jul",
+            "NEW ORLEANS": "30-Jul",
+            "ARCADIA": "01-Aug"
+          }
+        },
+        {
           "vessel": "COSCO EUROPE",
           "terminal": "",
           "eta": "",
@@ -2800,50 +2844,6 @@
             "MEMPHIS": "01-Aug",
             "NEW ORLEANS": "02-Aug",
             "ARCADIA": "02-Aug"
-          }
-        },
-        {
-          "vessel": "MSC DENISSE X",
-          "terminal": "",
-          "eta": "",
-          "etd": "",
-          "railPortCutoff": "22-Aug",
-          "comments": "",
-          "cutoffs": {
-            "TORONTO (MALPORT)": "Fri, Aug-14",
-            "MONTREAL": "Thu, Aug-13",
-            "WINNIPEG": "Fri, Aug-14",
-            "SASKATOON": "Thu, Aug-13",
-            "REGINA": "Sat, Aug-15",
-            "CALGARY": "Sat, Aug-15",
-            "EDMONTON": "Sat, Aug-15",
-            "PRINCE GEORGE": "Tue, Aug-18",
-            "CHIPPEWA FALLS": "Sun, Aug-09",
-            "JOLIET": "Thu, Aug-13",
-            "INDIANAPOLIS": "Tue, Aug-11",
-            "CHICAGO": "Fri, Aug-14",
-            "DETROIT": "Mon, Aug-10",
-            "MEMPHIS": "Thu, Aug-13",
-            "NEW ORLEANS": "Wed, Aug-12",
-            "ARCADIA": "Fri, Aug-14"
-          },
-          "erds": {
-            "TORONTO (MALPORT)": "09-Aug",
-            "MONTREAL": "08-Aug",
-            "WINNIPEG": "09-Aug",
-            "SASKATOON": "08-Aug",
-            "REGINA": "10-Aug",
-            "CALGARY": "10-Aug",
-            "EDMONTON": "10-Aug",
-            "PRINCE GEORGE": "13-Aug",
-            "CHIPPEWA FALLS": "04-Aug",
-            "JOLIET": "08-Aug",
-            "INDIANAPOLIS": "06-Aug",
-            "CHICAGO": "09-Aug",
-            "DETROIT": "05-Aug",
-            "MEMPHIS": "08-Aug",
-            "NEW ORLEANS": "07-Aug",
-            "ARCADIA": "09-Aug"
           }
         },
         {
