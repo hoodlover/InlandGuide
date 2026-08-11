@@ -146,6 +146,8 @@ export function getLoccode(name) {
 // "DETROIT, MI - USDET" for the picker and the copied result (falls back to the
 // bare city name if no loccode is on file).
 export function cityLabel(name) {
+  if (name === 'COLUMBUS, OH') return 'COLUMBUS, OH - USCMH - NORFOL680 - Ricken';
+  if (name === 'COLUMBUS, OH Discovery Park') return 'COLUMBUS, OH - USCMH - NORFOL30 - Disc Park';
   const code = getLoccode(name);
   return code ? `${name} - ${code}` : name;
 }

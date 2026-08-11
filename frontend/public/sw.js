@@ -2,7 +2,7 @@
 // The app builds to a single self-contained index.html, so the "app shell"
 // is essentially just that one document plus the PWA icons/manifest.
 // Bump CACHE_VERSION whenever a new build should invalidate the offline cache.
-const CACHE_VERSION = 'icg-v10';
+const CACHE_VERSION = 'icg-v11';
 const APP_SHELL = [
   './',
   './index.html',
@@ -12,6 +12,7 @@ const APP_SHELL = [
   './icon-maskable-192.png',
   './icon-maskable-512.png',
   './apple-touch-icon.png',
+  './favicon.webp',
   './favicon-32.png',
   './favicon-192.png',
 ];
