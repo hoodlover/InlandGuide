@@ -44,6 +44,7 @@ import versionData from './version.json'; // committed; regenerate with `node ge
 const APP_VERSION = versionData.version;
 
 const MOBILE_DEMO_MS = 30 * 60 * 1000;
+const MOBILE_OWNER_ACCESS_KEY = 'hapagidt:mobile-owner-access';
 
 function isMobileDevice() {
   const ua = navigator.userAgent || '';
@@ -1905,20 +1906,32 @@ export default function App() {
   const [nameEditorOpen, setNameEditorOpen] = useState(false);
   const pwaInstalled = usePwaInstallStatus();
   const mobileDevice = isMobileDevice();
+  const [mobileOwnerAccess, setMobileOwnerAccess] = useState(() => {
+    try {
+      const mobileParam = new URLSearchParams(window.location.search).get('mobile');
+      if (mobileParam === 'owner') localStorage.setItem(MOBILE_OWNER_ACCESS_KEY, '1');
+      else if (mobileParam === 'block') localStorage.removeItem(MOBILE_OWNER_ACCESS_KEY);
+      return localStorage.getItem(MOBILE_OWNER_ACCESS_KEY) === '1';
+    } catch { return false; }
+  });
   const [mobileDemoUntil, setMobileDemoUntil] = useState(() => {
     try {
       const expires = Number(sessionStorage.getItem('icg-mobile-demo-until') || 0);
       return expires > Date.now() ? expires : 0;
     } catch { return 0; }
   });
-  const mobileDemoUnlocked = mobileDemoUntil > Date.now();
+  const mobileDemoUnlocked = mobileOwnerAccess || mobileDemoUntil > Date.now();
   const unlockMobileDemo = () => {
     const expires = Date.now() + MOBILE_DEMO_MS;
     try { sessionStorage.setItem('icg-mobile-demo-until', String(expires)); } catch { /* storage unavailable */ }
     setMobileDemoUntil(expires);
   };
   const lockMobileDemo = () => {
-    try { sessionStorage.removeItem('icg-mobile-demo-until'); } catch { /* storage unavailable */ }
+    try {
+      sessionStorage.removeItem('icg-mobile-demo-until');
+      localStorage.removeItem(MOBILE_OWNER_ACCESS_KEY);
+    } catch { /* storage unavailable */ }
+    setMobileOwnerAccess(false);
     setMobileDemoUntil(0);
   };
   const [tab, setTab] = useState('calculator');
@@ -2123,7 +2136,7 @@ export default function App() {
               onClick={lockMobileDemo}
               className="col-span-2 rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm font-extrabold text-red-700 shadow-[0_4px_10px_rgba(0,0,0,0.2)] transition hover:bg-red-100 sm:col-auto"
             >
-              🔒 End Mobile Demo
+              {mobileOwnerAccess ? '🔒 End Mobile Access' : '🔒 End Mobile Demo'}
             </button>
           )}
         </div>
