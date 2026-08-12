@@ -76,7 +76,7 @@ export default function NamePrompt({ open, initialName = '', initialEmail = '', 
         )}
         <h2 className="text-lg font-semibold text-[#002D72] dark:text-white">
           <span id="name-prompt-title">
-            {editing ? 'Your name & email' : "What's your name?"}
+            {editing ? 'Your name & email' : 'Welcome to the Inland Rail Cutoff Guide'}
           </span>
         </h2>
         {editing && (
