@@ -81,8 +81,8 @@ export default function NamePrompt({ open, initialName = '', initialEmail = '', 
         </h2>
         <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
           {editing
-            ? 'Future calculations will be recorded under this name and email.'
-            : <>Enter your name and work email so your calculations are recorded. You&apos;ll only be asked once on this computer.</>}
+            ? 'Update your name or work email.'
+            : <>Enter your name and work email to get started. You&apos;ll only be asked once on this computer.</>}
         </p>
         <label className="mt-4 block text-xs font-semibold text-slate-500 dark:text-slate-300">
           Name
