@@ -1,5 +1,8 @@
 {
-  "_comment": "Manager-editable display names for the calculator dropdowns, published from the Managers Hub (Rename ports & terminals). 'ports' map a POL loccode (USNYC) to the label shown in the Port of Loading dropdown. 'terminals' map a PORTMC terminal matchcode (MAHER 008) to the label shown in the SSY/Terminal dropdown. Display only — every underlying code stays untouched so lanes keep matching the master workbook.",
+  "_comment": "Manager-editable display names, published from the Managers Hub (Rename ports & terminals). 'ports' = POL loccode -> Port of Loading dropdown label. 'terminals' = PORTMC matchcode -> SSY/Terminal dropdown label. 'ramps' = 'RAMPMC|CITY' -> rail ramp label (e.g. 'NS / Landers'). 'canadaPorts' = schedule slug -> Canada tab port name. 'canadaCities' = published city -> Canada tab city label. Display only — every underlying code stays untouched so lanes keep matching the master workbook and schedule snapshots.",
   "ports": {},
-  "terminals": {}
+  "terminals": {},
+  "ramps": {},
+  "canadaPorts": {},
+  "canadaCities": {}
 }

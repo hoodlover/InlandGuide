@@ -29,34 +29,35 @@ const cleanLabel = (value) => {
   return clean;
 };
 
-const ports = {};
-for (const [pol, label] of Object.entries(payload.ports)) {
-  if (!/^(US|CA|MX)[A-Z]{3}$/.test(pol)) throw new Error(`Invalid port loccode in rename payload: ${pol}`);
-  ports[pol] = cleanLabel(label);
-}
+// Each override group validates its keys against the shape its source system
+// uses. Groups absent from older payloads simply publish as empty.
+const GROUPS = {
+  ports: /^(US|CA|MX)[A-Z]{3}$/,                       // POL loccode
+  terminals: /^[A-Za-z0-9][A-Za-z0-9 /&.\-]{0,39}$/,   // PORTMC matchcode ("MAHER 008", "FENIX")
+  ramps: /^[A-Za-z0-9][A-Za-z0-9 /&.\-]{0,39}\|[^|]{2,60}$/, // "RAMPMC|CITY"
+  canadaPorts: /^[a-z0-9][a-z0-9-]{1,39}$/,            // schedule slug ("montreal")
+  canadaCities: /^[^|]{2,60}$/,                        // published city name
+};
 
-const terminals = {};
-for (const [code, label] of Object.entries(payload.terminals)) {
-  // PORTMC matchcodes look like "MAHER 008" or "FENIX" — keep this permissive
-  // but bounded, since the master owns the real code list.
-  if (!/^[A-Za-z0-9][A-Za-z0-9 /&.\-]{0,39}$/.test(String(code))) {
-    throw new Error(`Invalid terminal matchcode in rename payload: ${code}`);
+const result = {};
+for (const [group, keyPattern] of Object.entries(GROUPS)) {
+  const entries = payload[group] || {};
+  if (typeof entries !== 'object' || Array.isArray(entries)) throw new Error(`Rename group '${group}' is not a map.`);
+  if (Object.keys(entries).length > 500) throw new Error(`Rename group '${group}' is unexpectedly large.`);
+  result[group] = {};
+  for (const [key, label] of Object.entries(entries)) {
+    if (!keyPattern.test(String(key))) throw new Error(`Invalid ${group} key in rename payload: ${key}`);
+    result[group][key] = cleanLabel(label);
   }
-  terminals[code] = cleanLabel(label);
-}
-
-if (Object.keys(ports).length > 200 || Object.keys(terminals).length > 500) {
-  throw new Error('The rename payload is unexpectedly large.');
 }
 
 const sortedEntries = (map) => Object.fromEntries(Object.entries(map).sort(([a], [b]) => a.localeCompare(b)));
 writeFileSync(
   resolve(root, 'frontend/src/data/name-overrides.json'),
   `${JSON.stringify({
-    _comment: 'Manager-editable display names for the calculator dropdowns, published from the Managers Hub (Rename ports & terminals). Display only — every underlying code stays untouched so lanes keep matching the master workbook.',
-    ports: sortedEntries(ports),
-    terminals: sortedEntries(terminals),
+    _comment: "Manager-editable display names, published from the Managers Hub (Rename ports & terminals). 'ports' = POL loccode -> Port of Loading dropdown label. 'terminals' = PORTMC matchcode -> SSY/Terminal dropdown label. 'ramps' = 'RAMPMC|CITY' -> rail ramp label (e.g. 'NS / Landers'). 'canadaPorts' = schedule slug -> Canada tab port name. 'canadaCities' = published city -> Canada tab city label. Display only — every underlying code stays untouched so lanes keep matching the master workbook and schedule snapshots.",
+    ...Object.fromEntries(Object.keys(GROUPS).map(group => [group, sortedEntries(result[group])])),
   }, null, 2)}\n`,
 );
 
-console.log(`Validated ${Object.keys(ports).length} port and ${Object.keys(terminals).length} terminal display names.`);
+console.log(Object.keys(GROUPS).map(group => `${group}: ${Object.keys(result[group]).length}`).join(', '));

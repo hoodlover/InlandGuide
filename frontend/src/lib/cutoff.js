@@ -14,10 +14,8 @@ import nameOverridesJson from '../data/name-overrides.json';
 const NAME_OVERRIDES = {
   ports: nameOverridesJson.ports || {},
   terminals: nameOverridesJson.terminals || {},
+  ramps: nameOverridesJson.ramps || {},
 };
-export function getNameOverrides() {
-  return NAME_OVERRIDES;
-}
 
 // When the US rail ramp data last changed — stamped by the publish workflow
 // each time a different master workbook is pushed live.
@@ -167,16 +165,24 @@ export function cityLabel(name) {
 // by rampMC code; a couple of shared codes are disambiguated by city). This is the
 // exact string dropped at the top of the copied notes. Falls back to the city.
 const normCode = (c) => String(c || '').trim().replace(/\s+/g, ' ');
+// Manager renames key on "RAMPMC|CITY" (uppercased city, matching the
+// disambiguation key) and replace the label everywhere it is displayed.
+const rampOverrideKey = (rampMC, city) => normCode(rampMC) + '|' + String(city).trim().toUpperCase();
 const TERMINAL_BY_RAMP = new Map();
 const TERMINAL_BY_RAMP_CITY = new Map();
 for (const t of terminals) {
   const key = normCode(t.rampMC);
-  TERMINAL_BY_RAMP.set(key, t.label);
-  TERMINAL_BY_RAMP_CITY.set(key + '|' + String(t.city).trim().toUpperCase(), t.label);
+  const label = NAME_OVERRIDES.ramps[rampOverrideKey(t.rampMC, t.city)] || t.label;
+  TERMINAL_BY_RAMP.set(key, label);
+  TERMINAL_BY_RAMP_CITY.set(key + '|' + String(t.city).trim().toUpperCase(), label);
 }
 
 export function getRailTerminal(rampMC, city) {
   const key = normCode(rampMC);
+  // Direct override check also covers ramps that have no terminals.json entry
+  // (they otherwise fall back to the bare city name).
+  const renamed = NAME_OVERRIDES.ramps[rampOverrideKey(rampMC, city)];
+  if (renamed) return renamed;
   const byCity = TERMINAL_BY_RAMP_CITY.get(key + '|' + String(city || '').trim().toUpperCase());
   return byCity || TERMINAL_BY_RAMP.get(key) || city || '';
 }
@@ -244,20 +250,36 @@ export function portLabel(pol) {
 }
 
 // Everything the rename editor needs: the POLs the calculator dropdown shows
-// (grouped like the dropdown) and each port's loading terminals with their
-// default labels. Values stay codes; only labels are editable.
+// (grouped like the dropdown), each port's loading terminals, and every rail
+// ramp label ("NS / Landers") with their default labels. Values stay codes;
+// only labels are editable.
 export function getRenameCatalog() {
   const groups = getPortGroups();
   const ports = groups.flatMap(g => g.ports.map(pol => ({ pol, group: g.label })));
-  const terminals = [];
+  const loadTerminals = [];
   for (const { pol } of ports) {
     const d = portInfo(pol);
     if (!d) continue;
     for (const t of d.terminals) {
-      terminals.push({ pol, code: t.code, defaultName: terminalDefaultLabel(t.code) });
+      loadTerminals.push({ pol, code: t.code, defaultName: terminalDefaultLabel(t.code) });
     }
   }
-  return { ports, terminals };
+  const ramps = terminals
+    .map(t => ({ key: rampOverrideKey(t.rampMC, t.city), rampMC: normCode(t.rampMC), city: t.city, defaultName: t.label }));
+  // Lane ramps whose code has no terminals.json entry at all display the bare
+  // city name — list them too so managers can give them a proper name
+  // (e.g. NORFOL 008 / APM 044 at Norfolk). Codes known under another city
+  // already display that entry's label, so they are left to that row.
+  const knownCodes = new Set(terminals.map(t => normCode(t.rampMC)));
+  const seen = new Set(ramps.map(r => r.key));
+  for (const lane of lanes) {
+    const key = rampOverrideKey(lane.rampMC, lane.name);
+    if (knownCodes.has(normCode(lane.rampMC)) || seen.has(key)) continue;
+    seen.add(key);
+    ramps.push({ key, rampMC: normCode(lane.rampMC), city: lane.name, defaultName: String(lane.name) });
+  }
+  ramps.sort((a, b) => a.city.localeCompare(b.city) || a.rampMC.localeCompare(b.rampMC));
+  return { ports, terminals: loadTerminals, ramps };
 }
 
 // A caveat note to show in the result for this POL, or '' (from terminal-info.json).

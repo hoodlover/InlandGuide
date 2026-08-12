@@ -4,6 +4,13 @@
 // published values read straight off the PDF. The only derived value is the ERD,
 // which the PDF defines as a flat "5 days prior to the in-land cut-off date".
 import schedules from '../data/cpkc-schedules.json';
+import nameOverridesJson from '../data/name-overrides.json';
+
+// Manager-published display names (Managers Hub → Rename ports & terminals).
+// Keys stay the authoritative schedule slugs / published city names — the
+// snapshot data is never rewritten, only what is shown on screen.
+const CANADA_PORT_NAMES = nameOverridesJson.canadaPorts || {};
+const CANADA_CITY_NAMES = nameOverridesJson.canadaCities || {};
 
 const ERD_DAYS_BEFORE = 5;
 const RAIL_ORDER = { CPKC: 0, CN: 1 };
@@ -17,7 +24,7 @@ export const pulledAt = schedules.pulledAt || '';
 // [{ slug, name, rail }] for the port picker.
 export function getPorts() {
   return Object.entries(schedules.ports || {})
-    .map(([slug, p]) => ({ slug, name: p.name || slug, rail: p.rail || '' }))
+    .map(([slug, p]) => ({ slug, name: CANADA_PORT_NAMES[slug] || p.name || slug, rail: p.rail || '' }))
     .sort((a, b) => {
       const railDelta = (RAIL_ORDER[a.rail.toUpperCase()] ?? 2) - (RAIL_ORDER[b.rail.toUpperCase()] ?? 2);
       return railDelta || a.name.localeCompare(b.name, 'en', { sensitivity: 'base' });
@@ -32,7 +39,7 @@ export function getPortInfo(slug) {
   const p = port(slug);
   if (!p) return null;
   const ref = p.generatedAt || generatedAt;
-  return { name: p.name, rail: p.rail || '', runDate: formatDate(p.runDate || '', ref), generatedAt: ref, notes: p.notes || [], parseError: p.parseError || '' };
+  return { name: CANADA_PORT_NAMES[slug] || p.name, rail: p.rail || '', runDate: formatDate(p.runDate || '', ref), generatedAt: ref, notes: p.notes || [], parseError: p.parseError || '' };
 }
 
 // True when leadership should try "Update Ramp Dates": a port failed its last
@@ -89,7 +96,19 @@ const CITY_ALIASES = {
 };
 
 export function cityDisplay(city) {
-  return CITY_ALIASES[city] || city;
+  return CANADA_CITY_NAMES[city] || CITY_ALIASES[city] || city;
+}
+
+// The Canada-tab entries the rename editor can relabel: ports from the
+// schedule snapshot and the union of every port's destination cities.
+// Defaults ignore manager renames so the editor knows what "standard" is.
+export function getCanadaRenameCatalog() {
+  const ports = Object.entries(schedules.ports || {})
+    .map(([slug, p]) => ({ slug, rail: p.rail || '', defaultName: p.name || slug }));
+  const cities = [...new Set(Object.values(schedules.ports || {}).flatMap(p => p.cities || []))]
+    .sort((a, b) => a.localeCompare(b))
+    .map(city => ({ city, defaultName: CITY_ALIASES[city] || city }));
+  return { ports, cities };
 }
 
 export function getVesselMeta(slug, vessel) {

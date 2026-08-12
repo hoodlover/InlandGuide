@@ -6,8 +6,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { gzipSync, strFromU8, strToU8, unzipSync } from 'fflate';
 import UsageStats from './UsageStats';
-import { masterUpdatedAt, getRenameCatalog, getNameOverrides, portLabel } from '../lib/cutoff';
-import { pulledAt as railPulledAt } from '../lib/cpkc';
+import { masterUpdatedAt, getRenameCatalog } from '../lib/cutoff';
+import { pulledAt as railPulledAt, getCanadaRenameCatalog } from '../lib/cpkc';
+import nameOverridesJson from '../data/name-overrides.json';
 import { obBot } from '../assets/banners';
 
 const PASS_SESSION_KEY = 'icg-manager-pass';
@@ -284,52 +285,114 @@ function ToolPanel({ title, onBack, children, wide = false }) {
 }
 
 // ---------------------------------------------------------------------------
-// Rename ports & terminals — display names for the calculator dropdowns.
-// Values (loccodes / terminal matchcodes) never change, so every selection
-// keeps mapping to the same rows in the master workbook.
+// Rename ports & terminals — display names for everything the guide shows in
+// its pickers and results: Ports of Load, loading terminals, US/CA rail ramp
+// labels, and the Canada tab's ports and destination cities. Values (codes,
+// slugs, published names) never change, so every selection keeps mapping to
+// the same rows in the master workbook and schedule snapshots.
 // ---------------------------------------------------------------------------
-function RenameEditor({ pass, onAuthExpired }) {
-  // Only the ports the US calculator dropdown actually shows are editable.
-  const catalog = useMemo(() => {
-    const all = getRenameCatalog();
-    const shown = new Set(['United States', 'Mexico']);
-    const ports = all.ports.filter(p => shown.has(p.group));
-    const polSet = new Set(ports.map(p => p.pol));
-    return { ports, terminals: all.terminals.filter(t => polSet.has(t.pol)) };
-  }, []);
+const RENAME_TABS = [
+  { id: 'ports', label: 'Ports of Load' },
+  { id: 'terminals', label: 'Load Terminals' },
+  { id: 'ramps', label: 'Rail Ramps' },
+  { id: 'canada', label: 'Canada Tab' },
+];
 
-  const saved = getNameOverrides();
-  const [portNames, setPortNames] = useState(() => ({ ...saved.ports }));
-  const [terminalNames, setTerminalNames] = useState(() => ({ ...saved.terminals }));
+// Row shape: { key, title, code, def } — def is the standard (non-renamed)
+// name; the input holds the name currently shown so edits are a word, not a
+// retype. Section ids double as the override-group names in the payload.
+function buildRenameSections() {
+  const us = getRenameCatalog();
+  const ca = getCanadaRenameCatalog();
+  const shownGroups = new Set(['United States', 'Mexico']);
+  const usPorts = us.ports.filter(p => shownGroups.has(p.group));
+  const polSet = new Set(usPorts.map(p => p.pol));
+
+  // One input per matchcode — a code repeated under two ports shares one name.
+  const terminalRows = new Map();
+  for (const t of us.terminals) {
+    if (!polSet.has(t.pol)) continue;
+    if (!terminalRows.has(t.code)) {
+      terminalRows.set(t.code, { key: t.code, title: t.pol, code: t.code, def: t.defaultName });
+    }
+  }
+
+  return [
+    {
+      id: 'ports', tab: 'ports', heading: '',
+      hint: 'Shown in the Port of Loading dropdown of the US calculator.',
+      rows: usPorts.map(({ pol }) => ({ key: pol, title: pol, code: 'Loccode', def: pol })),
+    },
+    {
+      id: 'terminals', tab: 'terminals', heading: '',
+      hint: 'Shown in the SSY / Terminal dropdown and on the "Port · Terminal · FCL Cut" line.',
+      rows: [...terminalRows.values()],
+    },
+    {
+      id: 'ramps', tab: 'ramps', heading: '',
+      hint: 'The "RAIL / Terminal" label shown with each result and copied card — keep that format.',
+      rows: us.ramps.map(r => ({ key: r.key, title: r.city, code: r.rampMC, def: r.defaultName })),
+    },
+    {
+      id: 'canadaPorts', tab: 'canada', heading: 'Ports',
+      hint: 'Shown in the Canada Rail Ramp Cuts port picker.',
+      rows: ca.ports.map(p => ({ key: p.slug, title: p.rail || 'Port', code: p.slug, def: p.defaultName })),
+    },
+    {
+      id: 'canadaCities', tab: 'canada', heading: 'Rail destination cities',
+      hint: 'Shown in the Canada tab city picker and results.',
+      rows: ca.cities.map(c => ({ key: c.city, title: c.city, code: 'Published name', def: c.defaultName })),
+    },
+  ];
+}
+
+function RenameEditor({ pass, onAuthExpired }) {
+  const sections = useMemo(buildRenameSections, []);
+
+  // Inputs start at the name currently in use: published rename, else standard.
+  const [values, setValues] = useState(() => {
+    const initial = {};
+    for (const section of sections) {
+      const saved = nameOverridesJson[section.id] || {};
+      initial[section.id] = Object.fromEntries(section.rows.map(row => [row.key, saved[row.key] || row.def]));
+    }
+    return initial;
+  });
+  const [tab, setTab] = useState('ports');
   const [filter, setFilter] = useState('');
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState(null);
 
-  const cleanMap = (map) => {
+  const setValue = (sectionId, key, value) =>
+    setValues(current => ({ ...current, [sectionId]: { ...current[sectionId], [key]: value } }));
+
+  // A row counts as changed when its box differs from the standard name;
+  // blank falls back to standard, so it can never publish an empty label.
+  const overridesFor = (section) => {
     const out = {};
-    for (const [key, value] of Object.entries(map)) {
-      const clean = String(value || '').replace(/\s+/g, ' ').trim().slice(0, 80);
-      if (clean) out[key] = clean;
+    for (const row of section.rows) {
+      const value = String(values[section.id][row.key] ?? '').replace(/\s+/g, ' ').trim().slice(0, 80);
+      if (value && value !== row.def) out[row.key] = value;
     }
     return out;
   };
-
-  const cleanedPorts = cleanMap(portNames);
-  const cleanedTerminals = cleanMap(terminalNames);
-  const dirty = JSON.stringify({ p: cleanedPorts, t: cleanedTerminals })
-    !== JSON.stringify({ p: cleanMap(saved.ports), t: cleanMap(saved.terminals) });
-
-  const q = filter.trim().toLowerCase();
-  const matches = (...texts) => !q || texts.some(text => String(text || '').toLowerCase().includes(q));
-  const visiblePorts = catalog.ports.filter(p => matches(p.pol, portNames[p.pol]));
-  const visibleTerminals = catalog.terminals.filter(t => matches(t.pol, t.code, t.defaultName, terminalNames[t.code]));
+  const pending = Object.fromEntries(sections.map(section => [section.id, overridesFor(section)]));
+  const changedCount = (ids) => ids.reduce((n, id) => n + Object.keys(pending[id]).length, 0);
+  const tabIds = (tabId) => sections.filter(s => s.tab === tabId).map(s => s.id);
+  const totalChanges = changedCount(sections.map(s => s.id));
+  const dirty = JSON.stringify(pending) !== JSON.stringify(
+    Object.fromEntries(sections.map(section => {
+      const saved = nameOverridesJson[section.id] || {};
+      return [section.id, Object.fromEntries(section.rows.filter(row => saved[row.key]).map(row => [row.key, saved[row.key]]))];
+    }))
+  );
 
   const publish = async () => {
     if (busy || !dirty) return;
     setBusy(true);
     setStatus(null);
     try {
-      const encoded = encodePayload({ schema: 1, ports: cleanedPorts, terminals: cleanedTerminals });
+      const encoded = encodePayload({ schema: 1, ...pending });
       if (encoded.length > 60000) throw new Error('The rename list is too large for the secure publish service.');
       const response = await fetch('/api/refresh', {
         method: 'POST',
@@ -347,84 +410,151 @@ function RenameEditor({ pass, onAuthExpired }) {
     }
   };
 
-  const inputClass = 'w-full rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-900 focus:border-[#EB6608] focus:outline-none focus:ring-2 focus:ring-[#EB6608]/30 dark:border-slate-500 dark:bg-slate-700 dark:text-white';
-  const sectionHead = 'mb-2 mt-6 text-sm font-semibold text-[#002D72] first:mt-0 dark:text-white';
-  const codeClass = 'font-mono text-xs text-slate-500 dark:text-slate-300';
+  const q = filter.trim().toLowerCase();
+  const rowMatches = (section, row) => {
+    if (!q) return true;
+    const current = values[section.id][row.key] || '';
+    return [row.title, row.code, row.def, current].some(text => String(text).toLowerCase().includes(q));
+  };
+
+  const activeSections = sections.filter(s => s.tab === tab);
 
   return (
     <div>
-      <div className="rounded-xl border-2 border-[#002D72] bg-blue-50 p-4 text-sm text-slate-700 dark:bg-slate-700 dark:text-slate-200">
-        Change what the dropdowns <b>display</b> — the underlying codes never change, so every
-        selection still connects to the same lane and terminal in the master workbook.
-        Leave a box blank to show the standard name.
-      </div>
+      <p className="text-sm text-slate-600 dark:text-slate-300">
+        Edit the name shown on screen — the underlying codes never change, so every selection
+        still connects to the same lane, terminal, and schedule in the master data.
+      </p>
 
-      <input
-        type="text"
-        value={filter}
-        onChange={(event) => setFilter(event.target.value)}
-        placeholder="Filter by port, code, or name…"
-        className={`${inputClass} mt-4`}
-        aria-label="Filter ports and terminals"
-      />
-
-      <h3 className={sectionHead}>Ports — Port of Loading dropdown</h3>
-      <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-600">
-        {visiblePorts.length === 0 && <p className="p-3 text-sm text-slate-500 dark:text-slate-300">No ports match the filter.</p>}
-        {visiblePorts.map(({ pol }) => (
-          <div key={pol} className="grid grid-cols-[7rem_1fr] items-center gap-3 border-b border-slate-100 px-3 py-2 last:border-b-0 dark:border-slate-700">
-            <span className={codeClass}>{pol}</span>
-            <input
-              type="text"
-              value={portNames[pol] || ''}
-              maxLength={80}
-              placeholder={pol}
-              onChange={(event) => setPortNames(current => ({ ...current, [pol]: event.target.value }))}
-              className={inputClass}
-              aria-label={`Display name for ${pol}`}
-            />
-          </div>
-        ))}
-      </div>
-
-      <h3 className={sectionHead}>Loading terminals — SSY / Terminal dropdown</h3>
-      <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-600">
-        {visibleTerminals.length === 0 && <p className="p-3 text-sm text-slate-500 dark:text-slate-300">No terminals match the filter.</p>}
-        {visibleTerminals.map(({ pol, code, defaultName }) => (
-          <div key={`${pol}|${code}`} className="grid grid-cols-[7rem_1fr] items-center gap-3 border-b border-slate-100 px-3 py-2 last:border-b-0 dark:border-slate-700">
-            <span className="leading-tight">
-              <span className="block text-xs font-semibold text-slate-600 dark:text-slate-200">{portLabel(pol)}</span>
-              <span className={codeClass}>{code}</span>
-            </span>
-            <input
-              type="text"
-              value={terminalNames[code] || ''}
-              maxLength={80}
-              placeholder={defaultName}
-              onChange={(event) => setTerminalNames(current => ({ ...current, [code]: event.target.value }))}
-              className={inputClass}
-              aria-label={`Display name for terminal ${code}`}
-            />
-          </div>
-        ))}
-      </div>
-
-      <button
-        type="button"
-        onClick={publish}
-        disabled={busy || !dirty}
-        className="mt-5 w-full rounded-lg bg-emerald-700 px-4 py-3 font-semibold text-white shadow-md transition hover:bg-emerald-800 disabled:opacity-50"
-      >
-        {busy ? 'Publishing…' : 'Publish new names to the live guide'}
-      </button>
-      {!dirty && !status && (
-        <p className="mt-2 text-center text-xs text-slate-500 dark:text-slate-400">The names above match what is currently published.</p>
-      )}
-      {status && (
-        <div className={`mt-3 rounded-lg border p-3 text-sm ${status.ok ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-red-200 bg-red-50 text-red-700'}`} role="status">
-          {status.msg}
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        {RENAME_TABS.map(t => {
+          const count = changedCount(tabIds(t.id));
+          return (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => setTab(t.id)}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
+                tab === t.id
+                  ? 'bg-[#002D72] text-white shadow-md'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600'
+              }`}
+            >
+              {t.label}
+              {count > 0 && (
+                <span className={`rounded-full px-1.5 text-[10px] font-bold ${tab === t.id ? 'bg-[#EB6608] text-white' : 'bg-amber-400/90 text-slate-900'}`}>
+                  {count}
+                </span>
+              )}
+            </button>
+          );
+        })}
+        <div className="relative ml-auto min-w-[12rem] flex-1 sm:max-w-xs">
+          <input
+            type="text"
+            value={filter}
+            onChange={(event) => setFilter(event.target.value)}
+            placeholder="Search…"
+            aria-label="Filter list"
+            className="w-full rounded-lg border border-slate-300 bg-white py-1.5 pl-8 pr-7 text-sm text-slate-900 focus:border-[#EB6608] focus:outline-none focus:ring-2 focus:ring-[#EB6608]/30 dark:border-slate-500 dark:bg-slate-700 dark:text-white"
+          />
+          <svg viewBox="0 0 24 24" className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+          {filter && (
+            <button
+              type="button"
+              onClick={() => setFilter('')}
+              aria-label="Clear search"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700 dark:hover:text-white"
+            >
+              ✕
+            </button>
+          )}
         </div>
-      )}
+      </div>
+
+      {activeSections.map(section => {
+        const rows = section.rows.filter(row => rowMatches(section, row));
+        return (
+          <section key={section.id} className="mt-4">
+            {section.heading && (
+              <h3 className="mb-1.5 text-sm font-semibold text-[#002D72] dark:text-white">{section.heading}</h3>
+            )}
+            <p className="mb-2 text-xs text-slate-500 dark:text-slate-400">{section.hint}</p>
+            <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-600">
+              <div className="grid grid-cols-2 gap-3 border-b border-slate-200 bg-slate-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:border-slate-600 dark:bg-slate-700/60 dark:text-slate-400">
+                <span>Item</span>
+                <span>Name shown on screen</span>
+              </div>
+              {rows.length === 0 && (
+                <p className="p-3 text-sm text-slate-500 dark:text-slate-300">Nothing matches the search.</p>
+              )}
+              {rows.map((row, index) => {
+                const value = values[section.id][row.key] ?? '';
+                const changed = value.replace(/\s+/g, ' ').trim() !== row.def && value.trim() !== '';
+                const cleared = value.trim() === '';
+                return (
+                  <div
+                    key={row.key}
+                    className={`grid grid-cols-2 items-center gap-3 px-3 py-1.5 ${index % 2 ? 'bg-slate-50/60 dark:bg-slate-700/25' : ''} ${changed ? 'shadow-[inset_3px_0_0_#EB6608]' : ''}`}
+                  >
+                    <div className="min-w-0 leading-tight">
+                      <span className="block truncate text-[13px] font-semibold text-slate-700 dark:text-slate-200">{row.title}</span>
+                      <span className="block truncate font-mono text-[11px] text-slate-400 dark:text-slate-400">{row.code}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="text"
+                        value={value}
+                        maxLength={80}
+                        placeholder={row.def}
+                        onChange={(event) => setValue(section.id, row.key, event.target.value)}
+                        aria-label={`Display name for ${row.title} ${row.code}`}
+                        className={`w-full rounded-md border px-2.5 py-1 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#EB6608]/30 dark:bg-slate-700 dark:text-white ${
+                          changed ? 'border-[#EB6608]/70 bg-orange-50/40 dark:border-[#EB6608]/70' : 'border-slate-300 bg-white dark:border-slate-500'
+                        }`}
+                      />
+                      {(changed || cleared) && (
+                        <button
+                          type="button"
+                          onClick={() => setValue(section.id, row.key, row.def)}
+                          aria-label={`Reset ${row.title} to its standard name`}
+                          title="Reset to the standard name"
+                          className="flex h-6 w-6 flex-none items-center justify-center rounded-full text-sm leading-none text-slate-400 transition hover:bg-slate-200 hover:text-slate-700 dark:hover:bg-slate-600 dark:hover:text-white"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        );
+      })}
+
+      <div className="sticky bottom-0 mt-5 -mx-6 border-t border-slate-200 bg-white/95 px-6 py-3 backdrop-blur dark:border-slate-600 dark:bg-slate-800/95">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <span className="text-sm text-slate-600 dark:text-slate-300">
+            {totalChanges === 0
+              ? 'All names match the standard data.'
+              : `${totalChanges} custom ${totalChanges === 1 ? 'name' : 'names'}${dirty ? ' — not published yet' : ' published'}`}
+          </span>
+          <button
+            type="button"
+            onClick={publish}
+            disabled={busy || !dirty}
+            className="rounded-lg bg-emerald-700 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-emerald-800 disabled:opacity-50"
+          >
+            {busy ? 'Publishing…' : 'Publish names'}
+          </button>
+        </div>
+        {status && (
+          <div className={`mt-2 rounded-lg border p-2.5 text-sm ${status.ok ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-red-200 bg-red-50 text-red-700'}`} role="status">
+            {status.msg}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
