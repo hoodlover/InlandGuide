@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { obBot } from '../assets/banners';
 import sammieBot from '../assets/obie-copilot-robot-sammie-bot.png';
+import rdoPhoto from '../assets/rdo.webp';
 
 // Obie's idle thoughts — cargo/ops humor + encouragement. Rotate every 15s.
 const THOUGHTS = [
@@ -57,6 +58,10 @@ const AWAKE_MS = 180_000;   // dozes off after 3 minutes on screen
 const SETTLE_MS = 3_000;    // matches the 3s CSS shrink-to-corner transition
 const MUMBLE_MS = 240_000;  // sleep-talks about rail every 4 minutes
 const MUMBLE_HOLD_MS = 6_000;
+// Easter egg: hovering the empty space while Obie sleeps fades in the RDO
+// photo, holds it, then slowly fades it back out.
+const RDO_HOLD_MS = 5_000;
+const RDO_FADE_OUT_MS = 2_500;
 export const SAMMIE_SURPRISE_EVENT = 'icg-sammie-surprise';
 
 const pick = (list) => list[Math.floor(Math.random() * list.length)];
@@ -69,6 +74,8 @@ export default function ObieThinking() {
   const [sammiePhase, setSammiePhase] = useState('idle');
   const sammieActiveRef = useRef(false);
   const sammieTimersRef = useRef([]);
+  const [rdoPhase, setRdoPhase] = useState('idle'); // idle | in | out
+  const rdoTimersRef = useRef([]);
 
   // Rotate thoughts while awake; the interval is torn down the moment he sleeps.
   useEffect(() => {
@@ -105,7 +112,27 @@ export default function ObieThinking() {
 
   useEffect(() => () => {
     sammieTimersRef.current.forEach(window.clearTimeout);
+    rdoTimersRef.current.forEach(window.clearTimeout);
   }, []);
+
+  // Waking up dismisses the photo instantly along with its timers.
+  useEffect(() => {
+    if (asleep) return;
+    rdoTimersRef.current.forEach(window.clearTimeout);
+    rdoTimersRef.current = [];
+    setRdoPhase('idle');
+  }, [asleep]);
+
+  const triggerRdo = () => {
+    if (!asleep || !settled || rdoPhase !== 'idle') return;
+    // Mount at opacity 0 for a beat so the fade-in transition actually runs.
+    setRdoPhase('pre');
+    rdoTimersRef.current = [
+      window.setTimeout(() => setRdoPhase('in'), 40),
+      window.setTimeout(() => setRdoPhase('out'), 40 + RDO_HOLD_MS),
+      window.setTimeout(() => setRdoPhase('idle'), 40 + RDO_HOLD_MS + RDO_FADE_OUT_MS + 200),
+    ];
+  };
 
   const startSammieRun = () => {
     if (sammieActiveRef.current) return;
@@ -147,6 +174,27 @@ export default function ObieThinking() {
 
   return (
     <div className="obie-stage relative w-full min-h-[26rem]">
+      {/* While Obie sleeps, the empty space above him becomes the RDO hover
+          zone. Render-gated so it never intercepts clicks while he's awake. */}
+      {asleep && settled && (
+        <div
+          className="absolute inset-x-0 top-0 z-10 h-[62%]"
+          onMouseEnter={triggerRdo}
+          aria-hidden="true"
+        />
+      )}
+      {rdoPhase !== 'idle' && (
+        <img
+          src={rdoPhoto}
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-6 z-20 w-72 max-w-[82%] -translate-x-1/2 rounded-2xl shadow-2xl"
+          style={{
+            opacity: rdoPhase === 'in' ? 1 : 0,
+            transition: `opacity ${rdoPhase === 'out' ? RDO_FADE_OUT_MS : 1200}ms ease`,
+          }}
+        />
+      )}
       <div
         key={i}
         className={`thought-bubble joke-fade absolute left-1/2 top-1 max-w-[17rem] -translate-x-1/2 rounded-2xl bg-white px-4 py-3 text-center text-sm font-semibold leading-snug text-slate-800 shadow-lg transition-opacity duration-500 ${asleep ? 'pointer-events-none opacity-0' : 'opacity-100'}`}

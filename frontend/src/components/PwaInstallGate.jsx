@@ -66,6 +66,9 @@ export default function PwaInstallGate() {
   const [installPrompt, setInstallPrompt] = useState(null);
   const [status, setStatus] = useState('waiting');
   const [message, setMessage] = useState('');
+  // Points a bouncing arrow at the Install button after someone clicks
+  // "Open app" without the app actually being installed.
+  const [pointAtInstall, setPointAtInstall] = useState(false);
   const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
   useEffect(() => {
@@ -113,6 +116,38 @@ export default function PwaInstallGate() {
   };
 
   const installed = status === 'installed';
+  // Best signal available: the browser only offers beforeinstallprompt while
+  // the app is NOT installed, and this page stores a flag once it is.
+  const knownInstalled = installed || (() => {
+    try { return localStorage.getItem('icg-pwa-installed') === '1'; } catch { return false; }
+  })();
+  const looksUninstalled = Boolean(installPrompt) || !knownInstalled;
+
+  // Same-tab navigation — opening new tabs left people with a pile of gate
+  // tabs. If the app clearly isn't installed, point at Install instead.
+  const openApp = (event) => {
+    if (!installed && looksUninstalled) {
+      event.preventDefault();
+      setPointAtInstall(true);
+      setMessage(
+        isiOS
+          ? 'The app is not on this device yet — in Safari, tap Share, then Add to Home Screen.'
+          : 'The app is not installed on this computer yet — click Install app first.',
+      );
+      return;
+    }
+    setMessage('If the app does not open, select Open in app in the browser address bar.');
+  };
+
+  // After install the browser usually launches the app itself; this tab is
+  // just leftovers. window.close() only works in some browsers, so fall back
+  // to telling the person to close it.
+  const closeTab = () => {
+    window.close();
+    window.setTimeout(() => {
+      setMessage('Your browser kept this tab open — you can close it like any other tab.');
+    }, 400);
+  };
 
   return (
     <main className="install-gate">
@@ -124,7 +159,7 @@ export default function PwaInstallGate() {
         <h1 id="install-gate-title">Inland Cutoff Guide</h1>
         <p className="install-gate-copy">
           {installed
-            ? 'Installation complete. Close this screen, then open Inland Cutoff Guide from your Start menu.'
+            ? 'Installation complete — the app now opens from its own window and your Start menu. This browser tab is no longer needed.'
             : (
               <>
                 Install Inland Cutoff Guide to open the
@@ -135,26 +170,36 @@ export default function PwaInstallGate() {
 
         <div className="install-gate-actions">
           {!installed && (
-            <button
-              type="button"
-              className="install-gate-button"
-              onClick={install}
-              disabled={status === 'installing'}
-            >
-              <span aria-hidden="true">↓</span>
-              {status === 'installing' ? 'Installing...' : 'Install app'}
-            </button>
+            <>
+              {pointAtInstall && (
+                <div className="install-gate-arrow" aria-hidden="true">⬇</div>
+              )}
+              <button
+                type="button"
+                className={`install-gate-button ${pointAtInstall ? 'install-gate-button-attn' : ''}`}
+                onClick={install}
+                disabled={status === 'installing'}
+              >
+                <span aria-hidden="true">↓</span>
+                {status === 'installing' ? 'Installing...' : 'Install app'}
+              </button>
+            </>
           )}
 
-          <a
-            className="install-gate-open"
-            href="./?open-app=1"
-            target="_blank"
-            rel="noopener"
-            onClick={() => setMessage('If the app does not open, select Open in app in the browser address bar.')}
-          >
-            {installed ? 'Open app' : 'Already installed? Open app'}
-          </a>
+          {installed ? (
+            <>
+              <button type="button" className="install-gate-button" onClick={closeTab}>
+                Close this tab
+              </button>
+              <a className="install-gate-open" href="./?open-app=1" onClick={openApp}>
+                Open app
+              </a>
+            </>
+          ) : (
+            <a className="install-gate-open" href="./?open-app=1" onClick={openApp}>
+              Already installed? Open app
+            </a>
+          )}
         </div>
 
         {!installed && status !== 'ready' && status !== 'installing' && !message && (

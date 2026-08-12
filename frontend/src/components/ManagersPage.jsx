@@ -292,10 +292,10 @@ function ToolPanel({ title, onBack, children, wide = false }) {
 // the same rows in the master workbook and schedule snapshots.
 // ---------------------------------------------------------------------------
 const RENAME_TABS = [
-  { id: 'ports', label: 'Ports of Load' },
   { id: 'terminals', label: 'Load Terminals' },
   { id: 'ramps', label: 'Rail Ramps' },
-  { id: 'canada', label: 'Canada Tab' },
+  { id: 'canada', label: 'Canada Ramps' },
+  { id: 'ports', label: 'Ports of Load' },
 ];
 
 // Row shape: { key, title, code, def } — def is the standard (non-renamed)
@@ -358,7 +358,7 @@ function RenameEditor({ pass, onAuthExpired }) {
     }
     return initial;
   });
-  const [tab, setTab] = useState('ports');
+  const [tab, setTab] = useState('terminals');
   const [filter, setFilter] = useState('');
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState(null);
@@ -426,53 +426,58 @@ function RenameEditor({ pass, onAuthExpired }) {
         still connects to the same lane, terminal, and schedule in the master data.
       </p>
 
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        {RENAME_TABS.map(t => {
-          const count = changedCount(tabIds(t.id));
-          return (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => setTab(t.id)}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
-                tab === t.id
-                  ? 'bg-[#002D72] text-white shadow-md'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600'
-              }`}
-            >
-              {t.label}
-              {count > 0 && (
-                <span className={`rounded-full px-1.5 text-[10px] font-bold ${tab === t.id ? 'bg-[#EB6608] text-white' : 'bg-amber-400/90 text-slate-900'}`}>
-                  {count}
-                </span>
-              )}
-            </button>
-          );
-        })}
-        <div className="relative ml-auto min-w-[12rem] flex-1 sm:max-w-xs">
-          <input
-            type="text"
-            value={filter}
-            onChange={(event) => setFilter(event.target.value)}
-            placeholder="Search…"
-            aria-label="Filter list"
-            className="w-full rounded-lg border border-slate-300 bg-white py-1.5 pl-8 pr-7 text-sm text-slate-900 focus:border-[#EB6608] focus:outline-none focus:ring-2 focus:ring-[#EB6608]/30 dark:border-slate-500 dark:bg-slate-700 dark:text-white"
-          />
-          <svg viewBox="0 0 24 24" className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
-          {filter && (
-            <button
-              type="button"
-              onClick={() => setFilter('')}
-              aria-label="Clear search"
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700 dark:hover:text-white"
-            >
-              ✕
-            </button>
-          )}
-        </div>
-      </div>
+      {/* Side curtain: vertical section rail on the left (sticky below the
+          page header), outputs for the chosen section in the main area. */}
+      <div className="mt-4 md:grid md:grid-cols-[11.5rem_minmax(0,1fr)] md:items-start md:gap-5">
+        <nav aria-label="Rename sections" className="flex flex-wrap gap-2 md:sticky md:top-24 md:flex-col md:gap-1.5">
+          {RENAME_TABS.map(t => {
+            const count = changedCount(tabIds(t.id));
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setTab(t.id)}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition md:w-full md:justify-between md:rounded-lg md:px-3 md:py-2 ${
+                  tab === t.id
+                    ? 'bg-[#002D72] text-white shadow-md'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600'
+                }`}
+              >
+                {t.label}
+                {count > 0 && (
+                  <span className={`rounded-full px-1.5 text-[10px] font-bold ${tab === t.id ? 'bg-[#EB6608] text-white' : 'bg-amber-400/90 text-slate-900'}`}>
+                    {count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </nav>
 
-      {activeSections.map(section => {
+        <div className="mt-4 min-w-0 md:mt-0">
+          <div className="relative">
+            <input
+              type="text"
+              value={filter}
+              onChange={(event) => setFilter(event.target.value)}
+              placeholder="Search…"
+              aria-label="Filter list"
+              className="w-full rounded-lg border border-slate-300 bg-white py-1.5 pl-8 pr-7 text-sm text-slate-900 focus:border-[#EB6608] focus:outline-none focus:ring-2 focus:ring-[#EB6608]/30 dark:border-slate-500 dark:bg-slate-700 dark:text-white"
+            />
+            <svg viewBox="0 0 24 24" className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+            {filter && (
+              <button
+                type="button"
+                onClick={() => setFilter('')}
+                aria-label="Clear search"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700 dark:hover:text-white"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          {activeSections.map(section => {
         const rows = section.rows.filter(row => rowMatches(section, row));
         return (
           <section key={section.id} className="mt-4">
@@ -532,27 +537,29 @@ function RenameEditor({ pass, onAuthExpired }) {
         );
       })}
 
-      <div className="sticky bottom-0 mt-5 -mx-6 border-t border-slate-200 bg-white/95 px-6 py-3 backdrop-blur dark:border-slate-600 dark:bg-slate-800/95">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <span className="text-sm text-slate-600 dark:text-slate-300">
-            {totalChanges === 0
-              ? 'All names match the standard data.'
-              : `${totalChanges} custom ${totalChanges === 1 ? 'name' : 'names'}${dirty ? ' — not published yet' : ' published'}`}
-          </span>
-          <button
-            type="button"
-            onClick={publish}
-            disabled={busy || !dirty}
-            className="rounded-lg bg-emerald-700 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-emerald-800 disabled:opacity-50"
-          >
-            {busy ? 'Publishing…' : 'Publish names'}
-          </button>
-        </div>
-        {status && (
-          <div className={`mt-2 rounded-lg border p-2.5 text-sm ${status.ok ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-red-200 bg-red-50 text-red-700'}`} role="status">
-            {status.msg}
+          <div className="sticky bottom-0 mt-5 border-t border-slate-200 bg-white/95 py-3 backdrop-blur dark:border-slate-600 dark:bg-slate-800/95">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <span className="text-sm text-slate-600 dark:text-slate-300">
+                {totalChanges === 0
+                  ? 'All names match the standard data.'
+                  : `${totalChanges} custom ${totalChanges === 1 ? 'name' : 'names'}${dirty ? ' — not published yet' : ' published'}`}
+              </span>
+              <button
+                type="button"
+                onClick={publish}
+                disabled={busy || !dirty}
+                className="rounded-lg bg-emerald-700 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-emerald-800 disabled:opacity-50"
+              >
+                {busy ? 'Publishing…' : 'Publish names'}
+              </button>
+            </div>
+            {status && (
+              <div className={`mt-2 rounded-lg border p-2.5 text-sm ${status.ok ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-red-200 bg-red-50 text-red-700'}`} role="status">
+                {status.msg}
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
@@ -1143,7 +1150,7 @@ export default function ManagersPage() {
   return (
     <div className="min-h-screen bg-[#EDE6D6] px-4 py-6 dark:bg-slate-900">
       <div className="mx-auto w-full max-w-4xl">
-        <header className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#E0D8C5] bg-[#F8F3EA] px-4 py-3 dark:border-slate-700 dark:bg-slate-800 sm:px-5">
+        <header className="sticky top-2 z-40 mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#E0D8C5] bg-[#F8F3EA]/95 px-4 py-3 shadow-md backdrop-blur dark:border-slate-700 dark:bg-slate-800/95 sm:px-5">
           <div>
             <h1 className="text-xl font-bold text-[#002D72] smallcaps txt-shadow-heavy dark:text-white">Managers Hub</h1>
             <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">Inland Cutoff Guide administration</p>

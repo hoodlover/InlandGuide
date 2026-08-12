@@ -122,11 +122,13 @@ module.exports = async (req, res) => {
       recentResult,
       usersResult,
     ] = await db.batch([
+      // activeDays counts weekdays only (Sat/Sun excluded) so the per-day
+      // averages reflect the business week; weekend calcs still count in total.
       statement(
         `SELECT
            COUNT(*) AS total,
            COUNT(DISTINCT ${IDENT}) AS uniqueUsers,
-           COUNT(DISTINCT date(ts)) AS activeDays
+           COUNT(DISTINCT CASE WHEN strftime('%w', ts) NOT IN ('0','6') THEN date(ts) END) AS activeDays
          FROM usage_log ${where}`,
         args
       ),

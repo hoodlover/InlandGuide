@@ -19,7 +19,7 @@ function exportExcel(data) {
     ['Calculations', data.summary.total],
     ['Active users', data.summary.uniqueUsers],
     ['Calculations per user', data.summary.avgPerUser],
-    ['Calculations per active day', data.summary.avgPerActiveDay],
+    ['Calculations per active weekday', data.summary.avgPerActiveDay],
     ['Repeat users', data.summary.returningUsers],
     ['Repeat-user rate', `${data.summary.repeatRate}%`],
   ]), 'Summary');
@@ -90,6 +90,8 @@ function StatCard({ label, value, detail }) {
   );
 }
 
+// Weekends are skipped unless they actually saw activity — the guide is a
+// business-week tool, and empty Sat/Sun bars just dilute the trend.
 function fillDailyGaps(daily, rangeDays) {
   if (!rangeDays || rangeDays === 'all') return daily;
   const counts = new Map(daily.map((item) => [item.day, item.count]));
@@ -100,7 +102,10 @@ function fillDailyGaps(daily, rangeDays) {
     const day = new Date(today);
     day.setUTCDate(today.getUTCDate() - offset);
     const key = day.toISOString().slice(0, 10);
-    result.push({ day: key, count: counts.get(key) || 0 });
+    const count = counts.get(key) || 0;
+    const weekend = day.getUTCDay() === 0 || day.getUTCDay() === 6;
+    if (weekend && !count) continue;
+    result.push({ day: key, count });
   }
   return result;
 }
@@ -245,7 +250,7 @@ export default function UsageStats({ passphrase, onAuthExpired }) {
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatCard label="Calculations" value={summary.total} detail={changeDetail} />
         <StatCard label="Active users" value={summary.uniqueUsers} detail={`${summary.avgPerUser} calcs / user`} />
-        <StatCard label="Daily use" value={summary.avgPerActiveDay} detail={`${summary.activeDays} active ${summary.activeDays === 1 ? 'day' : 'days'}`} />
+        <StatCard label="Daily use" value={summary.avgPerActiveDay} detail={`${summary.activeDays} active ${summary.activeDays === 1 ? 'weekday' : 'weekdays'}`} />
         <StatCard label="Repeat users" value={summary.returningUsers} detail={`${summary.repeatRate}% used it more than once`} />
       </div>
 
