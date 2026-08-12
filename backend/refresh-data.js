@@ -88,7 +88,8 @@ const termOfSSY = (pol, ssy) => { const m = mc[pol]; if (m) for (const [code, se
 const portmc = {};
 for (const pol of Object.keys(mc).sort()) {
   const m = mc[pol];
-  if (m.size < 2) continue;                                   // single terminal → no picker
+  // Single-terminal ports are exported too (the UI just shows no picker for
+  // them) so their terminal names appear in the Managers Hub rename editor.
   const ls = lanes.filter(l => l.pol === pol);
   if (!ls.length) continue;
   // 'terminal' when every non-"ALL" DATABASE token maps to a terminal; else 'ssy'.

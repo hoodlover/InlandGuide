@@ -288,9 +288,11 @@ export function getPortNote(pol) {
 }
 
 // Terminal options for a POL in 'terminal' mode (else null) — drives the picker.
+// Single-terminal ports return null: there is nothing to choose, they exist in
+// the data only so the rename editor can label their terminal.
 export function getTerminals(pol) {
   const d = portInfo(pol);
-  if (!d || d.mode !== 'terminal') return null;
+  if (!d || d.mode !== 'terminal' || d.terminals.length < 2) return null;
   return { mode: d.mode, terminals: d.terminals.map(t => ({ code: t.code, label: terminalLabel(t.code), ssys: t.ssys })) };
 }
 

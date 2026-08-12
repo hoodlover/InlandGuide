@@ -6,9 +6,48 @@ import * as XLSX from 'xlsx';
 
 const stamp = () => new Date().toISOString().slice(0, 10);
 
+// ---------------------------------------------------------------------------
+// Estimated savings vs. the old downtime-prone guide. Every assumption lives
+// here — tune a number and the dashboard banner plus both exports recompute.
+// Basis: ~60 staff; the previous online tool went down ~4×/month.
+// ---------------------------------------------------------------------------
+const SAVINGS = {
+  ratePerHour: 45,       // fully loaded ops labor, $/hr
+  minutesPerCalc: 4,     // manual lookup/verify time each calculation replaces
+  outagesPerMonth: 4,    // how often the old tool went down
+  staffPerOutage: 20,    // people scrambling per outage
+  minutesPerOutage: 20,  // scramble time per person
+  callsPerMonth: 240,    // 60 staff fielding ~4 cutoff calls each
+  minutesPerCall: 6,
+  incidentsPerMonth: 2,  // wrong/outdated-guide corrections avoided
+  costPerIncident: 250,  // labor + recovery per incident
+};
+const SAVINGS_FIXED_MONTHLY =
+  (SAVINGS.outagesPerMonth * SAVINGS.staffPerOutage * SAVINGS.minutesPerOutage / 60) * SAVINGS.ratePerHour +
+  (SAVINGS.callsPerMonth * SAVINGS.minutesPerCall / 60) * SAVINGS.ratePerHour +
+  SAVINGS.incidentsPerMonth * SAVINGS.costPerIncident;
+
+// Period + annualized savings. A single-user view counts only that person's
+// lookup time — the shared avoidance buckets belong to the whole team.
+function estimateSavings(summary, filter) {
+  const days = filter.rangeDays === 'all'
+    ? Math.max(1, (Date.now() - new Date(String(summary.firstTs || '').replace(' ', 'T') + 'Z').getTime()) / 86400000)
+    : Number(filter.rangeDays);
+  if (!Number.isFinite(days) || days <= 0) return null;
+  const perCalc = (SAVINGS.minutesPerCalc / 60) * SAVINGS.ratePerHour;
+  const lookupPart = summary.total * perCalc;
+  const fixedPart = filter.user ? 0 : SAVINGS_FIXED_MONTHLY * (days / 30.44);
+  const dailyRate = summary.total / days;
+  const annual = dailyRate * 365 * perCalc + (filter.user ? 0 : SAVINGS_FIXED_MONTHLY * 12);
+  return { period: Math.round(lookupPart + fixedPart), annual: Math.round(annual) };
+}
+
+const money = (n) => '$' + Math.round(n).toLocaleString();
+
 // One sheet per section of the report, mirroring the on-screen dashboard.
 function exportExcel(data) {
   const filterUser = data.filter.user || 'All users';
+  const savings = estimateSavings(data.summary, data.filter);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
     ['Inland Cutoff Guide — usage report', ''],
@@ -22,6 +61,12 @@ function exportExcel(data) {
     ['Calculations per active weekday', data.summary.avgPerActiveDay],
     ['Repeat users', data.summary.returningUsers],
     ['Repeat-user rate', `${data.summary.repeatRate}%`],
+    ...(savings ? [
+      [],
+      ['Estimated savings (period)', money(savings.period)],
+      ['Estimated savings (annualized)', money(savings.annual)],
+      ['Savings basis', `${SAVINGS.minutesPerCalc} min saved/calc at $${SAVINGS.ratePerHour}/hr loaded; avoided: ${SAVINGS.outagesPerMonth} outages/mo, ~${SAVINGS.callsPerMonth} cutoff calls/mo, ${SAVINGS.incidentsPerMonth} wrong-guide corrections/mo`],
+    ] : []),
   ]), 'Summary');
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(
     data.daily.map(d => ({ 'Day (UTC)': d.day, 'Calculations': d.count }))
@@ -40,6 +85,7 @@ function exportExcel(data) {
 function exportPdf(data) {
   const esc = (v) => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const filterUser = data.filter.user || 'All users';
+  const savings = estimateSavings(data.summary, data.filter);
   const rows = (items, cols) => items.map(item =>
     `<tr>${cols.map(c => `<td>${esc(item[c])}</td>`).join('')}</tr>`
   ).join('');
@@ -63,7 +109,10 @@ function exportPdf(data) {
       <div class="card"><div class="n">${esc(data.summary.uniqueUsers)}</div><div class="l">Active users</div></div>
       <div class="card"><div class="n">${esc(data.summary.avgPerUser)}</div><div class="l">Calcs / user</div></div>
       <div class="card"><div class="n">${esc(data.summary.repeatRate)}%</div><div class="l">Repeat-user rate</div></div>
+      ${savings ? `<div class="card"><div class="n" style="color:#047857">${esc(money(savings.period))}</div><div class="l">Est. savings (period)</div></div>
+      <div class="card"><div class="n" style="color:#047857">${esc(money(savings.annual))}</div><div class="l">Est. savings / year</div></div>` : ''}
     </div>
+    ${savings ? `<p class="sub">Savings basis: ${SAVINGS.minutesPerCalc} min saved per calculation at $${SAVINGS.ratePerHour}/hr loaded labor; avoided vs the old guide: ${SAVINGS.outagesPerMonth} outages/mo, ~${SAVINGS.callsPerMonth} cutoff calls/mo, ${SAVINGS.incidentsPerMonth} wrong-guide corrections/mo.</p>` : ''}
     <h2>Calculations per day (${esc(data.filter.periodLabel.toLowerCase())})</h2>
     <table><thead><tr><th>Day</th><th>Calculations</th></tr></thead><tbody>${rows(data.daily, ['day', 'count'])}</tbody></table>
     <h2>Most active users</h2>
@@ -253,6 +302,30 @@ export default function UsageStats({ passphrase, onAuthExpired }) {
         <StatCard label="Daily use" value={summary.avgPerActiveDay} detail={`${summary.activeDays} active ${summary.activeDays === 1 ? 'weekday' : 'weekdays'}`} />
         <StatCard label="Repeat users" value={summary.returningUsers} detail={`${summary.repeatRate}% used it more than once`} />
       </div>
+
+      {(() => {
+        const savings = estimateSavings(summary, filter);
+        if (!savings) return null;
+        return (
+          <div className="rounded-xl border border-emerald-300 bg-gradient-to-r from-emerald-50 to-teal-50 p-4 dark:border-emerald-700 dark:from-emerald-900/25 dark:to-teal-900/25">
+            <div className="flex flex-wrap items-baseline gap-x-8 gap-y-1">
+              <div>
+                <div className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">{money(savings.period)}</div>
+                <div className="text-[11px] uppercase tracking-wide text-emerald-800/70 dark:text-emerald-200/70">Estimated savings · {filter.periodLabel.toLowerCase()}</div>
+              </div>
+              <div>
+                <div className="text-lg font-bold text-emerald-700 dark:text-emerald-300">≈ {money(savings.annual)} / year</div>
+                <div className="text-[11px] uppercase tracking-wide text-emerald-800/70 dark:text-emerald-200/70">Annualized at the current pace</div>
+              </div>
+            </div>
+            <p className="mt-2 text-[11px] leading-snug text-emerald-900/70 dark:text-emerald-100/60">
+              {filter.user
+                ? `Lookup time only for this user (${SAVINGS.minutesPerCalc} min saved per calculation at $${SAVINGS.ratePerHour}/hr loaded).`
+                : `Vs. the old downtime-prone guide: ${SAVINGS.minutesPerCalc} min saved per calculation, ${SAVINGS.outagesPerMonth} outage scrambles/mo avoided, ~${SAVINGS.callsPerMonth} cutoff calls/mo avoided, and ${SAVINGS.incidentsPerMonth} wrong-guide corrections/mo — at $${SAVINGS.ratePerHour}/hr loaded labor.`}
+            </p>
+          </div>
+        );
+      })()}
 
       <section>
         <h3 className="mb-2 text-sm font-semibold text-[#002D72] dark:text-white">Calculations per day</h3>

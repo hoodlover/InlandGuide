@@ -65,6 +65,28 @@
       }
     ]
   },
+  "USBAL": {
+    "mode": "terminal",
+    "terminals": [
+      {
+        "code": "SEAGIR 001",
+        "ssys": [
+          "ALL"
+        ]
+      }
+    ]
+  },
+  "USCHS": {
+    "mode": "terminal",
+    "terminals": [
+      {
+        "code": "NORTHC 054 / WANDOT 004 / SOUTHC 256",
+        "ssys": [
+          "ALL"
+        ]
+      }
+    ]
+  },
   "USHOU": {
     "mode": "terminal",
     "terminals": [
@@ -83,6 +105,17 @@
         "code": "BAYPOR 007",
         "ssys": [
           "US3"
+        ]
+      }
+    ]
+  },
+  "USILM": {
+    "mode": "terminal",
+    "terminals": [
+      {
+        "code": "NCSPA 001",
+        "ssys": [
+          "ALL"
         ]
       }
     ]
@@ -144,6 +177,31 @@
       }
     ]
   },
+  "USMOB": {
+    "mode": "terminal",
+    "terminals": [
+      {
+        "code": "MOBILE 112",
+        "ssys": [
+          "ALL"
+        ]
+      }
+    ]
+  },
+  "USMSY": {
+    "mode": "terminal",
+    "terminals": [
+      {
+        "code": "NAPOLE 017",
+        "ssys": [
+          "AL4",
+          "GS1",
+          "EC6",
+          "GM8"
+        ]
+      }
+    ]
+  },
   "USNYC": {
     "mode": "terminal",
     "terminals": [
@@ -168,6 +226,17 @@
           "TEX",
           "USW",
           "US4"
+        ]
+      }
+    ]
+  },
+  "USOAK": {
+    "mode": "terminal",
+    "terminals": [
+      {
+        "code": "STEVED 022",
+        "ssys": [
+          "ALL"
         ]
       }
     ]
@@ -198,6 +267,17 @@
           "US4",
           "US2",
           "MUS"
+        ]
+      }
+    ]
+  },
+  "USPHL": {
+    "mode": "terminal",
+    "terminals": [
+      {
+        "code": "GREENW 133",
+        "ssys": [
+          "ALL"
         ]
       }
     ]

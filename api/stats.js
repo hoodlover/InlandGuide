@@ -121,6 +121,7 @@ module.exports = async (req, res) => {
       byUserResult,
       recentResult,
       usersResult,
+      firstResult,
     ] = await db.batch([
       // activeDays counts weekdays only (Sat/Sun excluded) so the per-day
       // averages reflect the business week; weekend calcs still count in total.
@@ -181,6 +182,8 @@ module.exports = async (req, res) => {
          ) g JOIN usage_log ul ON ul.id = g.last_id
          ORDER BY ul.user_name COLLATE NOCASE ASC`
       ),
+      // Very first logged calculation — anchors "all time" savings estimates.
+      statement('SELECT MIN(ts) AS firstTs FROM usage_log'),
     ], 'read');
 
     const s = summaryResult.rows[0];
@@ -205,6 +208,7 @@ module.exports = async (req, res) => {
         repeatRate: uniqueUsers ? Math.round((returningUsers / uniqueUsers) * 100) : 0,
         previousTotal,
         changePct,
+        firstTs: firstResult.rows[0]?.firstTs || null,
       },
       daily: dailyResult.rows.map(r => ({ day: r.day, count: Number(r.count) })),
       byUser: byUserResult.rows.map(r => ({ ident: r.ident, user_name: r.user_name, email: r.email || '', count: Number(r.count), last_used: r.last_used })),

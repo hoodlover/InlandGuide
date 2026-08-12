@@ -182,7 +182,7 @@ function buildMasterPayload(buffer, sourceHash) {
   const portmc = {};
   for (const pol of Object.keys(terminalMap).sort()) {
     const terminals = terminalMap[pol];
-    if (terminals.size < 2) continue;
+    // Single-terminal ports export too — no picker, but renamable labels.
     const polLanes = lanes.filter(lane => lane.pol === pol);
     if (!polLanes.length) continue;
     const services = new Set();
