@@ -925,6 +925,32 @@
   {
     "pol": "USLAX",
     "ssy": "ALL",
+    "name": "NORFOLK, VA",
+    "loccode": "USORF",
+    "rampMC": "NORFOL 008",
+    "rampCutTime": 0.7083333333333334,
+    "transit": 14,
+    "window": 4,
+    "ssyAdjustment": 0,
+    "reefer": "N",
+    "windowReefer": 0
+  },
+  {
+    "pol": "USLAX",
+    "ssy": "ALL",
+    "name": "NORFOLK, VA",
+    "loccode": "USORF",
+    "rampMC": "APM 044",
+    "rampCutTime": 0.7083333333333334,
+    "transit": 14,
+    "window": 4,
+    "ssyAdjustment": 0,
+    "reefer": "N",
+    "windowReefer": 0
+  },
+  {
+    "pol": "USLAX",
+    "ssy": "ALL",
     "name": "NEW ORLEANS, LA",
     "loccode": "USMSY",
     "rampMC": "UNIONP 070",

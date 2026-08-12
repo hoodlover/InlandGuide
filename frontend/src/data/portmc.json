@@ -202,6 +202,23 @@
       }
     ]
   },
+  "USSAV": {
+    "mode": "terminal",
+    "terminals": [
+      {
+        "code": "SAVTER 002",
+        "ssys": [
+          "ALL"
+        ]
+      },
+      {
+        "code": "GEORGI 022",
+        "ssys": [
+          "ALL"
+        ]
+      }
+    ]
+  },
   "USSEA": {
     "mode": "terminal",
     "terminals": [
