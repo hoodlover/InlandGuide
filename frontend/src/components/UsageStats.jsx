@@ -12,7 +12,7 @@ const stamp = () => new Date().toISOString().slice(0, 10);
 // Basis: ~60 staff; the previous online tool went down ~4×/month.
 // ---------------------------------------------------------------------------
 const SAVINGS = {
-  ratePerHour: 45,       // fully loaded ops labor, $/hr
+  ratePerHour: 31,       // fully loaded ops labor, $/hr
   minutesPerCalc: 4,     // manual lookup/verify time each calculation replaces
   outagesPerMonth: 4,    // how often the old tool went down
   staffPerOutage: 20,    // people scrambling per outage
