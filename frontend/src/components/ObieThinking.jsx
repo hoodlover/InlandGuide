@@ -58,8 +58,10 @@ const AWAKE_MS = 180_000;   // dozes off after 3 minutes on screen
 const SETTLE_MS = 3_000;    // matches the 3s CSS shrink-to-corner transition
 const MUMBLE_MS = 240_000;  // sleep-talks about rail every 4 minutes
 const MUMBLE_HOLD_MS = 6_000;
-// Easter egg: hovering the empty space while Obie sleeps fades in the RDO
-// photo, holds it, then slowly fades it back out.
+// Easter egg: resting the pointer on the empty space for 4s while Obie
+// sleeps fades in the RDO photo, holds it, then slowly fades it back out.
+// Leaving the area before the 4s is up cancels it.
+const RDO_ARM_MS = 4_000;
 const RDO_HOLD_MS = 5_000;
 const RDO_FADE_OUT_MS = 2_500;
 export const SAMMIE_SURPRISE_EVENT = 'icg-sammie-surprise';
@@ -76,6 +78,7 @@ export default function ObieThinking() {
   const sammieTimersRef = useRef([]);
   const [rdoPhase, setRdoPhase] = useState('idle'); // idle | in | out
   const rdoTimersRef = useRef([]);
+  const rdoArmTimerRef = useRef(0);
 
   // Rotate thoughts while awake; the interval is torn down the moment he sleeps.
   useEffect(() => {
@@ -113,6 +116,7 @@ export default function ObieThinking() {
   useEffect(() => () => {
     sammieTimersRef.current.forEach(window.clearTimeout);
     rdoTimersRef.current.forEach(window.clearTimeout);
+    window.clearTimeout(rdoArmTimerRef.current);
   }, []);
 
   // Waking up dismisses the photo instantly along with its timers.
@@ -120,11 +124,11 @@ export default function ObieThinking() {
     if (asleep) return;
     rdoTimersRef.current.forEach(window.clearTimeout);
     rdoTimersRef.current = [];
+    window.clearTimeout(rdoArmTimerRef.current);
     setRdoPhase('idle');
   }, [asleep]);
 
   const triggerRdo = () => {
-    if (!asleep || !settled || rdoPhase !== 'idle') return;
     // Mount at opacity 0 for a beat so the fade-in transition actually runs.
     setRdoPhase('pre');
     rdoTimersRef.current = [
@@ -133,6 +137,14 @@ export default function ObieThinking() {
       window.setTimeout(() => setRdoPhase('idle'), 40 + RDO_HOLD_MS + RDO_FADE_OUT_MS + 200),
     ];
   };
+
+  // The pointer must rest on the area for the full arm time; leaving cancels.
+  const armRdo = () => {
+    if (rdoPhase !== 'idle') return;
+    window.clearTimeout(rdoArmTimerRef.current);
+    rdoArmTimerRef.current = window.setTimeout(triggerRdo, RDO_ARM_MS);
+  };
+  const disarmRdo = () => window.clearTimeout(rdoArmTimerRef.current);
 
   const startSammieRun = () => {
     if (sammieActiveRef.current) return;
@@ -179,7 +191,8 @@ export default function ObieThinking() {
       {asleep && settled && (
         <div
           className="absolute inset-x-0 top-0 z-10 h-[62%]"
-          onMouseEnter={triggerRdo}
+          onMouseEnter={armRdo}
+          onMouseLeave={disarmRdo}
           aria-hidden="true"
         />
       )}

@@ -358,14 +358,18 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
               <p className="mb-2 text-xs font-bold uppercase tracking-wide text-white txt-shadow-soft">Published rail schedules</p>
               <ul className="space-y-2 text-sm">
                 <li>
+                  {/* The element id + text fragment steer Edge/Chrome straight
+                      to the "Port schedules" accordion and highlight it — the
+                      page's own name for rail ramp cuts, which nobody guesses. */}
                   <a
-                    href="https://www.cpkcr.com/en/customer-resources/shipping-guides-resources?"
+                    href="https://www.cpkcr.com/en/customer-resources/shipping-guides-resources#id-AAAB963170242246EEC2726E8F39E78F:~:text=Port%20schedules"
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-2 font-semibold text-white underline decoration-white/50 underline-offset-2 transition hover:decoration-white"
                   >
                     <span aria-hidden="true">↗</span> CP Rail Ramp Cuts
                   </a>
+                  <p className="mt-0.5 pl-6 text-[11px] text-white/80 txt-shadow-soft">Opens at the “Port schedules” section — that's CP's name for the rail ramp cuts.</p>
                 </li>
                 <li>
                   <a
