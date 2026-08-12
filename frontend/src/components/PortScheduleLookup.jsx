@@ -351,6 +351,36 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
             )}
           </div>
 
+          {/* Published-schedule sources — shown until a port is picked (Reset
+              brings them back), so the empty bottom of the card earns its keep. */}
+          {!sel.port && (
+            <div className="mt-5 rounded-xl border border-white/30 bg-white/10 p-4">
+              <p className="mb-2 text-xs font-bold uppercase tracking-wide text-white txt-shadow-soft">Published rail schedules</p>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <a
+                    href="https://www.cpkcr.com/en/customer-resources/shipping-guides-resources?"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 font-semibold text-white underline decoration-white/50 underline-offset-2 transition hover:decoration-white"
+                  >
+                    <span aria-hidden="true">↗</span> CP Rail Ramp Cuts
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://www.cn.ca/en/customer-centre/prices-tariffs-transit-times/terminal-to-port-service-grid"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 font-semibold text-white underline decoration-white/50 underline-offset-2 transition hover:decoration-white"
+                  >
+                    <span aria-hidden="true">↗</span> CN Rail Ramp Cuts
+                  </a>
+                </li>
+              </ul>
+            </div>
+          )}
+
           {info?.notes?.length > 0 && (
             <>
               <details className="peer mt-3 text-white/90 text-xs">
