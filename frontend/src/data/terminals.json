@@ -10,6 +10,11 @@
     "label": "NS / Austell"
   },
   {
+    "rampMC": "BURLIN 408",
+    "city": "Atlanta, GA",
+    "label": "BNSF / Atlanta"
+  },
+  {
     "rampMC": "CSXINT 027",
     "city": "Battleboro, NC",
     "label": "CSX / Rocky Mount"

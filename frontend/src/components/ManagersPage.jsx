@@ -321,7 +321,7 @@ function buildRenameSections() {
     {
       id: 'ports', tab: 'ports', heading: '',
       hint: 'Shown in the Port of Loading dropdown of the US calculator.',
-      rows: usPorts.map(({ pol }) => ({ key: pol, title: pol, code: 'Loccode', def: pol })),
+      rows: usPorts.map(({ pol }) => ({ key: pol, title: pol, code: '', def: pol })),
     },
     {
       id: 'terminals', tab: 'terminals', heading: '',
@@ -341,7 +341,7 @@ function buildRenameSections() {
     {
       id: 'canadaCities', tab: 'canada', heading: 'Rail destination cities',
       hint: 'Shown in the Canada tab city picker and results.',
-      rows: ca.cities.map(c => ({ key: c.city, title: c.city, code: 'Published name', def: c.defaultName })),
+      rows: ca.cities.map(c => ({ key: c.city, title: c.city, code: '', def: c.defaultName })),
     },
   ];
 }
@@ -481,7 +481,7 @@ function RenameEditor({ pass, onAuthExpired }) {
             )}
             <p className="mb-2 text-xs text-slate-500 dark:text-slate-400">{section.hint}</p>
             <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-600">
-              <div className="grid grid-cols-2 gap-3 border-b border-slate-200 bg-slate-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:border-slate-600 dark:bg-slate-700/60 dark:text-slate-400">
+              <div className="grid grid-cols-[minmax(0,11rem)_1fr] gap-3 border-b border-slate-200 bg-slate-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:border-slate-600 dark:bg-slate-700/60 dark:text-slate-400">
                 <span>Item</span>
                 <span>Name shown on screen</span>
               </div>
@@ -491,35 +491,34 @@ function RenameEditor({ pass, onAuthExpired }) {
               {rows.map((row, index) => {
                 const value = values[section.id][row.key] ?? '';
                 const changed = value.replace(/\s+/g, ' ').trim() !== row.def && value.trim() !== '';
-                const cleared = value.trim() === '';
                 return (
                   <div
                     key={row.key}
-                    className={`grid grid-cols-2 items-center gap-3 px-3 py-1.5 ${index % 2 ? 'bg-slate-50/60 dark:bg-slate-700/25' : ''} ${changed ? 'shadow-[inset_3px_0_0_#EB6608]' : ''}`}
+                    className={`grid grid-cols-[minmax(0,11rem)_1fr] items-center gap-3 px-3 py-1.5 ${index % 2 ? 'bg-slate-50/60 dark:bg-slate-700/25' : ''} ${changed ? 'shadow-[inset_3px_0_0_#EB6608]' : ''}`}
                   >
                     <div className="min-w-0 leading-tight">
                       <span className="block truncate text-[13px] font-semibold text-slate-700 dark:text-slate-200">{row.title}</span>
-                      <span className="block truncate font-mono text-[11px] text-slate-400 dark:text-slate-400">{row.code}</span>
+                      {row.code && <span className="block truncate font-mono text-[11px] text-slate-400 dark:text-slate-400">{row.code}</span>}
                     </div>
-                    <div className="flex items-center gap-1.5">
+                    <div className="relative">
                       <input
                         type="text"
                         value={value}
                         maxLength={80}
                         placeholder={row.def}
                         onChange={(event) => setValue(section.id, row.key, event.target.value)}
-                        aria-label={`Display name for ${row.title} ${row.code}`}
-                        className={`w-full rounded-md border px-2.5 py-1 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#EB6608]/30 dark:bg-slate-700 dark:text-white ${
+                        aria-label={`Display name for ${row.title} ${row.code || ''}`}
+                        className={`w-full rounded-md border py-1 pl-2.5 pr-8 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#EB6608]/30 dark:bg-slate-700 dark:text-white ${
                           changed ? 'border-[#EB6608]/70 bg-orange-50/40 dark:border-[#EB6608]/70' : 'border-slate-300 bg-white dark:border-slate-500'
                         }`}
                       />
-                      {(changed || cleared) && (
+                      {value !== '' && (
                         <button
                           type="button"
-                          onClick={() => setValue(section.id, row.key, row.def)}
-                          aria-label={`Reset ${row.title} to its standard name`}
-                          title="Reset to the standard name"
-                          className="flex h-6 w-6 flex-none items-center justify-center rounded-full text-sm leading-none text-slate-400 transition hover:bg-slate-200 hover:text-slate-700 dark:hover:bg-slate-600 dark:hover:text-white"
+                          onClick={() => setValue(section.id, row.key, '')}
+                          aria-label={`Clear the name for ${row.title}`}
+                          title="Clear (blank = standard name)"
+                          className="absolute right-1.5 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full text-xs leading-none text-slate-400 transition hover:bg-slate-200 hover:text-slate-700 dark:hover:bg-slate-600 dark:hover:text-white"
                         >
                           ✕
                         </button>

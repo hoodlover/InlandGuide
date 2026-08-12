@@ -9,8 +9,12 @@ import nameOverridesJson from '../data/name-overrides.json';
 // Manager-published display names (Managers Hub → Rename ports & terminals).
 // Keys stay the authoritative schedule slugs / published city names — the
 // snapshot data is never rewritten, only what is shown on screen.
+// City renames match case-insensitively: CPKC publishes "Regina" while CN
+// publishes "REGINA", and one rename should cover both spellings.
 const CANADA_PORT_NAMES = nameOverridesJson.canadaPorts || {};
-const CANADA_CITY_NAMES = nameOverridesJson.canadaCities || {};
+const CANADA_CITY_NAMES = Object.fromEntries(
+  Object.entries(nameOverridesJson.canadaCities || {}).map(([city, label]) => [city.toUpperCase(), label])
+);
 
 const ERD_DAYS_BEFORE = 5;
 const RAIL_ORDER = { CPKC: 0, CN: 1 };
@@ -96,16 +100,25 @@ const CITY_ALIASES = {
 };
 
 export function cityDisplay(city) {
-  return CANADA_CITY_NAMES[city] || CITY_ALIASES[city] || city;
+  return CANADA_CITY_NAMES[String(city).toUpperCase()] || CITY_ALIASES[city] || city;
 }
 
 // The Canada-tab entries the rename editor can relabel: ports from the
 // schedule snapshot and the union of every port's destination cities.
-// Defaults ignore manager renames so the editor knows what "standard" is.
+// CPKC/CN publish the same city in different casing ("Regina"/"REGINA") —
+// list each city once, preferring the normal-case spelling; the rename
+// covers every casing. Defaults ignore manager renames so the editor knows
+// what "standard" is.
 export function getCanadaRenameCatalog() {
   const ports = Object.entries(schedules.ports || {})
     .map(([slug, p]) => ({ slug, rail: p.rail || '', defaultName: p.name || slug }));
-  const cities = [...new Set(Object.values(schedules.ports || {}).flatMap(p => p.cities || []))]
+  const byUpper = new Map();
+  for (const city of Object.values(schedules.ports || {}).flatMap(p => p.cities || [])) {
+    const key = String(city).toUpperCase();
+    const existing = byUpper.get(key);
+    if (!existing || (existing === key && city !== key)) byUpper.set(key, city);
+  }
+  const cities = [...byUpper.values()]
     .sort((a, b) => a.localeCompare(b))
     .map(city => ({ city, defaultName: CITY_ALIASES[city] || city }));
   return { ports, cities };
