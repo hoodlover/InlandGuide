@@ -6,6 +6,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { gzipSync, strFromU8, strToU8, unzipSync } from 'fflate';
 import UsageStats from './UsageStats';
+import { getUserName } from './NamePrompt';
 import { masterUpdatedAt, getRenameCatalog } from '../lib/cutoff';
 import { pulledAt as railPulledAt, getCanadaRenameCatalog } from '../lib/cpkc';
 import nameOverridesJson from '../data/name-overrides.json';
@@ -236,11 +237,32 @@ const HUB_ICONS = {
   rename: <><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></>,
 };
 
-function HubCard({ icon, title, subtitle, detail, onClick, href }) {
+// Per-section icon-chip tints so the tool groups read apart at a glance.
+const HUB_ACCENTS = {
+  blue: 'bg-[#002D72]/[0.08] text-[#002D72] dark:bg-blue-400/15 dark:text-blue-200',
+  orange: 'bg-[#EB6608]/10 text-[#c95200] dark:bg-[#EB6608]/20 dark:text-orange-300',
+  slate: 'bg-slate-500/10 text-slate-600 dark:bg-white/10 dark:text-slate-200',
+};
+
+// Titled group of tool cards with a hairline rule — keeps the hub organized
+// instead of one undifferentiated card pile.
+function HubSection({ title, children }) {
+  return (
+    <section className="mt-6">
+      <div className="mb-2.5 flex items-center gap-3">
+        <h3 className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{title}</h3>
+        <div className="h-px flex-1 bg-slate-400/40 dark:bg-slate-700" aria-hidden="true" />
+      </div>
+      <div className="grid gap-2.5 sm:grid-cols-2">{children}</div>
+    </section>
+  );
+}
+
+function HubCard({ icon, title, subtitle, detail, onClick, href, accent = 'blue' }) {
   const className = 'group flex w-full items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#EB6608]/60 hover:shadow-md dark:border-slate-600 dark:bg-slate-700 dark:hover:border-[#EB6608]/70';
   const body = (
     <>
-      <span className="flex h-10 w-10 flex-none items-center justify-center rounded-lg bg-[#002D72]/[0.06] text-[#002D72] transition group-hover:bg-[#EB6608]/10 group-hover:text-[#EB6608] dark:bg-white/10 dark:text-white" aria-hidden="true">
+      <span className={`flex h-10 w-10 flex-none items-center justify-center rounded-lg transition group-hover:bg-[#EB6608]/10 group-hover:text-[#EB6608] ${HUB_ACCENTS[accent] || HUB_ACCENTS.blue}`} aria-hidden="true">
         <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{icon}</svg>
       </span>
       <span className="min-w-0 flex-1">
@@ -477,6 +499,8 @@ function RenameEditor({ pass, onAuthExpired }) {
             )}
           </div>
 
+          {/* Only the results scroll — search stays above, publish below. */}
+          <div className="mt-3 max-h-[58vh] min-h-[14rem] overflow-y-auto pr-1">
           {activeSections.map(section => {
         const rows = section.rows.filter(row => rowMatches(section, row));
         return (
@@ -537,7 +561,9 @@ function RenameEditor({ pass, onAuthExpired }) {
         );
       })}
 
-          <div className="sticky bottom-0 mt-5 border-t border-slate-200 bg-white/95 py-3 backdrop-blur dark:border-slate-600 dark:bg-slate-800/95">
+          </div>
+
+          <div className="mt-2 border-t border-slate-200 pt-3 dark:border-slate-600">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <span className="text-sm text-slate-600 dark:text-slate-300">
                 {totalChanges === 0
@@ -583,8 +609,24 @@ export default function ManagersPage() {
     railPulledAt,
     masterCheckedAt: masterUpdatedAt,
   });
+  // Small 7-day pulse for the welcome banner; loads quietly after sign-in
+  // and simply stays hidden if the stats service is unreachable.
+  const [weekStats, setWeekStats] = useState(null);
   const verifiedMasterRef = useRef(null);
   const autoVerifyRef = useRef(false);
+
+  const loadWeekStats = (passphrase) => {
+    fetch('/api/stats', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ passphrase, rangeDays: 7 }),
+    })
+      .then(r => (r.ok ? r.json() : null))
+      .then(body => {
+        if (body?.ok) setWeekStats({ total: body.summary.total, users: body.summary.uniqueUsers });
+      })
+      .catch(() => {});
+  };
 
   const exitToGuide = () => { window.location.hash = ''; };
 
@@ -621,6 +663,7 @@ export default function ManagersPage() {
           railPulledAt: data.activity?.railPulledAt || current.railPulledAt,
           masterCheckedAt: data.activity?.masterCheckedAt || current.masterCheckedAt,
         }));
+        loadWeekStats(passphrase);
         setStatus(null);
         setView('menu');
       }
@@ -892,28 +935,59 @@ export default function ManagersPage() {
       </section>
     );
   } else if (view === 'menu') {
+    const firstName = (getUserName() || '').split(/\s+/)[0];
+    const todayLabel = new Date().toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
     content = (
       <section className="mx-auto w-full max-w-3xl">
-        <div className="rounded-xl bg-gradient-to-r from-[#002D72] to-[#0a4b9b] px-5 py-4 text-white shadow-md">
-          <p className="text-base font-normal">Welcome, Hapag-Lloyd Managers</p>
-          <p className="mt-1 text-sm text-white/80">Your shortcuts for keeping the Inland Guide moving.</p>
+        {/* Welcome banner: greeting, live 7-day pulse, and Obie on the corner. */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#002D72] via-[#0a3d8f] to-[#0a4b9b] px-6 py-5 text-white shadow-lg">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/60">{todayLabel}</p>
+          <p className="mt-1 text-xl font-bold">Welcome back{firstName ? `, ${firstName}` : ''}.</p>
+          <p className="mt-0.5 max-w-[26rem] text-sm text-white/75">Everything you need to keep the Inland Guide moving.</p>
+          <div className="mt-3 flex flex-wrap gap-2 pr-24">
+            {weekStats && (
+              <>
+                <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white ring-1 ring-white/20">
+                  {weekStats.total.toLocaleString()} calcs · last 7 days
+                </span>
+                <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white ring-1 ring-white/20">
+                  {weekStats.users} active {weekStats.users === 1 ? 'user' : 'users'}
+                </span>
+              </>
+            )}
+            <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/80 ring-1 ring-white/20">
+              Rail data: {formatHubActivity(hubActivity.railPulledAt)}
+            </span>
+          </div>
+          <img
+            src={obBot}
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute -bottom-5 -right-3 w-28 opacity-90 drop-shadow-2xl"
+          />
         </div>
 
-        <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
-          <HubCard
-            icon={HUB_ICONS.requests}
-            title="Feature & change requests"
-            subtitle="Review what the team is asking for, newest first"
-            onClick={loadRequests}
-          />
+        <HubSection title="Insights">
           <HubCard
             icon={HUB_ICONS.stats}
+            accent="blue"
             title="Usage report"
             subtitle="Who's using the guide, trends & recent activity"
             onClick={() => setView('stats')}
           />
           <HubCard
+            icon={HUB_ICONS.requests}
+            accent="blue"
+            title="Feature & change requests"
+            subtitle="Review what the team is asking for, newest first"
+            onClick={loadRequests}
+          />
+        </HubSection>
+
+        <HubSection title="Live data">
+          <HubCard
             icon={HUB_ICONS.refresh}
+            accent="orange"
             title="Update CP Rail & CN Rail ramp cuts"
             subtitle="Pull the latest published Canadian schedules"
             detail={`Last pulled: ${formatHubActivity(hubActivity.railPulledAt)}`}
@@ -921,6 +995,7 @@ export default function ManagersPage() {
           />
           <HubCard
             icon={HUB_ICONS.publish}
+            accent="orange"
             title="Publish from the SharePoint master"
             subtitle="Verify the workbook & update the live calculator"
             detail={`Last checked: ${formatHubActivity(hubActivity.masterCheckedAt)}`}
@@ -928,23 +1003,29 @@ export default function ManagersPage() {
           />
           <HubCard
             icon={HUB_ICONS.rename}
+            accent="orange"
             title="Rename ports & terminals"
             subtitle="Change dropdown display names — codes stay linked to the master"
             onClick={() => setView('names')}
           />
+        </HubSection>
+
+        <HubSection title="More">
           <HubCard
             icon={HUB_ICONS.toggle}
+            accent="slate"
             title="Turn a lane on or off"
             subtitle="Lane activation stays in the source system"
             onClick={() => setView('lane')}
           />
           <HubCard
             icon={HUB_ICONS.news}
+            accent="slate"
             title="Insider information"
             subtitle="RNA Inland Delivery Team news on SharePoint"
             href="https://hlag.sharepoint.com/sites/RegionNorthAmerica/SitePages/RNA-Inland-Delivery-Team-(IDT).aspx"
           />
-        </div>
+        </HubSection>
       </section>
     );
   } else if (view === 'requests') {
