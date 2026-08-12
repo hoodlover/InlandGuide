@@ -9,11 +9,22 @@ require('dotenv').config({ path: path.join(__dirname, '.env') });
 const ROOT = path.join(__dirname, '..');
 
 // 1) Export the Excel DATABASE sheet -> frontend/src/data/lanes.json
-const excelPath = process.env.EXCEL_PATH;
-if (!excelPath || !fs.existsSync(excelPath)) {
-  console.error('ERROR: Excel not found at EXCEL_PATH:', excelPath);
+// Two master sources: EXCEL_PATH (the OneDrive-synced SharePoint copy — kept
+// fresh automatically while the owner is signed in) and EXCEL_PATH_FALLBACK
+// (the Z: network share the manual Managers Hub publish deposits to). Use the
+// most recently modified one that exists, so whichever channel got the latest
+// master wins.
+const candidates = [process.env.EXCEL_PATH, process.env.EXCEL_PATH_FALLBACK]
+  .filter(Boolean)
+  .filter(p => fs.existsSync(p))
+  .map(p => ({ path: p, mtime: fs.statSync(p).mtimeMs }))
+  .sort((a, b) => b.mtime - a.mtime);
+if (!candidates.length) {
+  console.error('ERROR: Excel not found at EXCEL_PATH or EXCEL_PATH_FALLBACK:', process.env.EXCEL_PATH, process.env.EXCEL_PATH_FALLBACK);
   process.exit(1);
 }
+const excelPath = candidates[0].path;
+console.log('  Master: reading ' + excelPath + ' (modified ' + new Date(candidates[0].mtime).toLocaleString() + ')');
 
 const wb = XLSX.readFile(excelPath);
 const rows = XLSX.utils.sheet_to_json(wb.Sheets['DATABASE'], { header: 1 });
@@ -34,7 +45,7 @@ for (let i = 0; i < rows.length; i++) {
 }
 const dataDir = path.join(ROOT, 'frontend/src/data');
 fs.mkdirSync(dataDir, { recursive: true });
-fs.writeFileSync(path.join(dataDir, 'lanes.json'), JSON.stringify(lanes, null, 2));
+fs.writeFileSync(path.join(dataDir, 'lanes.json'), JSON.stringify(lanes, null, 2) + '\n');
 console.log('  Data: wrote ' + lanes.length + ' lanes');
 
 // 1b) Export the HOLIDAYS sheet -> frontend/src/data/holidays.json, grouped by country.
@@ -50,7 +61,7 @@ for (const r of holRows) {
   }
 }
 Object.keys(holidays).forEach(c => holidays[c].sort());
-fs.writeFileSync(path.join(dataDir, 'holidays.json'), JSON.stringify(holidays, null, 2));
+fs.writeFileSync(path.join(dataDir, 'holidays.json'), JSON.stringify(holidays, null, 2) + '\n');
 console.log('  Holidays: wrote ' + Object.entries(holidays).map(([c, a]) => c + '=' + a.length).join(', '));
 
 // 1c) Export the PORTMC sheet -> frontend/src/data/portmc.json.
