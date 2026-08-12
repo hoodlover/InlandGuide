@@ -197,16 +197,19 @@ export default function ObieThinking() {
         />
       )}
       {rdoPhase !== 'idle' && (
-        <img
-          src={rdoPhoto}
-          alt=""
+        <div
           aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-6 z-20 w-72 max-w-[82%] -translate-x-1/2 rounded-2xl shadow-2xl"
+          className="pointer-events-none absolute left-1/2 top-6 z-20 w-72 max-w-[82%] -translate-x-1/2 text-center"
           style={{
             opacity: rdoPhase === 'in' ? 1 : 0,
             transition: `opacity ${rdoPhase === 'out' ? RDO_FADE_OUT_MS : 1200}ms ease`,
           }}
-        />
+        >
+          <img src={rdoPhoto} alt="" className="w-full rounded-2xl shadow-2xl" />
+          <p className="mt-2 text-lg font-extrabold uppercase tracking-wide text-[#002D72] dark:text-white">RDO</p>
+          <p className="text-sm font-bold uppercase tracking-widest text-[#EB6608]">VIBE GURU</p>
+          <p className="mt-0.5 text-sm font-semibold text-slate-700 dark:text-slate-200">Thanks for all you DO!</p>
+        </div>
       )}
       <div
         key={i}
