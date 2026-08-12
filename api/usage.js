@@ -31,16 +31,21 @@ function ensureSchema(db) {
         id        INTEGER PRIMARY KEY AUTOINCREMENT,
         ts        TEXT NOT NULL DEFAULT (datetime('now')),
         user_name TEXT NOT NULL,
+        email     TEXT,
         erd       TEXT,
         lrd       TEXT,
         ip        TEXT
       )`,
       `CREATE INDEX IF NOT EXISTS idx_usage_ts ON usage_log (ts)`,
       `CREATE INDEX IF NOT EXISTS idx_usage_user ON usage_log (user_name)`,
-    ], 'write').catch(err => {
-      schemaReady = null; // retry on the next request
-      throw err;
-    });
+    ], 'write')
+      // Tables created before the email column existed need one ALTER; the
+      // "duplicate column" error on every later run is expected and ignored.
+      .then(() => db.execute('ALTER TABLE usage_log ADD COLUMN email TEXT').catch(() => {}))
+      .catch(err => {
+        schemaReady = null; // retry on the next request
+        throw err;
+      });
   }
   return schemaReady;
 }
@@ -69,6 +74,8 @@ module.exports = async (req, res) => {
   if (!body || typeof body !== 'object') body = {};
 
   const userName = clean(body.userName, 80) || 'Unknown';
+  // Lowercased so the stats can merge rows regardless of how it was typed.
+  const email = clean(body.userEmail, 120).toLowerCase() || null;
   const erd = clean(body.erd, 40) || null;
   const lrd = clean(body.lrd, 40) || null;
   const ip = requestIp(req);
@@ -77,8 +84,8 @@ module.exports = async (req, res) => {
     const db = getClient();
     await ensureSchema(db);
     await db.execute({
-      sql: 'INSERT INTO usage_log (user_name, erd, lrd, ip) VALUES (?, ?, ?, ?)',
-      args: [userName, erd, lrd, ip],
+      sql: 'INSERT INTO usage_log (user_name, email, erd, lrd, ip) VALUES (?, ?, ?, ?, ?)',
+      args: [userName, email, erd, lrd, ip],
     });
     return res.status(201).json({ ok: true });
   } catch (err) {

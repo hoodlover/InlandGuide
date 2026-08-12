@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getPortGroups, getPortSearchDetails, getCities, getCitySearchDetails, getPortServices, calculateERDLRD, cityLabel, getRailTerminal, getRail, cityNeedsExtraDays, defaultExtraDays, getTerminals, getTerminalOptions, ssyForTerminal, terminalLabel, terminalForSSY, getPortNote, masterUpdatedAt } from '../lib/cutoff';
+import { getPortGroups, getPortSearchDetails, getCities, getCitySearchDetails, getPortServices, calculateERDLRD, cityLabel, getRailTerminal, getRail, cityNeedsExtraDays, defaultExtraDays, getTerminals, getTerminalOptions, ssyForTerminal, terminalLabel, terminalForSSY, getPortNote, masterUpdatedAt, portLabel } from '../lib/cutoff';
 import { IDT_TITLE, formatStamp } from '../lib/idt';
 import trainMark from '../assets/idt-train-mark.webp';
 import { hlLogo } from '../assets/hlLogo';
@@ -9,7 +9,7 @@ import { SalesforceIcon, OutlookIcon, TeamsIcon, TextIcon } from './BrandIcons';
 import ObieThinking, { SAMMIE_SURPRISE_EVENT } from './ObieThinking';
 import { renderPasteCardImage } from '../lib/pasteCardImage';
 import { cardTitleFloat, cardTitleTable } from '../lib/pasteCardHtml';
-import { getUserName } from './NamePrompt';
+import { getUserName, getUserEmail } from './NamePrompt';
 
 // Fire-and-forget usage log — must never affect the calculator, so errors are
 // swallowed (also covers the offline double-click build, where /api is absent).
@@ -30,7 +30,7 @@ function logUsage(res) {
     fetch('/api/usage', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userName: getUserName(), erd: res.erd, lrd: res.lrd }),
+      body: JSON.stringify({ userName: getUserName(), userEmail: getUserEmail(), erd: res.erd, lrd: res.lrd }),
     }).catch(() => {});
   } catch { /* ignore */ }
 }
@@ -507,12 +507,14 @@ export default function LookupForm({ onCanadaPort }) {
               options={[
                 // The US calculator lists only United States and Mexico ports.
                 // Canadian ports remain available on the Canada Rail Ramp tab.
-                ...(portGroups.find(g => g.label === 'United States')?.ports || []).map(p => ({ value: p, label: p, search: getPortSearchDetails(p) })),
+                // Labels honor manager renames; the raw loccode stays in the
+                // search text so typing "USNYC" still finds a renamed port.
+                ...(portGroups.find(g => g.label === 'United States')?.ports || []).map(p => ({ value: p, label: portLabel(p), search: `${p} ${getPortSearchDetails(p)}` })),
                 ...portGroups
                   .filter(g => g.label === 'Mexico')
-                  .flatMap(g => [{ header: `${g.label} Ports` }, ...g.ports.map(p => ({ value: p, label: p, search: getPortSearchDetails(p) }))]),
+                  .flatMap(g => [{ header: `${g.label} Ports` }, ...g.ports.map(p => ({ value: p, label: portLabel(p), search: `${p} ${getPortSearchDetails(p)}` }))]),
               ]}
-              placeholder="Type or select a port…"
+              placeholder="Select the Port of Load first"
               required
             />
           </div>

@@ -1,0 +1,5 @@
+{
+  "_comment": "Manager-editable display names for the calculator dropdowns, published from the Managers Hub (Rename ports & terminals). 'ports' map a POL loccode (USNYC) to the label shown in the Port of Loading dropdown. 'terminals' map a PORTMC terminal matchcode (MAHER 008) to the label shown in the SSY/Terminal dropdown. Display only — every underlying code stays untouched so lanes keep matching the master workbook.",
+  "ports": {},
+  "terminals": {}
+}

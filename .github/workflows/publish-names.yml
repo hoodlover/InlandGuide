@@ -1,0 +1,61 @@
+name: Publish port & terminal display names
+
+on:
+  workflow_dispatch:
+    inputs:
+      payload:
+        description: Validated, compressed rename data from the managers hub
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-names
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Validate and apply display names
+        env:
+          NAMES_PAYLOAD: ${{ inputs.payload }}
+        run: node scripts/publish-names/apply-payload.mjs
+
+      - name: Detect name changes
+        id: name_changes
+        run: |
+          if git diff --quiet -- frontend/src/data; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "These display names are already live."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Rebuild live and offline guides
+        if: steps.name_changes.outputs.changed == 'true'
+        working-directory: frontend
+        run: |
+          npm install --legacy-peer-deps
+          node gen-version.mjs
+          npm run build
+          cp dist/index.html ../InlandCutoffGuide.html
+
+      - name: Commit and deploy display names
+        if: steps.name_changes.outputs.changed == 'true'
+        run: |
+          git config user.name "master-db-bot"
+          git config user.email "actions@github.com"
+          git add frontend/src/data frontend/src/version.json InlandCutoffGuide.html
+          git commit -m "Publish port & terminal display names"
+          git push

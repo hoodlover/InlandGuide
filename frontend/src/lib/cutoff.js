@@ -7,6 +7,17 @@ import portTerminals from '../data/portmc.json';
 import portServices from '../data/port-services.json';
 import terminalInfo from '../data/terminal-info.json';
 import masterStatus from '../data/master-status.json';
+import nameOverridesJson from '../data/name-overrides.json';
+
+// Manager-published display names (Managers Hub → Rename ports & terminals).
+// Display only — codes stay authoritative so lanes keep matching the master.
+const NAME_OVERRIDES = {
+  ports: nameOverridesJson.ports || {},
+  terminals: nameOverridesJson.terminals || {},
+};
+export function getNameOverrides() {
+  return NAME_OVERRIDES;
+}
 
 // When the US rail ramp data last changed — stamped by the publish workflow
 // each time a different master workbook is pushed live.
@@ -218,8 +229,35 @@ for (const list of Object.values(terminalInfo.addTerminals || {})) {
   for (const t of list) if (t.name) TERMINAL_NAMES[t.code] = t.name;
 }
 export function terminalLabel(code) {
-  const name = TERMINAL_NAMES[code];
-  return name || code;
+  return NAME_OVERRIDES.terminals[code] || TERMINAL_NAMES[code] || code;
+}
+
+// The repo/master default for a terminal code, ignoring manager renames —
+// shown in the rename editor so managers see what a cleared field reverts to.
+export function terminalDefaultLabel(code) {
+  return TERMINAL_NAMES[code] || code;
+}
+
+// Port of Loading dropdown label: manager rename, else the raw loccode.
+export function portLabel(pol) {
+  return NAME_OVERRIDES.ports[pol] || pol;
+}
+
+// Everything the rename editor needs: the POLs the calculator dropdown shows
+// (grouped like the dropdown) and each port's loading terminals with their
+// default labels. Values stay codes; only labels are editable.
+export function getRenameCatalog() {
+  const groups = getPortGroups();
+  const ports = groups.flatMap(g => g.ports.map(pol => ({ pol, group: g.label })));
+  const terminals = [];
+  for (const { pol } of ports) {
+    const d = portInfo(pol);
+    if (!d) continue;
+    for (const t of d.terminals) {
+      terminals.push({ pol, code: t.code, defaultName: terminalDefaultLabel(t.code) });
+    }
+  }
+  return { ports, terminals };
 }
 
 // A caveat note to show in the result for this POL, or '' (from terminal-info.json).

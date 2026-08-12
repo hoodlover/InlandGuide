@@ -81,14 +81,18 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // Both publish actions carry a gzip+base64 payload and dispatch a dedicated
+  // workflow: the full master data, or just the dropdown display names.
   const publishingMaster = body.action === 'publish-master';
-  if (publishingMaster && (!body.payload || typeof body.payload !== 'string' || body.payload.length > 60000 || !/^[A-Za-z0-9+/=]+$/.test(body.payload))) {
-    res.status(400).json({ error: 'The extracted master database payload is missing or invalid.' });
+  const publishingNames = body.action === 'publish-names';
+  const publishing = publishingMaster || publishingNames;
+  if (publishing && (!body.payload || typeof body.payload !== 'string' || body.payload.length > 60000 || !/^[A-Za-z0-9+/=]+$/.test(body.payload))) {
+    res.status(400).json({ error: publishingNames ? 'The rename payload is missing or invalid.' : 'The extracted master database payload is missing or invalid.' });
     return;
   }
 
   try {
-    const workflow = publishingMaster ? 'publish-master.yml' : GH_WORKFLOW;
+    const workflow = publishingMaster ? 'publish-master.yml' : (publishingNames ? 'publish-names.yml' : GH_WORKFLOW);
     const gh = await fetch(
       `https://api.github.com/repos/${GH_REPO}/actions/workflows/${workflow}/dispatches`,
       {
@@ -102,12 +106,12 @@ module.exports = async (req, res) => {
         },
         body: JSON.stringify({
           ref: GH_REF,
-          ...(publishingMaster ? { inputs: { payload: body.payload } } : {}),
+          ...(publishing ? { inputs: { payload: body.payload } } : {}),
         }),
       }
     );
     if (gh.status === 204) {
-      res.status(200).json({ ok: true, action: publishingMaster ? 'publish-master' : 'refresh-schedules' });
+      res.status(200).json({ ok: true, action: publishingMaster ? 'publish-master' : (publishingNames ? 'publish-names' : 'refresh-schedules') });
       return;
     }
     const detail = (await gh.text()).slice(0, 300);

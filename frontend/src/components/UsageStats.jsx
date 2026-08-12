@@ -27,10 +27,10 @@ function exportExcel(data) {
     data.daily.map(d => ({ 'Day (UTC)': d.day, 'Calculations': d.count }))
   ), 'Daily trend');
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(
-    data.byUser.map(u => ({ 'Name': u.user_name, 'Calculations': u.count, 'Last used (UTC)': u.last_used }))
+    data.byUser.map(u => ({ 'Name': u.user_name, 'Email': u.email || '', 'Calculations': u.count, 'Last used (UTC)': u.last_used }))
   ), 'By user');
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(
-    data.recent.map(r => ({ 'Time (UTC)': r.ts, 'Name': r.user_name, 'ERD': r.erd || '', 'LRD': r.lrd || '' }))
+    data.recent.map(r => ({ 'Time (UTC)': r.ts, 'Name': r.user_name, 'Email': r.email || '', 'ERD': r.erd || '', 'LRD': r.lrd || '' }))
   ), 'Recent activity');
   XLSX.writeFile(wb, `InlandGuide-usage-${stamp()}.xlsx`);
 }
@@ -67,9 +67,9 @@ function exportPdf(data) {
     <h2>Calculations per day (${esc(data.filter.periodLabel.toLowerCase())})</h2>
     <table><thead><tr><th>Day</th><th>Calculations</th></tr></thead><tbody>${rows(data.daily, ['day', 'count'])}</tbody></table>
     <h2>Most active users</h2>
-    <table><thead><tr><th>Name</th><th>Calculations</th><th>Last used</th></tr></thead><tbody>${rows(data.byUser, ['user_name', 'count', 'last_used'])}</tbody></table>
+    <table><thead><tr><th>Name</th><th>Email</th><th>Calculations</th><th>Last used</th></tr></thead><tbody>${rows(data.byUser, ['user_name', 'email', 'count', 'last_used'])}</tbody></table>
     <h2>Recent activity</h2>
-    <table><thead><tr><th>Time</th><th>Name</th><th>ERD</th><th>LRD</th></tr></thead><tbody>${rows(data.recent, ['ts', 'user_name', 'erd', 'lrd'])}</tbody></table>
+    <table><thead><tr><th>Time</th><th>Name</th><th>Email</th><th>ERD</th><th>LRD</th></tr></thead><tbody>${rows(data.recent, ['ts', 'user_name', 'email', 'erd', 'lrd'])}</tbody></table>
   </body></html>`;
   const w = window.open('', '_blank');
   if (!w) return; // popup blocked — nothing else to do
@@ -204,7 +204,11 @@ export default function UsageStats({ passphrase, onAuthExpired }) {
             <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">User</span>
             <select value={selectedUser} onChange={(event) => setSelectedUser(event.target.value)} className={`${filterClass} w-full`}>
               <option value="">All users</option>
-              {users.map((user) => <option key={user.user_name} value={user.user_name}>{user.user_name}</option>)}
+              {users.map((user) => (
+                <option key={user.ident} value={user.ident}>
+                  {user.user_name}{user.email ? ` — ${user.email}` : ''}
+                </option>
+              ))}
             </select>
           </label>
           {(rangeDays !== 30 || selectedUser) && (
@@ -257,8 +261,11 @@ export default function UsageStats({ passphrase, onAuthExpired }) {
           </thead>
           <tbody>
             {byUser.map((u) => (
-              <tr key={u.user_name} className="border-b border-slate-100 dark:border-slate-700">
-                <td className="py-2 text-slate-900 dark:text-white">{u.user_name}</td>
+              <tr key={u.ident || u.user_name} className="border-b border-slate-100 dark:border-slate-700">
+                <td className="py-2 text-slate-900 dark:text-white">
+                  {u.user_name}
+                  {u.email && <span className="block text-[11px] text-slate-400 dark:text-slate-400">{u.email}</span>}
+                </td>
                 <td className="py-2 text-slate-700 dark:text-slate-200">{u.count}</td>
                 <td className="py-2 text-slate-500 dark:text-slate-300">{u.last_used}</td>
               </tr>
@@ -284,7 +291,10 @@ export default function UsageStats({ passphrase, onAuthExpired }) {
             {recent.map((r, i) => (
               <tr key={i} className="border-b border-slate-100 dark:border-slate-700">
                 <td className="py-2 text-slate-500 dark:text-slate-300">{r.ts}</td>
-                <td className="py-2 text-slate-900 dark:text-white">{r.user_name}</td>
+                <td className="py-2 text-slate-900 dark:text-white">
+                  {r.user_name}
+                  {r.email && <span className="block text-[11px] text-slate-400 dark:text-slate-400">{r.email}</span>}
+                </td>
                 <td className="py-2 text-slate-700 dark:text-slate-200">{r.erd || '—'}</td>
                 <td className="py-2 text-slate-700 dark:text-slate-200">{r.lrd || '—'}</td>
               </tr>

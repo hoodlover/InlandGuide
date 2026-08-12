@@ -33,6 +33,10 @@ module.exports = async (req, res) => {
     return res.status(401).json({ error: 'Wrong passphrase.' });
   }
 
+  // One person = one email. Rows logged before the email rollout (or with a
+  // blank email) fall back to the typed name, so history still shows up.
+  const IDENT = "COALESCE(NULLIF(LOWER(TRIM(email)), ''), user_name)";
+
   try {
     const db = getClient();
     const requestedDays = body && body.rangeDays;
@@ -53,7 +57,7 @@ module.exports = async (req, res) => {
       }
     }
     if (user) {
-      filters.push('user_name = ?');
+      filters.push(`${IDENT} = ?`);
       args.push(user);
     }
 
@@ -84,6 +88,10 @@ module.exports = async (req, res) => {
       });
     }
 
+    // A table created before the email rollout needs the column added before
+    // any query below references it (usage.js does the same on insert).
+    await db.execute('ALTER TABLE usage_log ADD COLUMN email TEXT').catch(() => {});
+
     const previousFilters = [];
     const previousArgs = [];
     if (rangeDays) {
@@ -98,7 +106,7 @@ module.exports = async (req, res) => {
       }
     }
     if (user) {
-      previousFilters.push('user_name = ?');
+      previousFilters.push(`${IDENT} = ?`);
       previousArgs.push(user);
     }
     const previousWhere = previousFilters.length ? `WHERE ${previousFilters.join(' AND ')}` : '';
@@ -116,7 +124,7 @@ module.exports = async (req, res) => {
       statement(
         `SELECT
            COUNT(*) AS total,
-           COUNT(DISTINCT user_name) AS uniqueUsers,
+           COUNT(DISTINCT ${IDENT}) AS uniqueUsers,
            COUNT(DISTINCT date(ts)) AS activeDays
          FROM usage_log ${where}`,
         args
@@ -124,9 +132,9 @@ module.exports = async (req, res) => {
       statement(
         `SELECT COUNT(*) AS returningUsers
          FROM (
-           SELECT user_name
+           SELECT ${IDENT} AS ident
            FROM usage_log ${where}
-           GROUP BY user_name
+           GROUP BY ident
            HAVING COUNT(*) > 1
          )`,
         args
@@ -141,26 +149,34 @@ module.exports = async (req, res) => {
          ORDER BY day ASC`,
         args
       ),
+      // Merged people keep the name/email from their most recent row, so a
+      // corrected spelling wins over old typos in the tables and dropdown.
       statement(
-        `SELECT user_name, COUNT(*) AS count, MAX(ts) AS last_used
-         FROM usage_log ${where}
-         GROUP BY user_name
-         ORDER BY count DESC, user_name COLLATE NOCASE ASC
+        `SELECT g.ident, ul.user_name, ul.email, g.count, g.last_used
+         FROM (
+           SELECT ${IDENT} AS ident, COUNT(*) AS count, MAX(ts) AS last_used, MAX(id) AS last_id
+           FROM usage_log ${where}
+           GROUP BY ident
+         ) g JOIN usage_log ul ON ul.id = g.last_id
+         ORDER BY g.count DESC, ul.user_name COLLATE NOCASE ASC
          LIMIT 50`,
         args
       ),
       statement(
-        `SELECT ts, user_name, erd, lrd
+        `SELECT ts, user_name, email, erd, lrd
          FROM usage_log ${where}
          ORDER BY id DESC
          LIMIT 50`,
         args
       ),
       statement(
-        `SELECT user_name, COUNT(*) AS count
-         FROM usage_log
-         GROUP BY user_name
-         ORDER BY user_name COLLATE NOCASE ASC`
+        `SELECT g.ident, ul.user_name, ul.email, g.count
+         FROM (
+           SELECT ${IDENT} AS ident, COUNT(*) AS count, MAX(id) AS last_id
+           FROM usage_log
+           GROUP BY ident
+         ) g JOIN usage_log ul ON ul.id = g.last_id
+         ORDER BY ul.user_name COLLATE NOCASE ASC`
       ),
     ], 'read');
 
@@ -188,9 +204,9 @@ module.exports = async (req, res) => {
         changePct,
       },
       daily: dailyResult.rows.map(r => ({ day: r.day, count: Number(r.count) })),
-      byUser: byUserResult.rows.map(r => ({ user_name: r.user_name, count: Number(r.count), last_used: r.last_used })),
-      recent: recentResult.rows.map(r => ({ ts: r.ts, user_name: r.user_name, erd: r.erd, lrd: r.lrd })),
-      users: usersResult.rows.map(r => ({ user_name: r.user_name, count: Number(r.count) })),
+      byUser: byUserResult.rows.map(r => ({ ident: r.ident, user_name: r.user_name, email: r.email || '', count: Number(r.count), last_used: r.last_used })),
+      recent: recentResult.rows.map(r => ({ ts: r.ts, user_name: r.user_name, email: r.email || '', erd: r.erd, lrd: r.lrd })),
+      users: usersResult.rows.map(r => ({ ident: r.ident, user_name: r.user_name, email: r.email || '', count: Number(r.count) })),
       filter: { rangeDays: rangeDays || 'all', periodLabel, user },
     });
   } catch (err) {

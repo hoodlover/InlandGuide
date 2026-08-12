@@ -13,9 +13,9 @@ of team usage fits in a few megabytes).
 
 | File | Role |
 | --- | --- |
-| `api/usage.js` | Serverless POST endpoint that logs one calculation (name, ERD, LRD, IP). Creates the `usage_log` table on first use. |
-| `api/stats.js` | Serverless POST endpoint returning summary / daily trend / per-user / recent rows. Guarded by the manager passphrase (`REFRESH_PASSPHRASE`), same as `/api/refresh`. |
-| `frontend/src/components/NamePrompt.jsx` | First-visit name capture, remembered in `localStorage` (`inlandguide.userName`). Rendered in `App.jsx`. |
+| `api/usage.js` | Serverless POST endpoint that logs one calculation (name, email, ERD, LRD, IP). Creates the `usage_log` table on first use and adds the `email` column to older tables automatically. |
+| `api/stats.js` | Serverless POST endpoint returning summary / daily trend / per-user / recent rows. People are merged by lowercased email (rows without an email fall back to the typed name), so name spelling differences no longer split one user into several. Guarded by the manager passphrase (`REFRESH_PASSPHRASE`), same as `/api/refresh`. |
+| `frontend/src/components/NamePrompt.jsx` | First-visit name **and email** capture, remembered in `localStorage` (`inlandguide.userName`, `inlandguide.userEmail`). Users saved before the email rollout are asked once more to add their email. Rendered in `App.jsx`. |
 | `frontend/src/components/UsageStats.jsx` | Manager dashboard: headline numbers, 30-day trend bars, most-active-users table, recent-activity audit trail. Rendered in the Managers Hub ("See who's using the guide"). |
 | `frontend/src/components/LookupForm.jsx` | Calls `logUsage()` (fire-and-forget fetch to `/api/usage`) after each successful calculation. A failed log can never break the calculator. |
 | `package.json` (repo root) | Holds `@libsql/client` for the api functions. `vercel.json`'s installCommand runs `npm install` at the root too. |
