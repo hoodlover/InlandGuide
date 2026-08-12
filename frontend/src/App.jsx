@@ -4,6 +4,7 @@ import PortScheduleLookup from './components/PortScheduleLookup';
 import HlMockup from './components/HlMockup';
 import ManagersPage from './components/ManagersPage';
 import NamePrompt, { getUserName, getUserEmail } from './components/NamePrompt';
+import ObieEggs from './components/ObieEggs';
 import PwaInstallGate, { shouldShowInstallGate } from './components/PwaInstallGate';
 import UpdateToast from './components/UpdateToast';
 import { obBot } from './assets/banners';
@@ -1352,6 +1353,7 @@ export default function App() {
       {jokerOn && !compactView && <ObieWalkOn />}
       {!mobileDevice && <RailTeamSurprise />}
       <DoviberSurprise />
+      <ObieEggs />
 
       <div className={`w-full max-w-[70rem] mx-auto px-4 text-right ${compactView ? 'mt-3' : 'mt-8'}`}>
         <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">v {APP_VERSION}</span>

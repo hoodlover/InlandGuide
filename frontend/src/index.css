@@ -1320,3 +1320,335 @@ textarea {
     animation: none;
   }
 }
+
+/* ============================================================================
+   FIRE + BOOM easter eggs — ported from OPS-BASE (see ObieEggs.jsx).
+   ============================================================================ */
+/* ----- Rockets: OB flies in from top-left, fires 2 missiles, exits ----- */
+.bot-egg-stage {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none; z-index: 1000; overflow: hidden;
+}
+.bot-egg {
+  position: absolute; top: 58px; left: 0;
+  width: 64px; height: 64px;
+  transform: translateX(-140px) scaleX(-1);
+  filter: drop-shadow(0 6px 14px rgba(242, 106, 28, 0.55));
+  animation: bot-flight 6.5s cubic-bezier(0.45, 0, 0.25, 1) forwards;
+}
+@keyframes bot-flight {
+  0%   { transform: translateX(-140px)            translateY(0)    scaleX(-1); }
+  9%   { transform: translateX(-80px)             translateY(-1px) scaleX(-1); }
+  18%  { transform: translateX(-20px)             translateY(0)    scaleX(-1); }
+  24%  { transform: translateX(calc(33vw - 80px)) translateY(-1px) scaleX(-1); }
+  28%  { transform: translateX(calc(33vw - 32px)) translateY(0)    scaleX(-1); }
+  72%  { transform: translateX(calc(33vw - 32px)) translateY(0)    scaleX(-1); }
+  76%  { transform: translateX(calc(33vw - 32px)) translateY(0); }
+  82%  { transform: translateX(calc(33vw - 60px)) translateY(-1px); }
+  92%  { transform: translateX(15vw)              translateY(0); }
+  100% { transform: translateX(-140px)            translateY(0); }
+}
+.bot-rocket {
+  position: absolute; top: 90px; left: calc(33vw + 8px);
+  width: 22px; height: 5px;
+  background: linear-gradient(90deg, transparent, #F26A1C 30%, #fff);
+  border-radius: 3px;
+  box-shadow: 0 0 14px rgba(242, 106, 28, 0.85);
+  opacity: 0;
+}
+.bot-rocket-direct { animation: bot-rocket-direct 0.75s cubic-bezier(0.35, 0, 0.65, 1) 2.4s forwards; }
+@keyframes bot-rocket-direct {
+  0%   { transform: translate(0, 0) rotate(20deg); opacity: 1; }
+  100% { transform: translate(37vw, 12vh) rotate(20deg); opacity: 0.9; }
+}
+.bot-rocket-arc { animation: bot-rocket-arc 0.95s cubic-bezier(0.4, 0.05, 0.5, 0.95) 2.7s forwards; }
+@keyframes bot-rocket-arc {
+  0%   { transform: translate(0, 0) rotate(-10deg); opacity: 1; }
+  35%  { transform: translate(15vw, -5vh) rotate(10deg); opacity: 1; }
+  100% { transform: translate(37vw, 12vh) rotate(45deg); opacity: 0.9; }
+}
+.bot-boom {
+  position: absolute; top: 90px; left: calc(33vw + 8px);
+  width: 32px; height: 32px; margin-left: -16px; margin-top: -16px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, rgba(255, 220, 140, 0.85) 28%, rgba(255, 120, 90, 0.7) 55%, transparent 72%);
+  box-shadow: 0 0 24px rgba(255, 180, 120, 0.5);
+  transform: translate(37vw, 12vh) scale(0); opacity: 0;
+}
+.bot-boom-1 { animation: bot-boom 0.6s cubic-bezier(0, 0.6, 0.4, 1) 3.10s forwards; }
+.bot-boom-2 { animation: bot-boom 0.6s cubic-bezier(0, 0.6, 0.4, 1) 3.55s forwards; margin-left: 8px; margin-top: 4px; }
+@keyframes bot-boom {
+  0%   { transform: translate(37vw, 12vh) scale(0);   opacity: 1; }
+  35%  { transform: translate(37vw, 12vh) scale(1.6); opacity: 1; }
+  100% { transform: translate(37vw, 12vh) scale(2.4); opacity: 0; }
+}
+.bot-bubble {
+  position: absolute; top: 38px; left: calc(33vw + 60px);
+  padding: 8px 12px;
+  background: #0e1b20;
+  border: 1px solid rgba(242, 106, 28, 0.55);
+  border-radius: 12px 12px 12px 2px;
+  color: #F26A1C;
+  font-family: 'Archivo', sans-serif;
+  font-size: 12px; font-weight: 900; letter-spacing: 0.06em;
+  white-space: nowrap;
+  opacity: 0; transform: translateY(8px) scale(0.85);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.5), 0 0 16px rgba(242, 106, 28, 0.30);
+  animation: bot-bubble 1.5s cubic-bezier(0.4, 1.4, 0.5, 1) 3.8s forwards;
+}
+@keyframes bot-bubble {
+  0%   { opacity: 0; transform: translateY(8px)  scale(0.85); }
+  18%  { opacity: 1; transform: translateY(0)    scale(1); }
+  82%  { opacity: 1; transform: translateY(0)    scale(1); }
+  100% { opacity: 0; transform: translateY(-4px) scale(0.92); }
+}
+.bot-egg-trail {
+  position: absolute; top: 110px; left: 0;
+  width: 64px; height: 3px;
+  background: linear-gradient(90deg, transparent, rgba(242, 106, 28, 0.55), transparent);
+  border-radius: 2px; opacity: 0; transform: translateX(-140px);
+  animation: bot-trail 6.5s cubic-bezier(0.45, 0, 0.25, 1) forwards;
+}
+@keyframes bot-trail {
+  0%   { opacity: 0;   transform: translateX(-140px); }
+  10%  { opacity: 0.6; }
+  28%  { opacity: 0.6; transform: translateX(calc(33vw - 90px)); }
+  34%  { opacity: 0; }
+  76%  { opacity: 0;   transform: translateX(calc(33vw - 60px)) scaleX(-1); }
+  84%  { opacity: 0.6; transform: translateX(calc(33vw - 90px)) scaleX(-1); }
+  100% { opacity: 0;   transform: translateX(-140px)            scaleX(-1); }
+}
+
+/* ----- Bomb: OB walks in from right, places dyno by container, BOOM ----- */
+.bombbot-stage { position: fixed; inset: 0; pointer-events: none; z-index: 1200; overflow: hidden; }
+.bombbot {
+  position: absolute; bottom: 30vh; left: 0;
+  width: 162px; height: 162px;
+  transform: translate(110vw, 0) scaleX(1);
+  filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.55));
+  animation: bombbot-walk 7.2s linear 1s forwards;
+}
+@keyframes bombbot-walk {
+  0%   { transform: translate(110vw, 0)               scaleX(1); }
+  28%  { transform: translate(calc(50vw - 81px), 0)   scaleX(1); }
+  31%  { transform: translate(calc(50vw - 81px), 14px) scaleX(1); }
+  33%  { transform: translate(calc(50vw - 81px), 14px) scaleX(1); }
+  36%  { transform: translate(calc(50vw - 81px), 0)   scaleX(1); }
+  41%  { transform: translate(calc(50vw - 81px), 0)   scaleX(1); }
+  42%  { transform: translate(calc(50vw - 81px), 0)   scaleX(-1); }
+  67%  { transform: translate(75vw, 0)                scaleX(-1); }
+  70%  { transform: translate(75vw, 0)                scaleX(-1); }
+  73%  { transform: translate(75vw, 0)                scaleX(1); }
+  76%  { transform: translate(75vw, -8px)             scaleX(1); }
+  79%  { transform: translate(75vw, 0)                scaleX(1); }
+  85%  { transform: translate(75vw, 0)                scaleX(1); }
+  88%  { transform: translate(75vw, 0)                scaleX(-1); }
+  90%  { transform: translate(77vw, 0)                scaleX(-1); }
+  100% { transform: translate(115vw, 0)               scaleX(-1); }
+}
+.bombbot-yell {
+  position: absolute;
+  bottom: calc(30vh + 162px - 10px);
+  left: calc(75vw - 220px);
+  padding: 14px 20px;
+  background: #0e1b20;
+  border: 2px solid #d94518;
+  border-radius: 18px 18px 4px 18px;
+  color: #ffb454;
+  font-family: 'Archivo', sans-serif;
+  font-size: 22px; font-weight: 900; letter-spacing: 0.06em;
+  white-space: nowrap;
+  opacity: 0; transform: translateY(8px) scale(0.85);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55), 0 0 28px rgba(217, 69, 24, 0.5);
+  animation: bombbot-yell 7.2s linear 1s forwards;
+}
+@keyframes bombbot-yell {
+  0%, 73%   { opacity: 0; transform: translateY(8px) scale(0.85); }
+  75%       { opacity: 1; transform: translateY(0)   scale(1.15); }
+  77%       { opacity: 1; transform: translateY(0)   scale(1); }
+  80%       { opacity: 1; transform: translateY(0)   scale(1.07); }
+  82%       { opacity: 1; transform: translateY(0)   scale(1); }
+  84%       { opacity: 1; transform: translateY(0)   scale(1); }
+  87%       { opacity: 0; transform: translateY(-6px) scale(0.92); }
+  100%      { opacity: 0; }
+}
+.bombbot-flash {
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 70%, rgba(255, 255, 255, 0.9), rgba(255, 220, 140, 0.4) 30%, transparent 60%);
+  opacity: 0;
+  animation: bombbot-flash 7.2s linear 1s forwards;
+}
+@keyframes bombbot-flash {
+  0%, 84%  { opacity: 0; }
+  85%      { opacity: 1; }
+  88%      { opacity: 0.4; }
+  92%      { opacity: 0; }
+  100%     { opacity: 0; }
+}
+.bombbot-boom {
+  position: absolute;
+  bottom: calc(30vh - 30px);
+  left: calc(50vw - 60px);
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, rgba(255, 220, 140, 0.95) 28%, rgba(255, 120, 90, 0.85) 55%, transparent 72%);
+  box-shadow: 0 0 80px rgba(255, 180, 120, 0.7);
+  opacity: 0; transform: scale(0);
+  animation: bombbot-boom 7.2s cubic-bezier(0, 0.6, 0.4, 1) 1s forwards;
+}
+@keyframes bombbot-boom {
+  0%, 83%  { opacity: 0; transform: scale(0); }
+  85%      { opacity: 1; transform: scale(1.4); }
+  88%      { opacity: 1; transform: scale(3.2); }
+  93%      { opacity: 0.4; transform: scale(5); }
+  100%     { opacity: 0; transform: scale(6); }
+}
+.bombbot-shock {
+  position: absolute;
+  bottom: calc(30vh + 30px);
+  left: calc(50vw - 6px);
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 200, 100, 0.9);
+  opacity: 0;
+  animation: bombbot-shock 7.2s linear 1s forwards;
+}
+@keyframes bombbot-shock {
+  0%, 84%  { opacity: 0; transform: scale(1); border-width: 3px; }
+  85%      { opacity: 1; transform: scale(2);  border-width: 3px; }
+  92%      { opacity: 0.6; transform: scale(18); border-width: 1px; }
+  100%     { opacity: 0; transform: scale(24); border-width: 0; }
+}
+
+/* Maersk container — uses /maersk_rusty_stack_40kb.webp (640x640 webp).
+   Display box is 200x180 so the square photo isn't squashed but still has
+   a footprint roughly matching the original wharf shot. */
+.bombbot-ctr {
+  position: absolute;
+  bottom: calc(30vh - 4px);
+  left: calc(50vw - 240px);
+  width: 200px;
+  height: 180px;
+  opacity: 0;
+  transform: translateY(-80px) rotate(-3deg);
+  filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.55));
+  animation: bombbot-ctr 8.2s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+}
+.bombbot-ctr-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@keyframes bombbot-ctr {
+  0%   { opacity: 0; transform: translateY(-80px) rotate(-3deg); }
+  8%   { opacity: 1; transform: translateY(6px)  rotate(2deg); }
+  12%  { opacity: 1; transform: translateY(-2px) rotate(-1deg); }
+  16%  { opacity: 1; transform: translateY(0)    rotate(0); }
+  83%  { opacity: 1; transform: translateY(0)    rotate(0); }
+  85%  { opacity: 1; transform: translate(8px, -4px) rotate(2deg) scale(1.04); }
+  86%  { opacity: 0; transform: translate(8px, -4px) rotate(2deg) scale(1.04); }
+  100% { opacity: 0; transform: translate(8px, -4px) rotate(2deg) scale(1.04); }
+}
+
+/* Debris: each piece uses the same maersk photo as a background, with a
+   per-piece background-position so it shows a different chunk — like the
+   container has been torn into 8 jagged shards. Background-size matches
+   the container's display dims (200x180) so each piece looks like a true
+   cutout of what was just standing there. Slow-mo: 12s animation lets the
+   shards float through the air for several seconds after the boom. */
+.bombbot-ctr-piece {
+  position: absolute;
+  bottom: calc(30vh + 50px);
+  /* anchor so pieces start centered on the container's footprint */
+  left: calc(50vw - 240px);
+  width: 60px; height: 50px;
+  background-size: 200px 180px;
+  background-repeat: no-repeat;
+  background-position: var(--bg-x, 0) var(--bg-y, 0);
+  border-radius: 3px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.55), inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transform: translate(0, 0) rotate(0);
+  /* slow-mo: linear-ish tail so the shards drift through the air */
+  animation: bombbot-ctr-debris 12s cubic-bezier(0.18, 0.7, 0.4, 1) forwards;
+}
+/* Each piece shows its slice of the 200x180 photo, then is thrown along its
+   own --tx/--ty trajectory with --rot Z-spin. Most pieces also tumble on the
+   Y-axis (--flip) so they read as flipping shrapnel. */
+.bombbot-ctr-piece.p1 { --tx: -260px; --ty: -220px; --rot: -420deg; --flip:  720deg; width: 60px; height: 55px; --bg-x:    0;   --bg-y:    0; }   /* UL */
+.bombbot-ctr-piece.p2 { --tx: -160px; --ty: -310px; --rot:  280deg; --flip: -540deg; width: 50px; height: 50px; --bg-x: -70px;  --bg-y:    0; }   /* UM */
+.bombbot-ctr-piece.p3 { --tx:  -60px; --ty: -340px; --rot: -180deg; --flip:  360deg; width: 55px; height: 55px; --bg-x:-135px;  --bg-y:    0; }   /* UR */
+.bombbot-ctr-piece.p4 { --tx:   80px; --ty: -360px; --rot:  500deg; --flip: -720deg; width: 50px; height: 55px; --bg-x:  -5px;  --bg-y: -65px; } /* ML */
+.bombbot-ctr-piece.p5 { --tx:  220px; --ty: -300px; --rot:  340deg; --flip:  540deg; width: 55px; height: 60px; --bg-x: -75px;  --bg-y: -65px; } /* MM */
+.bombbot-ctr-piece.p6 { --tx:  340px; --ty: -180px; --rot: -260deg; --flip: -360deg; width: 50px; height: 55px; --bg-x:-140px;  --bg-y: -65px; } /* MR */
+.bombbot-ctr-piece.p7 { --tx: -340px; --ty: -100px; --rot:  600deg; --flip:  900deg; width: 60px; height: 50px; --bg-x:   0;    --bg-y:-130px; } /* BL */
+/* p8 is the breakout piece — gets its own fast arc that flies clean off
+   the screen at regular speed. Trajectory peaks high then drops far. */
+.bombbot-ctr-piece.p8 {
+  --tx: 110vw; --ty: -140px; --rot: 900deg; --flip: 1080deg;
+  width: 70px; height: 60px;
+  --bg-x: -130px; --bg-y: -130px;
+  animation: bombbot-ctr-debris-arc 2.4s cubic-bezier(0.30, 0.4, 0.55, 1) 6.97s forwards;
+}
+
+@keyframes bombbot-ctr-debris {
+  /* Stay invisible until the boom moment.
+     8.2s egg × 85% boom = 6.97s. On a 12s debris animation that's 58%. */
+  0%, 58%  { opacity: 0; transform: translate(0, 0) rotate(0) scale(0.6); }
+  60%      { opacity: 1; transform: translate(0, 0) rotate(0) scale(1.05); }
+  /* Initial outward burst — ~30% of trajectory in the first 1.4s post-boom;
+     remainder drifts languidly through the final 5s. rotateY flipping
+     accumulates throughout the float. */
+  72%      { opacity: 1; transform: translate(calc(var(--tx) * 0.35), calc(var(--ty) * 0.45)) rotate(calc(var(--rot) * 0.30)) rotateY(calc(var(--flip) * 0.30)) scale(1); }
+  85%      { opacity: 1; transform: translate(calc(var(--tx) * 0.65), calc(var(--ty) * 0.85)) rotate(calc(var(--rot) * 0.65)) rotateY(calc(var(--flip) * 0.65)) scale(0.97); }
+  100%     { opacity: 0; transform: translate(var(--tx), calc(var(--ty) + 320px)) rotate(var(--rot)) rotateY(var(--flip)) scale(0.9); }
+}
+
+/* Regular-speed ballistic arc for the breakout piece — peaks high, drops
+   off-screen. Starts at the boom moment (animation-delay handles that). */
+@keyframes bombbot-ctr-debris-arc {
+  0%   { opacity: 1; transform: translate(0, 0) rotate(0) rotateY(0) scale(1.05); }
+  20%  { opacity: 1; transform: translate(calc(var(--tx) * 0.18), -280px) rotate(calc(var(--rot) * 0.20)) rotateY(calc(var(--flip) * 0.20)) scale(1); }
+  50%  { opacity: 1; transform: translate(calc(var(--tx) * 0.50), -420px) rotate(calc(var(--rot) * 0.50)) rotateY(calc(var(--flip) * 0.50)) scale(0.95); }
+  80%  { opacity: 1; transform: translate(calc(var(--tx) * 0.85), -160px) rotate(calc(var(--rot) * 0.85)) rotateY(calc(var(--flip) * 0.85)) scale(0.9); }
+  100% { opacity: 0; transform: translate(var(--tx), 300px) rotate(var(--rot)) rotateY(var(--flip)) scale(0.85); }
+}
+
+/* Dynamite pile — uses /dynamite_transparent_80kb.png as the visual. Now sits
+   leaning ON the container (overlaps its right portion) so the bot's "place"
+   action reads as setting the bundle against the side of the box. */
+.bombbot-dyno {
+  position: absolute;
+  bottom: calc(30vh + 12px);          /* lifted off the ground onto the container's lower edge */
+  left: calc(50vw - 96px);             /* tucked into the container's right portion */
+  width: 76px; height: 66px;           /* a hair larger so it reads at distance */
+  opacity: 0;
+  transform: scale(0.4);
+  animation: bombbot-dyno 8.2s linear 1s forwards;
+}
+/* Flip the dynamite art horizontally so the drawn lit fuse (originally on the
+   upper-LEFT of the PNG) ends up on the upper-RIGHT — away from the
+   container and matching where the animated CSS spark sits. */
+.bombbot-dyno-img { width: 100%; height: 100%; object-fit: contain; display: block; transform: scaleX(-1); }
+/* CSS spark sits directly on top of the drawn flame so the wick reads as
+   actively burning (the animated glow pulses over the static artwork). */
+.bombbot-dyno-spark {
+  position: absolute;
+  right: 6px; top: -2px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, #fbbf24 35%, #d94518 70%, transparent 80%);
+  box-shadow: 0 0 14px #fbbf24, 0 0 28px #d94518;
+  animation: bombbot-dyno-spark 0.32s steps(2) infinite;
+}
+@keyframes bombbot-dyno-spark {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.45; transform: scale(0.7); }
+}
+@keyframes bombbot-dyno {
+  0%, 30%   { opacity: 0; transform: scale(0.4); }
+  33%       { opacity: 1; transform: scale(1.15); }
+  36%       { opacity: 1; transform: scale(1); }
+  83%       { opacity: 1; transform: scale(1); }
+  85%       { opacity: 0; transform: scale(0.8); }
+  100%      { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bot-egg-stage, .bombbot-stage { display: none; }
+}

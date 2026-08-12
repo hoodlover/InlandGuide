@@ -369,7 +369,7 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
                   >
                     <span aria-hidden="true">↗</span> CP Rail Ramp Cuts
                   </a>
-                  <p className="mt-0.5 pl-6 text-[11px] text-white/80 txt-shadow-soft">Opens at the “Port schedules” section — that's CP's name for the rail ramp cuts.</p>
+                  <p className="mt-0.5 pl-6 text-[11px] text-white/80 txt-shadow-soft">Click “Port Schedules”</p>
                 </li>
                 <li>
                   <a
