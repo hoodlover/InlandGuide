@@ -76,14 +76,12 @@ export default function NamePrompt({ open, initialName = '', initialEmail = '', 
         )}
         <h2 className="text-lg font-semibold text-[#002D72] dark:text-white">
           <span id="name-prompt-title">
-            {editing ? 'Your name & email' : 'Welcome to the Inland Cutoff Guide'}
+            {editing ? 'Your name & email' : "What's your name?"}
           </span>
         </h2>
-        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-          {editing
-            ? 'Update your name or work email.'
-            : <>Enter your name and work email to get started. You&apos;ll only be asked once on this computer.</>}
-        </p>
+        {editing && (
+          <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Update your name or work email.</p>
+        )}
         <label className="mt-4 block text-xs font-semibold text-slate-500 dark:text-slate-300">
           Name
           <input
