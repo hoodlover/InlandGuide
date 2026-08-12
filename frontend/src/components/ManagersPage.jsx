@@ -313,11 +313,11 @@ function ToolPanel({ title, onBack, children, wide = false }) {
 // slugs, published names) never change, so every selection keeps mapping to
 // the same rows in the master workbook and schedule snapshots.
 // ---------------------------------------------------------------------------
+// Ports of Load deliberately have no rename tab — loccodes are the labels.
 const RENAME_TABS = [
-  { id: 'terminals', label: 'Load Terminals' },
+  { id: 'terminals', label: 'Port Terminals' },
   { id: 'ramps', label: 'Rail Ramps' },
   { id: 'canada', label: 'Canada Ramps' },
-  { id: 'ports', label: 'Ports of Load' },
 ];
 
 // Row shape: { key, title, code, def } — def is the standard (non-renamed)
@@ -340,11 +340,6 @@ function buildRenameSections() {
   }
 
   return [
-    {
-      id: 'ports', tab: 'ports', heading: '',
-      hint: 'Shown in the Port of Loading dropdown of the US calculator.',
-      rows: usPorts.map(({ pol }) => ({ key: pol, title: pol, code: '', def: pol })),
-    },
     {
       id: 'terminals', tab: 'terminals', heading: '',
       hint: 'Shown in the SSY / Terminal dropdown and on the "Port · Terminal · FCL Cut" line.',
