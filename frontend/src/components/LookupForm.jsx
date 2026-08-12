@@ -21,7 +21,7 @@ let lastLogged = { key: '', at: 0 };
 const RAIL_EMAIL_DUPLICATE_WINDOW_MS = 2 * 60 * 1000;
 let lastRailEmail = { key: '', at: 0 };
 
-function logUsage(res) {
+function logUsage(res, bookingNumber) {
   const key = `${res.erd}|${res.lrd}`;
   const now = Date.now();
   if (key === lastLogged.key && now - lastLogged.at < DUPLICATE_WINDOW_MS) return;
@@ -30,7 +30,13 @@ function logUsage(res) {
     fetch('/api/usage', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userName: getUserName(), userEmail: getUserEmail(), erd: res.erd, lrd: res.lrd }),
+      body: JSON.stringify({
+        userName: getUserName(),
+        userEmail: getUserEmail(),
+        bookingNumber: String(bookingNumber || '').trim(),
+        erd: res.erd,
+        lrd: res.lrd,
+      }),
     }).catch(() => {});
   } catch { /* ignore */ }
 }
@@ -308,7 +314,7 @@ export default function LookupForm({ onCanadaPort }) {
       setError(res.error);
     } else {
       setResults(res);
-      logUsage(res);
+      logUsage(res, formData.bookingNumber);
       emailRailCuts(formData.bookingNumber, buildPlainResultsText(res));
     }
   };

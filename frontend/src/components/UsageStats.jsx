@@ -30,7 +30,7 @@ function exportExcel(data) {
     data.byUser.map(u => ({ 'Name': u.user_name, 'Email': u.email || '', 'Calculations': u.count, 'Last used (UTC)': u.last_used }))
   ), 'By user');
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(
-    data.recent.map(r => ({ 'Time (UTC)': r.ts, 'Name': r.user_name, 'Email': r.email || '', 'ERD': r.erd || '', 'LRD': r.lrd || '' }))
+    data.recent.map(r => ({ 'Time (UTC)': r.ts, 'Name': r.user_name, 'Email': r.email || '', 'Booking': r.booking || '', 'ERD': r.erd || '', 'LRD': r.lrd || '' }))
   ), 'Recent activity');
   XLSX.writeFile(wb, `InlandGuide-usage-${stamp()}.xlsx`);
 }
@@ -69,7 +69,7 @@ function exportPdf(data) {
     <h2>Most active users</h2>
     <table><thead><tr><th>Name</th><th>Email</th><th>Calculations</th><th>Last used</th></tr></thead><tbody>${rows(data.byUser, ['user_name', 'email', 'count', 'last_used'])}</tbody></table>
     <h2>Recent activity</h2>
-    <table><thead><tr><th>Time</th><th>Name</th><th>Email</th><th>ERD</th><th>LRD</th></tr></thead><tbody>${rows(data.recent, ['ts', 'user_name', 'email', 'erd', 'lrd'])}</tbody></table>
+    <table><thead><tr><th>Time</th><th>Name</th><th>Email</th><th>Booking</th><th>ERD</th><th>LRD</th></tr></thead><tbody>${rows(data.recent, ['ts', 'user_name', 'email', 'booking', 'erd', 'lrd'])}</tbody></table>
   </body></html>`;
   const w = window.open('', '_blank');
   if (!w) return; // popup blocked — nothing else to do
@@ -147,6 +147,12 @@ export default function UsageStats({ passphrase, onAuthExpired }) {
   const [rangeDays, setRangeDays] = useState(30);
   const [selectedUser, setSelectedUser] = useState('');
   const [loading, setLoading] = useState(true);
+  // Most-active-users column sort. Clicking a header toggles its direction;
+  // switching columns starts from that column's natural direction.
+  const [sort, setSort] = useState({ key: 'count', dir: -1 });
+  const sortBy = (key, naturalDir) => setSort(current =>
+    current.key === key ? { key, dir: -current.dir } : { key, dir: naturalDir }
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -254,13 +260,31 @@ export default function UsageStats({ passphrase, onAuthExpired }) {
         <table className="w-full min-w-[30rem] text-sm">
           <thead>
             <tr className="border-b border-slate-200 dark:border-slate-600">
-              <th className={TH}>Name</th>
-              <th className={TH}>Calcs</th>
-              <th className={TH}>Last used (UTC)</th>
+              {[
+                { key: 'name', label: 'Name', naturalDir: 1 },
+                { key: 'count', label: 'Calcs', naturalDir: -1 },
+                { key: 'last', label: 'Last used (UTC)', naturalDir: -1 },
+              ].map(col => (
+                <th key={col.key} className={TH}>
+                  <button
+                    type="button"
+                    onClick={() => sortBy(col.key, col.naturalDir)}
+                    className="inline-flex items-center gap-1 uppercase tracking-wide hover:text-[#002D72] dark:hover:text-white"
+                    title={`Sort by ${col.label}`}
+                  >
+                    {col.label}
+                    <span aria-hidden="true" className="text-[9px]">{sort.key === col.key ? (sort.dir === 1 ? '▲' : '▼') : '↕'}</span>
+                  </button>
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {byUser.map((u) => (
+            {[...byUser].sort((a, b) => {
+              if (sort.key === 'name') return sort.dir * a.user_name.localeCompare(b.user_name, undefined, { sensitivity: 'base' });
+              if (sort.key === 'count') return sort.dir * (a.count - b.count);
+              return sort.dir * String(a.last_used).localeCompare(String(b.last_used));
+            }).map((u) => (
               <tr key={u.ident || u.user_name} className="border-b border-slate-100 dark:border-slate-700">
                 <td className="py-2 text-slate-900 dark:text-white">
                   {u.user_name}
@@ -283,6 +307,7 @@ export default function UsageStats({ passphrase, onAuthExpired }) {
             <tr className="border-b border-slate-200 dark:border-slate-600">
               <th className={TH}>Time (UTC)</th>
               <th className={TH}>Name</th>
+              <th className={TH}>Booking</th>
               <th className={TH}>ERD</th>
               <th className={TH}>LRD</th>
             </tr>
@@ -295,6 +320,7 @@ export default function UsageStats({ passphrase, onAuthExpired }) {
                   {r.user_name}
                   {r.email && <span className="block text-[11px] text-slate-400 dark:text-slate-400">{r.email}</span>}
                 </td>
+                <td className="py-2 font-mono text-xs text-slate-700 dark:text-slate-200">{r.booking || '—'}</td>
                 <td className="py-2 text-slate-700 dark:text-slate-200">{r.erd || '—'}</td>
                 <td className="py-2 text-slate-700 dark:text-slate-200">{r.lrd || '—'}</td>
               </tr>

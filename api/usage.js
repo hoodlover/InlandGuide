@@ -32,6 +32,7 @@ function ensureSchema(db) {
         ts        TEXT NOT NULL DEFAULT (datetime('now')),
         user_name TEXT NOT NULL,
         email     TEXT,
+        booking   TEXT,
         erd       TEXT,
         lrd       TEXT,
         ip        TEXT
@@ -39,9 +40,10 @@ function ensureSchema(db) {
       `CREATE INDEX IF NOT EXISTS idx_usage_ts ON usage_log (ts)`,
       `CREATE INDEX IF NOT EXISTS idx_usage_user ON usage_log (user_name)`,
     ], 'write')
-      // Tables created before the email column existed need one ALTER; the
-      // "duplicate column" error on every later run is expected and ignored.
+      // Tables created before the email/booking columns existed need one ALTER
+      // each; the "duplicate column" error on later runs is expected & ignored.
       .then(() => db.execute('ALTER TABLE usage_log ADD COLUMN email TEXT').catch(() => {}))
+      .then(() => db.execute('ALTER TABLE usage_log ADD COLUMN booking TEXT').catch(() => {}))
       .catch(err => {
         schemaReady = null; // retry on the next request
         throw err;
@@ -76,6 +78,7 @@ module.exports = async (req, res) => {
   const userName = clean(body.userName, 80) || 'Unknown';
   // Lowercased so the stats can merge rows regardless of how it was typed.
   const email = clean(body.userEmail, 120).toLowerCase() || null;
+  const booking = clean(body.bookingNumber, 40) || null;
   const erd = clean(body.erd, 40) || null;
   const lrd = clean(body.lrd, 40) || null;
   const ip = requestIp(req);
@@ -84,9 +87,21 @@ module.exports = async (req, res) => {
     const db = getClient();
     await ensureSchema(db);
     await db.execute({
-      sql: 'INSERT INTO usage_log (user_name, email, erd, lrd, ip) VALUES (?, ?, ?, ?, ?)',
-      args: [userName, email, erd, lrd, ip],
+      sql: 'INSERT INTO usage_log (user_name, email, booking, erd, lrd, ip) VALUES (?, ?, ?, ?, ?, ?)',
+      args: [userName, email, booking, erd, lrd, ip],
     });
+    // Self-healing history: rows logged before the email rollout carry only a
+    // name. When this person's email arrives, stamp it onto their old rows
+    // with the same name (case-insensitive) so the stats merge retroactively.
+    // Best-effort — a failure here must never fail the logged calculation.
+    if (email) {
+      await db.execute({
+        sql: `UPDATE usage_log SET email = ?
+              WHERE (email IS NULL OR email = '')
+                AND LOWER(TRIM(user_name)) = LOWER(TRIM(?))`,
+        args: [email, userName],
+      }).catch(() => {});
+    }
     return res.status(201).json({ ok: true });
   } catch (err) {
     console.error('[usage] failed to write log entry:', err.message);

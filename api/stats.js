@@ -88,9 +88,10 @@ module.exports = async (req, res) => {
       });
     }
 
-    // A table created before the email rollout needs the column added before
-    // any query below references it (usage.js does the same on insert).
+    // A table created before the email/booking rollout needs the columns added
+    // before any query below references them (usage.js does the same on insert).
     await db.execute('ALTER TABLE usage_log ADD COLUMN email TEXT').catch(() => {});
+    await db.execute('ALTER TABLE usage_log ADD COLUMN booking TEXT').catch(() => {});
 
     const previousFilters = [];
     const previousArgs = [];
@@ -163,7 +164,7 @@ module.exports = async (req, res) => {
         args
       ),
       statement(
-        `SELECT ts, user_name, email, erd, lrd
+        `SELECT ts, user_name, email, booking, erd, lrd
          FROM usage_log ${where}
          ORDER BY id DESC
          LIMIT 50`,
@@ -205,7 +206,7 @@ module.exports = async (req, res) => {
       },
       daily: dailyResult.rows.map(r => ({ day: r.day, count: Number(r.count) })),
       byUser: byUserResult.rows.map(r => ({ ident: r.ident, user_name: r.user_name, email: r.email || '', count: Number(r.count), last_used: r.last_used })),
-      recent: recentResult.rows.map(r => ({ ts: r.ts, user_name: r.user_name, email: r.email || '', erd: r.erd, lrd: r.lrd })),
+      recent: recentResult.rows.map(r => ({ ts: r.ts, user_name: r.user_name, email: r.email || '', booking: r.booking || '', erd: r.erd, lrd: r.lrd })),
       users: usersResult.rows.map(r => ({ ident: r.ident, user_name: r.user_name, email: r.email || '', count: Number(r.count) })),
       filter: { rangeDays: rangeDays || 'all', periodLabel, user },
     });
