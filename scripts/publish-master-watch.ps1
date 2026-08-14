@@ -27,8 +27,35 @@ try {
     Add-Content -LiteralPath $logPath -Value "`r`n==== InlandGuide master check $($now.ToString('yyyy-MM-dd HH:mm:ss')) ===="
     Push-Location $repoRoot
     try {
-        & node (Join-Path $repoRoot 'scripts\auto-publish\run.mjs') *>> $logPath
-        $nodeExit = $LASTEXITCODE
+        # Windows PowerShell 5 turns normal native stderr (for example Git's
+        # successful "From https://..." fetch message) into a terminating
+        # NativeCommandError when ErrorActionPreference is Stop. Capture both
+        # native streams through Start-Process so only the real exit code
+        # decides whether the scheduled check passed.
+        $nodeScript = Join-Path $repoRoot 'scripts\auto-publish\run.mjs'
+        $stdoutPath = [System.IO.Path]::GetTempFileName()
+        $stderrPath = [System.IO.Path]::GetTempFileName()
+        try {
+            $process = Start-Process `
+                -FilePath (Get-Command node).Source `
+                -ArgumentList "`"$nodeScript`"" `
+                -WorkingDirectory $repoRoot `
+                -NoNewWindow `
+                -Wait `
+                -PassThru `
+                -RedirectStandardOutput $stdoutPath `
+                -RedirectStandardError $stderrPath
+            if ((Get-Item -LiteralPath $stdoutPath).Length -gt 0) {
+                Add-Content -LiteralPath $logPath -Value (Get-Content -LiteralPath $stdoutPath -Raw)
+            }
+            if ((Get-Item -LiteralPath $stderrPath).Length -gt 0) {
+                Add-Content -LiteralPath $logPath -Value (Get-Content -LiteralPath $stderrPath -Raw)
+            }
+            $nodeExit = $process.ExitCode
+        }
+        finally {
+            Remove-Item -LiteralPath $stdoutPath, $stderrPath -Force -ErrorAction SilentlyContinue
+        }
         if ($nodeExit -ne 0) {
             throw "Auto-publish returned exit code $nodeExit."
         }
