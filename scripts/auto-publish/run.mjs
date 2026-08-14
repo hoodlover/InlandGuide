@@ -1,5 +1,5 @@
-// Scheduled auto-publish orchestrator (run hourly from 9am through 3pm by
-// AutoPublish.bat and Windows Task Scheduler).
+// Scheduled auto-publish orchestrator (run every 10 minutes from 8am through
+// 5pm by scripts/publish-master-watch.ps1 and Windows Task Scheduler).
 //
 // Regenerates the calculator data from the master workbook. Only when the
 // exported rail data actually changes does it stamp the publish time, rebuild
@@ -38,12 +38,17 @@ const masterDataUnchanged = () =>
   tryRun(`git diff --quiet -- ${masterDataPaths.join(' ')}`);
 
 try {
+  const currentBranch = execSync('git branch --show-current', { cwd: root, encoding: 'utf8' }).trim();
+  if (currentBranch !== 'main') {
+    throw new Error(`Scheduled publishing requires the local main branch; current branch is ${currentBranch || '(detached)'}.`);
+  }
+
   log('sync local main to latest (fast-forward only, non-destructive)');
   run('git fetch origin main');
-  tryRun('git merge --ff-only origin/main'); // harmless if it can't ff; we proceed
+  run('git merge --ff-only origin/main');
 
   log('export calculator data from the master workbook');
-  run('node backend/refresh-data.js');
+  run('node backend/refresh-data.js --skip-banners');
   tryRun('git checkout -- frontend/src/assets/banners.js'); // drop deterministic banner re-encode
 
   if (masterDataUnchanged()) {

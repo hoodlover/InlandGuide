@@ -8,6 +8,7 @@ frontend/dist/
 
 # local env / secrets
 backend/.env
+backend/.last-master-source.json
 
 # large tools / binaries (not part of the app)
 cloudflared.exe
