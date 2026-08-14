@@ -35,6 +35,7 @@ try {
         $nodeScript = Join-Path $repoRoot 'scripts\auto-publish\run.mjs'
         $stdoutPath = [System.IO.Path]::GetTempFileName()
         $stderrPath = [System.IO.Path]::GetTempFileName()
+        $stdoutText = ''
         try {
             $process = Start-Process `
                 -FilePath (Get-Command node).Source `
@@ -46,7 +47,8 @@ try {
                 -RedirectStandardOutput $stdoutPath `
                 -RedirectStandardError $stderrPath
             if ((Get-Item -LiteralPath $stdoutPath).Length -gt 0) {
-                Add-Content -LiteralPath $logPath -Value (Get-Content -LiteralPath $stdoutPath -Raw)
+                $stdoutText = Get-Content -LiteralPath $stdoutPath -Raw
+                Add-Content -LiteralPath $logPath -Value $stdoutText
             }
             if ((Get-Item -LiteralPath $stderrPath).Length -gt 0) {
                 Add-Content -LiteralPath $logPath -Value (Get-Content -LiteralPath $stderrPath -Raw)
@@ -58,6 +60,11 @@ try {
         }
         if ($nodeExit -ne 0) {
             throw "Auto-publish returned exit code $nodeExit."
+        }
+        if ($stdoutText -match '\[auto-publish\] PUBLISHED_UPDATE') {
+            $notice = New-Object -ComObject WScript.Shell
+            $message = "New InlandGuide master data was published at $((Get-Date).ToString('h:mm tt')). The live guide update is on the way."
+            $null = $notice.Popup($message, 5, 'InlandGuide updated', 64)
         }
         Add-Content -LiteralPath $logPath -Value "[$((Get-Date).ToString('s'))] SUCCESS check completed."
     }

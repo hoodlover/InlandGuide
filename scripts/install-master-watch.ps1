@@ -81,7 +81,7 @@ $logon.Repetition.StopAtDurationEnd = $false
 
 $action = $definition.Actions.Create(0) # TASK_ACTION_EXEC
 $action.Path = (Get-Command powershell.exe).Source
-$action.Arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$watchScript`""
+$action.Arguments = "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$watchScript`""
 $action.WorkingDirectory = $repoRoot
 
 $null = $rootFolder.RegisterTaskDefinition($TaskName, $definition, 6, $userId, $null, 3, $null)

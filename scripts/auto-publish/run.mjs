@@ -80,6 +80,7 @@ try {
     run('git push origin main');
   }
 
+  log('PUBLISHED_UPDATE');
   log('done — Vercel will deploy shortly');
 } catch (err) {
   console.error(`[auto-publish] FAILED: ${err.message}`);

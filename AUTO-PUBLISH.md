@@ -26,6 +26,8 @@ or `AutoPublish.bat`.
 Every invocation is recorded in `auto-publish.log`. Unchanged valid data is
 logged but does not create a commit or Vercel deployment. The Managers Hub
 manual publish remains independent and works when COBBLA's computer is offline.
+Scheduled checks run with a hidden PowerShell window. A five-second Windows
+message appears only after changed master data is successfully pushed.
 
 ## Verify or remove the task
 
