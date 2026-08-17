@@ -10,6 +10,10 @@ import { cardTitleFloat, cardTitleTable } from '../lib/pasteCardHtml';
 
 const EMPTY = { port: '', vessel: '', city: '' };
 const COPY_SCHEDULE_NOTES_PORTS = new Set(['montreal', 'metro-vancouver', 'saint-john']);
+const RAIL_SCHEDULE_LINKS = {
+  cp: 'https://www.cpkcr.com/en/customer-resources/shipping-guides-resources#id-AAAB963170242246EEC2726E8F39E78F:~:text=Port%20schedules',
+  cn: 'https://www.cn.ca/en/customer-centre/prices-tariffs-transit-times/terminal-to-port-service-grid',
+};
 
 // ISO timestamp -> "Jul 12, 2026, 3:04 PM"
 function formatPulled(iso) {
@@ -48,7 +52,19 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
   // only one port.
   const [sel, setSel] = useState({ ...EMPTY, port: initialPort || (ports.length === 1 ? ports[0].slug : '') });
   const [copyMessage, setCopyMessage] = useState('');
+  const [copiedRailLink, setCopiedRailLink] = useState('');
   const [pasteProof, setPasteProof] = useState(null);
+
+  async function copyRailLink(key) {
+    try {
+      await navigator.clipboard.writeText(RAIL_SCHEDULE_LINKS[key]);
+      setCopiedRailLink(key);
+      setTimeout(() => setCopiedRailLink((current) => current === key ? '' : current), 1800);
+    } catch {
+      setCopiedRailLink(`failed-${key}`);
+      setTimeout(() => setCopiedRailLink(''), 1800);
+    }
+  }
 
   const vessels = sel.port ? getVessels(sel.port) : [];
   const cities = sel.port ? getCities(sel.port) : [];
@@ -357,29 +373,47 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
             <div className="mt-5 rounded-xl border border-white/30 bg-white/10 p-4">
               <p className="mb-2 text-xs font-bold uppercase tracking-wide text-white txt-shadow-soft">Published rail schedules</p>
               <ul className="space-y-2 text-sm">
-                <li>
-                  {/* The element id + text fragment steer Edge/Chrome straight
-                      to the "Port schedules" accordion and highlight it — the
-                      page's own name for rail ramp cuts, which nobody guesses. */}
-                  <a
-                    href="https://www.cpkcr.com/en/customer-resources/shipping-guides-resources#id-AAAB963170242246EEC2726E8F39E78F:~:text=Port%20schedules"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 font-semibold text-white underline decoration-white/50 underline-offset-2 transition hover:decoration-white"
+                <li className="flex items-start justify-between gap-3">
+                  <div>
+                    {/* The element id + text fragment steer Edge/Chrome straight
+                        to the "Port schedules" accordion and highlight it — the
+                        page's own name for rail ramp cuts, which nobody guesses. */}
+                    <a
+                      href={RAIL_SCHEDULE_LINKS.cp}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 font-semibold text-white underline decoration-white/50 underline-offset-2 transition hover:decoration-white"
+                    >
+                      <span aria-hidden="true">↗</span> CP Rail Ramp Cuts
+                    </a>
+                    <p className="mt-0.5 pl-6 text-[11px] text-white/80 txt-shadow-soft">Click “Port Schedules”</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => copyRailLink('cp')}
+                    className="shrink-0 rounded-md border border-white/50 bg-white/10 px-2 py-1 text-[11px] font-bold text-white transition hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/70"
+                    aria-label="Copy CP Rail ramp cuts link"
                   >
-                    <span aria-hidden="true">↗</span> CP Rail Ramp Cuts
-                  </a>
-                  <p className="mt-0.5 pl-6 text-[11px] text-white/80 txt-shadow-soft">Click “Port Schedules”</p>
+                    {copiedRailLink === 'cp' ? '✓ Copied' : copiedRailLink === 'failed-cp' ? 'Try again' : 'Copy link'}
+                  </button>
                 </li>
-                <li>
+                <li className="flex items-start justify-between gap-3">
                   <a
-                    href="https://www.cn.ca/en/customer-centre/prices-tariffs-transit-times/terminal-to-port-service-grid"
+                    href={RAIL_SCHEDULE_LINKS.cn}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-2 font-semibold text-white underline decoration-white/50 underline-offset-2 transition hover:decoration-white"
                   >
                     <span aria-hidden="true">↗</span> CN Rail Ramp Cuts
                   </a>
+                  <button
+                    type="button"
+                    onClick={() => copyRailLink('cn')}
+                    className="shrink-0 rounded-md border border-white/50 bg-white/10 px-2 py-1 text-[11px] font-bold text-white transition hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/70"
+                    aria-label="Copy CN Rail ramp cuts link"
+                  >
+                    {copiedRailLink === 'cn' ? '✓ Copied' : copiedRailLink === 'failed-cn' ? 'Try again' : 'Copy link'}
+                  </button>
                 </li>
               </ul>
             </div>

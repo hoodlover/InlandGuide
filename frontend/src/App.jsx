@@ -617,8 +617,11 @@ function ObieWalkOn() {
 
 // Keep secondary desktop actions available without turning the toolbar into a
 // row of equally prominent pills.
+const OFFICIAL_ERD_URL = 'https://www.hapag-lloyd.com/en/services-information/offices-localinfo/north-america/usa/local-info/erd-cutoff-request-form.html';
+
 function DesktopToolsMenu({ compact, onToggleCompact, onChangeName, onRefresh, onRequest }) {
   const [open, setOpen] = useState(false);
+  const [erdCopyStatus, setErdCopyStatus] = useState('');
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -640,6 +643,16 @@ function DesktopToolsMenu({ compact, onToggleCompact, onChangeName, onRefresh, o
   const run = (action) => {
     setOpen(false);
     action();
+  };
+
+  const copyErdLink = async () => {
+    try {
+      await navigator.clipboard.writeText(OFFICIAL_ERD_URL);
+      setErdCopyStatus('Copied');
+    } catch {
+      setErdCopyStatus('Retry');
+    }
+    setTimeout(() => setErdCopyStatus(''), 1800);
   };
 
   return (
@@ -688,6 +701,27 @@ function DesktopToolsMenu({ compact, onToggleCompact, onChangeName, onRefresh, o
             <span aria-hidden="true">↻</span>
             Refresh updated data
           </button>
+          <div className="flex items-center gap-1 rounded-lg pr-1 transition hover:bg-slate-100 dark:hover:bg-slate-700">
+            <a
+              href={OFFICIAL_ERD_URL}
+              target="_blank"
+              rel="noreferrer"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              className="flex min-w-0 flex-1 items-center gap-3 px-3 py-2 text-sm text-slate-700 dark:text-slate-200"
+            >
+              <span aria-hidden="true">↗</span>
+              <span>Official ERD tool</span>
+            </a>
+            <button
+              type="button"
+              onClick={copyErdLink}
+              className="shrink-0 rounded-md border border-slate-300 px-2 py-1 text-[10px] font-bold text-slate-600 transition hover:bg-white dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-600"
+              aria-label="Copy official Hapag-Lloyd ERD tool link"
+            >
+              {erdCopyStatus || 'Copy'}
+            </button>
+          </div>
           <div className="my-1 border-t border-slate-200 dark:border-slate-700" />
           <button
             type="button"
