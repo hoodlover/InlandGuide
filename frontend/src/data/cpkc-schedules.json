@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-08-20",
-  "pulledAt": "2026-08-20T12:26:12.679Z",
+  "pulledAt": "2026-08-20T20:17:37.532Z",
   "ports": {
     "montreal": {
       "name": "Port of Montreal",
@@ -2617,7 +2617,7 @@
           "terminal": "",
           "eta": "",
           "etd": "",
-          "railPortCutoff": "30-Aug",
+          "railPortCutoff": "29-Aug",
           "comments": "",
           "cutoffs": {
             "TORONTO (MALPORT)": "Fri, Aug-21",
@@ -2627,14 +2627,14 @@
             "REGINA": "Sat, Aug-22",
             "CALGARY": "Sat, Aug-22",
             "EDMONTON": "Sat, Aug-22",
-            "PRINCE GEORGE": "Wed, Aug-26",
+            "PRINCE GEORGE": "Tue, Aug-25",
             "CHIPPEWA FALLS": "Sun, Aug-16",
             "JOLIET": "Thu, Aug-20",
-            "INDIANAPOLIS": "Wed, Aug-19",
-            "CHICAGO": "Sat, Aug-22",
-            "DETROIT": "Fri, Aug-21",
+            "INDIANAPOLIS": "Tue, Aug-18",
+            "CHICAGO": "Fri, Aug-21",
+            "DETROIT": "Mon, Aug-17",
             "MEMPHIS": "Thu, Aug-20",
-            "NEW ORLEANS": "Thu, Aug-20",
+            "NEW ORLEANS": "Wed, Aug-19",
             "ARCADIA": "Fri, Aug-21"
           },
           "erds": {
@@ -2645,14 +2645,14 @@
             "REGINA": "17-Aug",
             "CALGARY": "17-Aug",
             "EDMONTON": "17-Aug",
-            "PRINCE GEORGE": "21-Aug",
+            "PRINCE GEORGE": "20-Aug",
             "CHIPPEWA FALLS": "11-Aug",
             "JOLIET": "15-Aug",
-            "INDIANAPOLIS": "14-Aug",
-            "CHICAGO": "17-Aug",
-            "DETROIT": "16-Aug",
+            "INDIANAPOLIS": "13-Aug",
+            "CHICAGO": "16-Aug",
+            "DETROIT": "12-Aug",
             "MEMPHIS": "15-Aug",
-            "NEW ORLEANS": "15-Aug",
+            "NEW ORLEANS": "14-Aug",
             "ARCADIA": "16-Aug"
           }
         },
