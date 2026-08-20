@@ -1,6 +1,6 @@
 name: Refresh CPKC port schedules
 
-# Once daily: download the CPKC/CN port-schedule PDFs and inspect the
+# Hourly during the Eastern business day: download the CPKC/CN port-schedule PDFs and inspect the
 # published/last-updated dates printed in them. Only when a date or schedule
 # actually changes do we rebuild the offline app, commit, and trigger Vercel.
 #
@@ -9,9 +9,10 @@ name: Refresh CPKC port schedules
 # than sending any alert. No notifications are sent from here.
 
 on:
-  # Once daily at 13:00 UTC (08:00 ET standard / 09:00 ET daylight).
+  # GitHub cron is UTC. Cover both EDT (12:00-21:00 UTC) and EST
+  # (13:00-22:00 UTC), then gate the job to 08:00-17:00 America/New_York.
   schedule:
-    - cron: '0 13 * * *'
+    - cron: '0 12-22 * * *'
   workflow_dispatch: {}
 
 permissions:
@@ -25,15 +26,34 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     steps:
+      - name: Check Eastern business-hour window
+        id: business_hours
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          eastern_hour="$(TZ=America/New_York date +%H)"
+          if (( 10#$eastern_hour >= 8 && 10#$eastern_hour <= 17 )); then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping: ${eastern_hour}:00 is outside 08:00-17:00 Eastern."
+          fi
+
       - uses: actions/checkout@v4
+        if: steps.business_hours.outputs.run == 'true'
         with:
           fetch-depth: 0   # full history so gen-version.mjs counts correctly
 
       - uses: actions/setup-node@v4
+        if: steps.business_hours.outputs.run == 'true'
         with:
           node-version: 20
 
       - name: Install parser deps
+        if: steps.business_hours.outputs.run == 'true'
         working-directory: scripts/refresh-cpkc
         run: npm ci
 
@@ -41,10 +61,12 @@ jobs:
       # Partial failures still write the file (good ports updated, failed ports
       # kept + flagged) so the app can show the pulsing light.
       - name: Parse CPKC/CN PDFs
+        if: steps.business_hours.outputs.run == 'true'
         working-directory: scripts/refresh-cpkc
         run: node refresh.mjs
 
       - name: Detect published schedule changes
+        if: steps.business_hours.outputs.run == 'true'
         id: schedule_changes
         run: |
           if git diff --quiet -- frontend/src/data/cpkc-schedules.json; then
