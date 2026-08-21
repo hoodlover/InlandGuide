@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-08-21",
-  "pulledAt": "2026-08-21T17:19:42.949Z",
+  "pulledAt": "2026-08-21T18:22:17.322Z",
   "ports": {
     "montreal": {
       "name": "Port of Montreal",
@@ -40,7 +40,7 @@
             "Regina": "Wed 19-Aug 17:00",
             "Winnipeg": "Wed 19-Aug 15:00",
             "Vaughan": "Sun 23-Aug 13:00",
-            "Minneapolis": "Thu 13-Aug 12:00",
+            "Minneapolis": "Thu 20-Aug 12:00",
             "Bensenville": "Fri 21-Aug 17:00",
             "Detroit": "Fri 21-Aug 15:00"
           }
@@ -59,7 +59,7 @@
             "Regina": "Wed 26-Aug 17:00",
             "Winnipeg": "Wed 26-Aug 15:00",
             "Vaughan": "Sun 30-Aug 13:00",
-            "Minneapolis": "Thu 20-Aug 12:00",
+            "Minneapolis": "Thu 27-Aug 12:00",
             "Bensenville": "Fri 28-Aug 17:00",
             "Detroit": "Fri 28-Aug 15:00"
           }
@@ -91,13 +91,13 @@
           "railPortCutoff": "Tue 15-Sep",
           "comments": "",
           "cutoffs": {
-            "Vancouver": "",
-            "Edmonton": "",
-            "Calgary": "",
-            "Regina": "",
-            "Winnipeg": "",
+            "Vancouver": "Mon 7-Sep 18:30",
+            "Edmonton": "Tue 8-Sep 17:00",
+            "Calgary": "Tue 8-Sep 23:00",
+            "Regina": "Wed 9-Sep 17:00",
+            "Winnipeg": "Wed 9-Sep 15:00",
             "Vaughan": "Sun 13-Sep 13:00",
-            "Minneapolis": "",
+            "Minneapolis": "Thu 10-Sep 12:00",
             "Bensenville": "Fri 11-Sep 17:00",
             "Detroit": "Fri 11-Sep 15:00"
           }
@@ -116,7 +116,7 @@
             "Regina": "Tue 18-Aug 17:00",
             "Winnipeg": "Tue 18-Aug 15:00",
             "Vaughan": "Sat 22-Aug 13:00",
-            "Minneapolis": "Wed 12-Aug 12:00",
+            "Minneapolis": "Wed 19-Aug 12:00",
             "Bensenville": "Thu 20-Aug 17:00",
             "Detroit": "Thu 20-Aug 15:00"
           }
@@ -135,7 +135,7 @@
             "Regina": "Tue 25-Aug 17:00",
             "Winnipeg": "Tue 25-Aug 15:00",
             "Vaughan": "Sat 29-Aug 13:00",
-            "Minneapolis": "Wed 19-Aug 12:00",
+            "Minneapolis": "Wed 26-Aug 12:00",
             "Bensenville": "Thu 27-Aug 17:00",
             "Detroit": "Thu 27-Aug 15:00"
           }
@@ -154,7 +154,7 @@
             "Regina": "Tue 8-Sep 17:00",
             "Winnipeg": "Tue 8-Sep 15:00",
             "Vaughan": "Sat 12-Sep 13:00",
-            "Minneapolis": "Wed 26-Aug 12:00",
+            "Minneapolis": "Wed 9-Sep 12:00",
             "Bensenville": "Thu 10-Sep 17:00",
             "Detroit": "Thu 10-Sep 15:00"
           }
@@ -192,7 +192,7 @@
             "Regina": "Sat 15-Aug 17:00",
             "Winnipeg": "Sat 15-Aug 15:00",
             "Vaughan": "Wed 19-Aug 13:00",
-            "Minneapolis": "Tue 18-Aug 12:00",
+            "Minneapolis": "Sun 16-Aug 12:00",
             "Bensenville": "Tue 18-Aug 17:00",
             "Detroit": "Tue 18-Aug 15:00"
           }
@@ -211,7 +211,7 @@
             "Regina": "Mon 24-Aug 17:00",
             "Winnipeg": "Mon 24-Aug 15:00",
             "Vaughan": "Wed 26-Aug 13:00",
-            "Minneapolis": "Mon 17-Aug 12:00",
+            "Minneapolis": "Sun 23-Aug 12:00",
             "Bensenville": "Tue 25-Aug 17:00",
             "Detroit": "Tue 25-Aug 15:00"
           }
@@ -230,7 +230,7 @@
             "Regina": "Sat 22-Aug 00:00",
             "Winnipeg": "Sat 22-Aug 15:00",
             "Vaughan": "Tue 25-Aug 13:00",
-            "Minneapolis": "Tue 25-Aug 12:00",
+            "Minneapolis": "Sat 22-Aug 12:00",
             "Bensenville": "Mon 24-Aug 17:00",
             "Detroit": "Mon 24-Aug 15:00"
           }
@@ -249,7 +249,7 @@
             "Regina": "Mon 31-Aug 18:00",
             "Winnipeg": "Mon 31-Aug 16:00",
             "Vaughan": "Wed 2-Sep 13:00",
-            "Minneapolis": "Sat 29-Aug 12:00",
+            "Minneapolis": "Sun 30-Aug 12:00",
             "Bensenville": "Tue 1-Sep 17:00",
             "Detroit": "Tue 1-Sep 15:00"
           }
@@ -287,7 +287,7 @@
             "Regina": "Mon 17-Aug 17:00",
             "Winnipeg": "Mon 17-Aug 15:00",
             "Vaughan": "Wed 19-Aug 13:00",
-            "Minneapolis": "Mon 17-Aug 12:00",
+            "Minneapolis": "Tue 18-Aug 12:00",
             "Bensenville": "Tue 18-Aug 17:00",
             "Detroit": "Tue 18-Aug 15:00"
           }
