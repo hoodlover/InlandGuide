@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-08-25",
-  "pulledAt": "2026-08-25T12:27:08.890Z",
+  "pulledAt": "2026-08-25T13:09:53.782Z",
   "ports": {
     "montreal": {
       "name": "Port of Montreal",
@@ -652,8 +652,8 @@
     "montreal-cast": {
       "name": "Montreal — Cast",
       "rail": "CN",
-      "runDate": "Mon 24-Aug",
-      "generatedAt": "2026-08-24",
+      "runDate": "Tue 25-Aug",
+      "generatedAt": "2026-08-25",
       "cities": [
         "Toronto (Brampton)",
         "Chicago",
@@ -680,28 +680,28 @@
           "railPortCutoff": "24-Aug",
           "comments": "",
           "cutoffs": {
-            "Toronto (Brampton)": "Sun, Aug-23",
-            "Chicago": "Fri, Aug-21",
-            "Detroit": "Fri, Aug-21",
-            "Indianapolis": "Mon, Aug-17",
-            "Winnipeg": "Mon, Aug-17",
-            "Calgary": "Thu, Aug-13",
-            "Edmonton": "Sun, Aug-16",
-            "Saskatoon": "Fri, Aug-14",
-            "Regina": "Fri, Aug-14",
-            "Vancouver": "Fri, Aug-14"
+            "Toronto (Brampton)": "Sun, Sep-27",
+            "Chicago": "Fri, Sep-25",
+            "Detroit": "Fri, Sep-25",
+            "Indianapolis": "Mon, Sep-21",
+            "Winnipeg": "Mon, Sep-21",
+            "Calgary": "Thu, Sep-17",
+            "Edmonton": "Sun, Sep-20",
+            "Saskatoon": "Fri, Sep-18",
+            "Regina": "Fri, Sep-18",
+            "Vancouver": "Fri, Sep-18"
           },
           "erds": {
-            "Toronto (Brampton)": "Aug-19",
-            "Chicago": "Aug-16",
-            "Detroit": "Aug-16",
-            "Indianapolis": "Aug-12",
-            "Winnipeg": "Aug-12",
-            "Calgary": "Aug-08",
-            "Edmonton": "Aug-11",
-            "Saskatoon": "Sun, Aug-09",
-            "Regina": "Sun, Aug-09",
-            "Vancouver": "Aug-09"
+            "Toronto (Brampton)": "Sep-23",
+            "Chicago": "Sep-20",
+            "Detroit": "Sep-20",
+            "Indianapolis": "Sep-16",
+            "Winnipeg": "Sep-16",
+            "Calgary": "Sep-12",
+            "Edmonton": "Sep-15",
+            "Saskatoon": "Sun, Sep-13",
+            "Regina": "Sun, Sep-13",
+            "Vancouver": "Sep-13"
           }
         },
         {
