@@ -618,6 +618,7 @@ function ObieWalkOn() {
 // Keep secondary desktop actions available without turning the toolbar into a
 // row of equally prominent pills.
 const OFFICIAL_ERD_URL = 'https://www.hapag-lloyd.com/en/services-information/offices-localinfo/north-america/usa/local-info/erd-cutoff-request-form.html';
+const CUSTOMER_INLAND_GUIDE_URL = 'https://webguide.hapagidt.com/';
 
 function DesktopToolsMenu({ compact, onToggleCompact, onChangeName, onRefresh, onRequest }) {
   const [open, setOpen] = useState(false);
@@ -722,6 +723,17 @@ function DesktopToolsMenu({ compact, onToggleCompact, onChangeName, onRefresh, o
               {erdCopyStatus || 'Copy'}
             </button>
           </div>
+          <a
+            href={CUSTOMER_INLAND_GUIDE_URL}
+            target="_blank"
+            rel="noreferrer"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700"
+          >
+            <span aria-hidden="true">↗</span>
+            Customer Facing Inland Guide
+          </a>
           <div className="my-1 border-t border-slate-200 dark:border-slate-700" />
           <button
             type="button"
