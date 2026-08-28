@@ -235,7 +235,7 @@ function MobileDemoGate({ onUnlock }) {
 
 // OB strolls in on the main tool: every ~10 min he slides in from the left,
 // tells a joke for ~30s, then leaves again.
-const OBIE_FIRST_MS = 120_000;  // first appearance after 2 min
+const OBIE_FIRST_MS = 420_000;  // original page: first appearance after 7 min
 const OBIE_SHOW_MS = 30_000;    // stays on screen 30s
 const OBIE_HIDE_MS = 600_000;   // hidden 10 min between visits
 
@@ -533,7 +533,7 @@ function DoviberSurprise() {
   );
 }
 
-function ObieWalkOn() {
+function ObieWalkOn({ firstDelay = OBIE_FIRST_MS }) {
   const [visible, setVisible] = useState(false);
   const [flipped, setFlipped] = useState(false);
   const [leaving, setLeaving] = useState(false);
@@ -565,7 +565,7 @@ function ObieWalkOn() {
     };
     // First visit is shortly after load. Clicking Obie restarts this effect and
     // schedules his next normal visit ten minutes later.
-    push(enter, scheduleKey === 0 ? OBIE_FIRST_MS : OBIE_HIDE_MS);
+    push(enter, scheduleKey === 0 ? firstDelay : OBIE_HIDE_MS);
     return () => timers.forEach(clearTimeout);
   }, [scheduleKey]);
 
@@ -1182,8 +1182,8 @@ function ProfessionalPreview({ userName, userEmail, mobileDevice, onManagerAcces
           </div>
           <div className="professional-form-surface">
             {tab === 'calculator'
-              ? <LookupForm onCanadaPort={goCanada} />
-              : <PortScheduleLookup onUpdateRamps={onManagerAccess} initialPort={canadaPort} />}
+              ? <LookupForm onCanadaPort={goCanada} professional />
+              : <PortScheduleLookup onUpdateRamps={onManagerAccess} initialPort={canadaPort} professional />}
           </div>
         </section>
 
@@ -1197,7 +1197,7 @@ function ProfessionalPreview({ userName, userEmail, mobileDevice, onManagerAcces
         onClose={onCloseNameEditor}
       />
       {installOpen && <InstallModal onClose={onCloseInstall} />}
-      {jokerOn && <ObieWalkOn />}
+      {jokerOn && <ObieWalkOn firstDelay={120_000} />}
     </div>
   );
 }

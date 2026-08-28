@@ -6,7 +6,7 @@ import { hlLogo } from '../assets/hlLogo';
 import { hlLogoOrange } from '../assets/hlLogoOrange';
 import Combobox from './Combobox';
 import { SalesforceIcon, OutlookIcon, TeamsIcon, TextIcon } from './BrandIcons';
-import { SAMMIE_SURPRISE_EVENT } from './ObieThinking';
+import ObieThinking, { SAMMIE_SURPRISE_EVENT } from './ObieThinking';
 import railOperationsPhoto from '../assets/rail-operations-professional.jpg';
 import { renderPasteCardImage } from '../lib/pasteCardImage';
 import { cardTitleFloat, cardTitleTable } from '../lib/pasteCardHtml';
@@ -157,7 +157,7 @@ function outlookLogoBlock() {
     `</td></tr></table>`;
 }
 
-export default function LookupForm({ onCanadaPort }) {
+export default function LookupForm({ onCanadaPort, professional = false }) {
   const [formData, setFormData] = useState(() => ({ ...EMPTY_FORM, portCutDate: today().iso }));
   const resultsRef = useRef(null);
 
@@ -771,7 +771,9 @@ export default function LookupForm({ onCanadaPort }) {
           </div>
         ) : (
           <div className="rounded-lg p-6 h-full flex flex-col items-center justify-center min-h-[32rem]">
-            <img src={railOperationsPhoto} alt="Hapag-Lloyd rail operations professional at the terminal" className="idle-results-photo" />
+            {professional
+              ? <img src={railOperationsPhoto} alt="Hapag-Lloyd rail operations professional at the terminal" className="idle-results-photo" />
+              : <ObieThinking />}
             <p className="text-slate-500 dark:text-slate-300 text-sm mt-6 text-center">Fill in the form and click Calculate to see results</p>
           </div>
         )}

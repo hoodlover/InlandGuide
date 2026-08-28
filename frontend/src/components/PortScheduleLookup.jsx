@@ -5,6 +5,7 @@ import { hlLogo } from '../assets/hlLogo';
 import { hlLogoOrange } from '../assets/hlLogoOrange';
 import { SalesforceIcon, OutlookIcon, TeamsIcon, TextIcon } from './BrandIcons';
 import railOperationsPhoto from '../assets/rail-operations-professional.jpg';
+import ObieThinking from './ObieThinking';
 import { renderPasteCardImage } from '../lib/pasteCardImage';
 import { cardTitleFloat, cardTitleTable } from '../lib/pasteCardHtml';
 
@@ -46,7 +47,7 @@ function outlookLogoBlock() {
     `</td></tr></table>`;
 }
 
-export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
+export default function PortScheduleLookup({ onUpdateRamps, initialPort, professional = false }) {
   const ports = getPorts();
   // Preselect the port handed off from the US tab; else auto-select when there's
   // only one port.
@@ -516,7 +517,9 @@ export default function PortScheduleLookup({ onUpdateRamps, initialPort }) {
           </div>
         ) : (
           <div className="rounded-lg p-6 h-full flex flex-col items-center justify-center min-h-[32rem]">
-            <img src={railOperationsPhoto} alt="Hapag-Lloyd rail operations professional at the terminal" className="idle-results-photo" />
+            {professional
+              ? <img src={railOperationsPhoto} alt="Hapag-Lloyd rail operations professional at the terminal" className="idle-results-photo" />
+              : <ObieThinking />}
             <p className="text-slate-500 dark:text-slate-300 text-sm mt-6 text-center">Pick a vessel and rail city to see the cut-off</p>
           </div>
         )}
