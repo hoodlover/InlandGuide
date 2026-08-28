@@ -1725,16 +1725,16 @@ textarea {
 .professional-footer { display: flex; justify-content: space-between; margin-top: 18px; color: #8a98a5; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 
 /* Semi-dark preview: deep blue-grey surfaces with white working fields. */
-.dark .professional-preview { --pro-ink: #f4f4f6; --pro-muted: #b6b6bc; --pro-grey: #c7c7cc; --pro-line: #41435f; background: #17192f; }
-.dark .professional-header { border-color: #41435f; background: #222441; }
+.dark .professional-preview { --pro-ink: #f4f4f6; --pro-muted: #c1c1c7; --pro-grey: #d0d0d5; --pro-line: #565875; background: #252741; }
+.dark .professional-header { border-color: #565875; background: #31334f; }
 .dark .professional-brand-logo { filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .18)); }
 .dark .professional-wordmark strong,
 .dark .professional-intro h1 { color: #fff; }
-.dark .professional-back-button { border-color: #565978; background: #2d2f50; color: #fff; }
-.dark .professional-workspace { border-color: #41435f; background: #20223c; box-shadow: 0 16px 45px rgba(0, 0, 0, .22); }
-.dark .professional-tabs { border-color: #41435f; background: #292b49; }
+.dark .professional-back-button { border-color: #696b87; background: #3a3c5a; color: #fff; }
+.dark .professional-workspace { border-color: #565875; background: #2d2f4a; box-shadow: 0 16px 45px rgba(0, 0, 0, .18); }
+.dark .professional-tabs { border-color: #565875; background: #383a56; }
 .dark .professional-tabs button.is-active { color: #fff; }
-.dark .professional-form-surface .bg-\[\#EB6608\] { border-color: #4b4d69 !important; background: #292b47 !important; }
+.dark .professional-form-surface .bg-\[\#EB6608\] { border-color: #62647f !important; background: #383a55 !important; }
 .dark .professional-form-surface .bg-\[\#EB6608\] h2 { color: #fff !important; }
 .dark .professional-form-surface .bg-\[\#EB6608\] label,
 .dark .professional-form-surface .bg-\[\#EB6608\] label span,
@@ -1743,7 +1743,7 @@ textarea {
 .dark .professional-form-surface .bg-\[\#EB6608\] .text-white\/85,
 .dark .professional-form-surface .bg-\[\#EB6608\] .text-white\/90 { color: #e2e2e6 !important; }
 .dark .professional-form-surface .bg-\[\#EB6608\] a.text-white { color: #ff9a57 !important; }
-.dark .professional-form-surface .bg-\[\#EB6608\] .border-white\/30 { border-color: #555873 !important; background: #343653 !important; }
+.dark .professional-form-surface .bg-\[\#EB6608\] .border-white\/30 { border-color: #6b6d87 !important; background: #444660 !important; }
 .dark .professional-form-surface input:not([type='radio']),
 .dark .professional-form-surface select { border-color: #b9bbc8 !important; background: #fff !important; color: #111565 !important; opacity: 1 !important; }
 .dark .professional-form-surface input::placeholder { color: #8a8a94 !important; opacity: 1; }
