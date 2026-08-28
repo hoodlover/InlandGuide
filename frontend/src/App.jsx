@@ -1128,9 +1128,10 @@ function TopControls({ compact, onManagerAccess, showInstall, mobile = false }) 
   );
 }
 
-function ProfessionalPreview({ userName, userEmail, mobileDevice, onManagerAccess, jokerOn, installOpen, onCloseInstall, onSaveIdentity }) {
+function ProfessionalPreview({ userName, userEmail, mobileDevice, onManagerAccess, onChangeName, nameEditorOpen, onCloseNameEditor, jokerOn, installOpen, onCloseInstall, onSaveIdentity }) {
   const [tab, setTab] = useState('calculator');
   const [canadaPort, setCanadaPort] = useState('');
+  const [dark, toggleTheme] = useTheme();
   const goCanada = (slug) => { setCanadaPort(slug); setTab('cpkc'); };
 
   return (
@@ -1144,6 +1145,9 @@ function ProfessionalPreview({ userName, userEmail, mobileDevice, onManagerAcces
           <div className="professional-header-actions">
             <span className="professional-status"><i /> Operational</span>
             <button type="button" onClick={onManagerAccess} className="professional-header-link">Managers</button>
+            <button type="button" onClick={toggleTheme} className="professional-header-link" aria-label={dark ? 'Use light appearance' : 'Use semi-dark appearance'}>
+              {dark ? '☀ Light' : '◐ Dusk'}
+            </button>
             <button type="button" onClick={() => { window.location.hash = ''; }} className="professional-back-button">← Current design</button>
           </div>
         </div>
@@ -1157,10 +1161,10 @@ function ProfessionalPreview({ userName, userEmail, mobileDevice, onManagerAcces
             <p className="professional-subtitle">Reliable return dates and ramp cutoffs in one focused workflow.</p>
           </div>
           {userName && (
-            <div className="professional-user">
+            <button type="button" onClick={onChangeName} className="professional-user" title="Change name or email" aria-label="Change name or email">
               <span className="professional-avatar">{userName.trim().charAt(0).toUpperCase()}</span>
               <span><small>Signed in as</small><strong>{userName}</strong></span>
-            </div>
+            </button>
           )}
         </section>
 
@@ -1186,11 +1190,11 @@ function ProfessionalPreview({ userName, userEmail, mobileDevice, onManagerAcces
         <footer className="professional-footer"><span>Inland Cutoff Guide</span><span>Preview concept · v {APP_VERSION}</span></footer>
       </main>
       <NamePrompt
-        open={!userName || !userEmail}
+        open={!userName || !userEmail || nameEditorOpen}
         initialName={userName}
         initialEmail={userEmail}
         onSave={onSaveIdentity}
-        onClose={() => {}}
+        onClose={onCloseNameEditor}
       />
       {installOpen && <InstallModal onClose={onCloseInstall} />}
       {jokerOn && <ObieWalkOn />}
@@ -1297,6 +1301,9 @@ export default function App() {
         userEmail={userEmail}
         mobileDevice={mobileDevice}
         onManagerAccess={() => { window.location.hash = '#managers'; }}
+        onChangeName={() => setNameEditorOpen(true)}
+        nameEditorOpen={nameEditorOpen}
+        onCloseNameEditor={() => setNameEditorOpen(false)}
         jokerOn={jokerOn}
         installOpen={installOpen}
         onCloseInstall={() => setInstallOpen(false)}
@@ -1436,6 +1443,7 @@ export default function App() {
       <ObieEggs />
 
       <div className={`w-full max-w-[70rem] mx-auto px-4 text-right ${compactView ? 'mt-3' : 'mt-8'}`}>
+        <a href="#professional" className="mr-3 text-[10px] font-semibold text-slate-400/70 transition hover:text-[#EB6608] dark:text-slate-600 dark:hover:text-orange-300">preview</a>
         <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">v {APP_VERSION}</span>
       </div>
       {!compactView && (
