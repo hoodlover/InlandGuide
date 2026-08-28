@@ -158,11 +158,15 @@ function outlookLogoBlock() {
 }
 
 export default function LookupForm({ onCanadaPort, professional = false }) {
-  const [formData, setFormData] = useState(() => ({ ...EMPTY_FORM, portCutDate: today().iso }));
+  const [formData, setFormData] = useState(() => ({
+    ...EMPTY_FORM,
+    portCutDate: professional ? '' : today().iso,
+  }));
   const resultsRef = useRef(null);
 
-  // Date box prefilled to today so users can just tweak the day.
-  const [dateInput, setDateInput] = useState(() => today().mdy);
+  // The preview requires an intentional future cutoff date. Preserve the
+  // original page's familiar today-prefill behavior.
+  const [dateInput, setDateInput] = useState(() => professional ? '' : today().mdy);
   const resolvedDate = parseFlexibleDate(dateInput);
 
   const [results, setResults] = useState(null);
