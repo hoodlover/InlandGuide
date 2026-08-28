@@ -36,6 +36,7 @@ import doviberDavisHighfive from './assets/doviber-davis-highfive.webp';
 import doviberDavisPoint from './assets/doviber-davis-point.webp';
 import guideMe from './assets/guide-me.webp';
 import vintageErd from './assets/vintage-erd.webp';
+import hapagLloydLogo from './assets/hapag-lloyd-logo.png';
 import './index.css';
 
 import versionData from './version.json'; // committed; regenerate with `node gen-version.mjs`
@@ -235,7 +236,7 @@ function MobileDemoGate({ onUnlock }) {
 
 // OB strolls in on the main tool: every ~10 min he slides in from the left,
 // tells a joke for ~30s, then leaves again.
-const OBIE_FIRST_MS = 420_000;  // first appearance held off until 7 min in
+const OBIE_FIRST_MS = 120_000;  // first appearance after 2 min
 const OBIE_SHOW_MS = 30_000;    // stays on screen 30s
 const OBIE_HIDE_MS = 600_000;   // hidden 10 min between visits
 
@@ -1128,7 +1129,7 @@ function TopControls({ compact, onManagerAccess, showInstall, mobile = false }) 
   );
 }
 
-function ProfessionalPreview({ userName, mobileDevice, mobileOwnerAccess, onLockMobile, onManagerAccess }) {
+function ProfessionalPreview({ userName, mobileDevice, mobileOwnerAccess, onLockMobile, onManagerAccess, jokerOn }) {
   const [tab, setTab] = useState('calculator');
   const [canadaPort, setCanadaPort] = useState('');
   const goCanada = (slug) => { setCanadaPort(slug); setTab('cpkc'); };
@@ -1138,13 +1139,8 @@ function ProfessionalPreview({ userName, mobileDevice, mobileOwnerAccess, onLock
       <header className="professional-header">
         <div className="professional-header-inner">
           <button type="button" onClick={() => { window.location.hash = ''; }} className="professional-wordmark" aria-label="Return to the current Inland Cutoff Guide">
-            <span className="professional-mark" aria-hidden="true">
-              <svg viewBox="0 0 32 32" fill="none">
-                <path d="M5 22h22M8 17h16M11 12h10" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
-                <path d="M9 26h14" stroke="#ff6600" strokeWidth="2.4" strokeLinecap="round" />
-              </svg>
-            </span>
-            <span><strong>Inland Cutoff Guide</strong><small>Rail Operations</small></span>
+            <img src={hapagLloydLogo} alt="Hapag-Lloyd" className="professional-brand-logo" />
+            <span className="professional-product-name"><strong>Inland Cutoff Guide</strong><small>Rail Operations</small></span>
           </button>
           <div className="professional-header-actions">
             <span className="professional-status"><i /> Operational</span>
@@ -1195,6 +1191,7 @@ function ProfessionalPreview({ userName, mobileDevice, mobileOwnerAccess, onLock
         )}
         <footer className="professional-footer"><span>Inland Cutoff Guide</span><span>Preview concept · v {APP_VERSION}</span></footer>
       </main>
+      {jokerOn && <ObieWalkOn />}
     </div>
   );
 }
@@ -1333,7 +1330,7 @@ export default function App() {
     return <ManagersPage />;
   }
   if (hash === '#professional') {
-    return <ProfessionalPreview userName={userName} mobileDevice={mobileDevice} mobileOwnerAccess={mobileOwnerAccess} onLockMobile={lockMobileDemo} onManagerAccess={() => { window.location.hash = '#managers'; }} />;
+    return <ProfessionalPreview userName={userName} mobileDevice={mobileDevice} mobileOwnerAccess={mobileOwnerAccess} onLockMobile={lockMobileDemo} onManagerAccess={() => { window.location.hash = '#managers'; }} jokerOn={jokerOn} />;
   }
   return (
     <div className="min-h-screen bg-[#EDE6D6] dark:bg-slate-900 flex flex-col">
@@ -1407,14 +1404,7 @@ export default function App() {
               )}
             </div>
           )}
-          <div className="flex flex-wrap items-center gap-2">
-            <TopControls compact={compactView} mobile={mobileDevice} showInstall={!pwaInstalled && !mobileDevice} onManagerAccess={() => { window.location.hash = '#managers'; }} />
-            {!mobileDevice && (
-              <button type="button" onClick={() => { window.location.hash = '#professional'; }} className="rounded-lg border border-[#002D72]/20 bg-white px-3 py-2 text-xs font-extrabold text-[#002D72] shadow-sm transition hover:border-[#EB6608] hover:text-[#c45405]">
-                Preview new design →
-              </button>
-            )}
-          </div>
+          <TopControls compact={compactView} mobile={mobileDevice} showInstall={!pwaInstalled && !mobileDevice} onManagerAccess={() => { window.location.hash = '#managers'; }} />
         </header>
       </div>
 
