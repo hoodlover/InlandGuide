@@ -1713,7 +1713,6 @@ textarea {
 .professional-form-surface .bg-\[\#EB6608\] button[type='button'] { color: var(--pro-navy) !important; border-color: #bdcad3 !important; background: #fff !important; text-shadow: none !important; box-shadow: none !important; }
 .professional-form-surface img.rounded-xl { border-radius: 7px !important; filter: saturate(.72) contrast(1.05); box-shadow: none !important; }
 .professional-form-surface .text-slate-500.dark\:text-slate-300 { color: var(--pro-grey) !important; }
-.professional-end-demo { width: 100%; margin-top: 16px; border: 1px solid #e5b4ae; border-radius: 7px; background: #fff; padding: 10px; color: #a13d32; font-weight: 750; }
 .professional-footer { display: flex; justify-content: space-between; margin-top: 18px; color: #8a98a5; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 
 @media (max-width: 700px) {

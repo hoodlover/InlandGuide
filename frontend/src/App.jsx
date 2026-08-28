@@ -5,7 +5,6 @@ import HlMockup from './components/HlMockup';
 import ManagersPage from './components/ManagersPage';
 import NamePrompt, { getUserName, getUserEmail } from './components/NamePrompt';
 import ObieEggs from './components/ObieEggs';
-import PwaInstallGate, { shouldShowInstallGate } from './components/PwaInstallGate';
 import UpdateToast from './components/UpdateToast';
 import { obBot } from './assets/banners';
 import { IDT_TITLE } from './lib/idt';
@@ -1129,7 +1128,7 @@ function TopControls({ compact, onManagerAccess, showInstall, mobile = false }) 
   );
 }
 
-function ProfessionalPreview({ userName, mobileDevice, mobileOwnerAccess, onLockMobile, onManagerAccess, jokerOn }) {
+function ProfessionalPreview({ userName, userEmail, mobileDevice, onManagerAccess, jokerOn, installOpen, onCloseInstall, onSaveIdentity }) {
   const [tab, setTab] = useState('calculator');
   const [canadaPort, setCanadaPort] = useState('');
   const goCanada = (slug) => { setCanadaPort(slug); setTab('cpkc'); };
@@ -1184,13 +1183,16 @@ function ProfessionalPreview({ userName, mobileDevice, mobileOwnerAccess, onLock
           </div>
         </section>
 
-        {mobileDevice && (
-          <button type="button" onClick={onLockMobile} className="professional-end-demo">
-            {mobileOwnerAccess ? 'End mobile access' : 'End mobile demo'}
-          </button>
-        )}
         <footer className="professional-footer"><span>Inland Cutoff Guide</span><span>Preview concept · v {APP_VERSION}</span></footer>
       </main>
+      <NamePrompt
+        open={!userName || !userEmail}
+        initialName={userName}
+        initialEmail={userEmail}
+        onSave={onSaveIdentity}
+        onClose={() => {}}
+      />
+      {installOpen && <InstallModal onClose={onCloseInstall} />}
       {jokerOn && <ObieWalkOn />}
     </div>
   );
@@ -1204,34 +1206,6 @@ export default function App() {
   const [nameEditorOpen, setNameEditorOpen] = useState(false);
   const pwaInstalled = usePwaInstallStatus();
   const mobileDevice = isMobileDevice();
-  const [mobileOwnerAccess, setMobileOwnerAccess] = useState(() => {
-    try {
-      const mobileParam = new URLSearchParams(window.location.search).get('mobile');
-      if (mobileParam === 'owner') localStorage.setItem(MOBILE_OWNER_ACCESS_KEY, '1');
-      else if (mobileParam === 'block') localStorage.removeItem(MOBILE_OWNER_ACCESS_KEY);
-      return localStorage.getItem(MOBILE_OWNER_ACCESS_KEY) === '1';
-    } catch { return false; }
-  });
-  const [mobileDemoUntil, setMobileDemoUntil] = useState(() => {
-    try {
-      const expires = Number(sessionStorage.getItem('icg-mobile-demo-until') || 0);
-      return expires > Date.now() ? expires : 0;
-    } catch { return 0; }
-  });
-  const mobileDemoUnlocked = mobileOwnerAccess || mobileDemoUntil > Date.now();
-  const unlockMobileDemo = () => {
-    const expires = Date.now() + MOBILE_DEMO_MS;
-    try { sessionStorage.setItem('icg-mobile-demo-until', String(expires)); } catch { /* storage unavailable */ }
-    setMobileDemoUntil(expires);
-  };
-  const lockMobileDemo = () => {
-    try {
-      sessionStorage.removeItem('icg-mobile-demo-until');
-      localStorage.removeItem(MOBILE_OWNER_ACCESS_KEY);
-    } catch { /* storage unavailable */ }
-    setMobileOwnerAccess(false);
-    setMobileDemoUntil(0);
-  };
   const [tab, setTab] = useState('calculator');
   // Picking a Canadian port in the US calculator hands off to the Canada Rail
   // Ramp tab, preselecting that port in the published-schedule tool.
@@ -1304,23 +1278,10 @@ export default function App() {
   }, [pwaInstalled]);
 
   useEffect(() => {
-    if (!mobileDemoUntil) return undefined;
-    const remaining = mobileDemoUntil - Date.now();
-    if (remaining <= 0) {
-      lockMobileDemo();
-      return undefined;
-    }
-    const timer = setTimeout(lockMobileDemo, remaining);
-    return () => clearTimeout(timer);
-  }, [mobileDemoUntil]);
-
-  if (shouldShowInstallGate()) {
-    return <PwaInstallGate />;
-  }
-
-  if (mobileDevice && !mobileDemoUnlocked) {
-    return <MobileDemoGate onUnlock={unlockMobileDemo} />;
-  }
+    if (pwaInstalled || !userName || !userEmail) return undefined;
+    const timer = window.setTimeout(() => setInstallOpen(true), 3 * 60 * 1000);
+    return () => window.clearTimeout(timer);
+  }, [pwaInstalled, userName, userEmail]);
 
   if (hash === '#vintage-ERD-tool') {
     return <HlMockup />;
@@ -1330,7 +1291,18 @@ export default function App() {
     return <ManagersPage />;
   }
   if (hash === '#professional') {
-    return <ProfessionalPreview userName={userName} mobileDevice={mobileDevice} mobileOwnerAccess={mobileOwnerAccess} onLockMobile={lockMobileDemo} onManagerAccess={() => { window.location.hash = '#managers'; }} jokerOn={jokerOn} />;
+    return (
+      <ProfessionalPreview
+        userName={userName}
+        userEmail={userEmail}
+        mobileDevice={mobileDevice}
+        onManagerAccess={() => { window.location.hash = '#managers'; }}
+        jokerOn={jokerOn}
+        installOpen={installOpen}
+        onCloseInstall={() => setInstallOpen(false)}
+        onSaveIdentity={(name, email) => { setUserName(name); setUserEmail(email); }}
+      />
+    );
   }
   return (
     <div className="min-h-screen bg-[#EDE6D6] dark:bg-slate-900 flex flex-col">
@@ -1434,15 +1406,6 @@ export default function App() {
               onRefresh={refreshUpdatedData}
               onRequest={() => setRequestOpen(true)}
             />
-          )}
-          {mobileDevice && (
-            <button
-              type="button"
-              onClick={lockMobileDemo}
-              className="col-span-2 rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm font-extrabold text-red-700 shadow-[0_4px_10px_rgba(0,0,0,0.2)] transition hover:bg-red-100 sm:col-auto"
-            >
-              {mobileOwnerAccess ? '🔒 End Mobile Access' : '🔒 End Mobile Demo'}
-            </button>
           )}
         </div>
         {tab === 'calculator'
