@@ -1667,7 +1667,7 @@ textarea {
 .professional-header-inner { width: min(1180px, calc(100% - 40px)); min-height: 72px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 .professional-wordmark { display: inline-flex; align-items: center; gap: 11px; border: 0; background: transparent; color: var(--pro-navy); text-align: left; cursor: pointer; }
 .professional-wordmark strong, .professional-wordmark small { display: block; }
-.professional-brand-logo { width: 168px; height: 40px; object-fit: cover; object-position: center; }
+.professional-brand-logo { display: block; width: 184px; height: auto; max-height: 42px; object-fit: contain; object-position: left center; }
 .professional-product-name { border-left: 1px solid var(--pro-line); padding-left: 12px; }
 .professional-wordmark strong { font-size: 15px; line-height: 1.2; letter-spacing: .015em; }
 .professional-wordmark small { margin-top: 2px; color: var(--pro-muted); font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
@@ -1727,7 +1727,7 @@ textarea {
 /* Semi-dark preview: deep blue-grey surfaces with white working fields. */
 .dark .professional-preview { --pro-ink: #f4f4f6; --pro-muted: #b6b6bc; --pro-grey: #c7c7cc; --pro-line: #41435f; background: #17192f; }
 .dark .professional-header { border-color: #41435f; background: #222441; }
-.dark .professional-brand-logo { border-radius: 4px; background: #fff; }
+.dark .professional-brand-logo { filter: drop-shadow(0 1px 0 rgba(255, 255, 255, .18)); }
 .dark .professional-wordmark strong,
 .dark .professional-intro h1 { color: #fff; }
 .dark .professional-back-button { border-color: #565978; background: #2d2f50; color: #fff; }
@@ -1750,7 +1750,7 @@ textarea {
   .professional-header-inner { min-height: 64px; }
   .professional-status, .professional-header-link { display: none; }
   .professional-back-button { padding: 7px 9px; }
-  .professional-brand-logo { width: 122px; height: 32px; }
+  .professional-brand-logo { width: 142px; max-height: 32px; }
   .professional-product-name { display: none; }
   .professional-shell { padding-top: 32px; }
   .professional-intro { display: block; }
