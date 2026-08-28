@@ -1749,6 +1749,7 @@ textarea {
 .dark .professional-form-surface input::placeholder { color: #8a8a94 !important; opacity: 1; }
 .dark .professional-form-surface input:disabled,
 .dark .professional-form-surface select:disabled { background: #eeeef1 !important; color: #77777d !important; opacity: 1 !important; }
+.dark .professional-form-surface input[type='date'].opacity-0 { border: 0 !important; background: transparent !important; opacity: 0 !important; }
 .dark .professional-form-surface .bg-\[\#EB6608\] button[type='button'] { border-color: #c7c8d1 !important; background: #fff !important; color: #111565 !important; opacity: 1 !important; }
 .dark .professional-form-surface .bg-\[\#EB6608\] button[type='button']:disabled { background: #eeeef1 !important; color: #77777d !important; }
 
