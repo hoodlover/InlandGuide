@@ -1128,6 +1128,77 @@ function TopControls({ compact, onManagerAccess, showInstall, mobile = false }) 
   );
 }
 
+function ProfessionalPreview({ userName, mobileDevice, mobileOwnerAccess, onLockMobile, onManagerAccess }) {
+  const [tab, setTab] = useState('calculator');
+  const [canadaPort, setCanadaPort] = useState('');
+  const goCanada = (slug) => { setCanadaPort(slug); setTab('cpkc'); };
+
+  return (
+    <div className="professional-preview min-h-screen">
+      <header className="professional-header">
+        <div className="professional-header-inner">
+          <button type="button" onClick={() => { window.location.hash = ''; }} className="professional-wordmark" aria-label="Return to the current Inland Cutoff Guide">
+            <span className="professional-mark" aria-hidden="true">
+              <svg viewBox="0 0 32 32" fill="none">
+                <path d="M5 22h22M8 17h16M11 12h10" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+                <path d="M9 26h14" stroke="#ff6600" strokeWidth="2.4" strokeLinecap="round" />
+              </svg>
+            </span>
+            <span><strong>Inland Cutoff Guide</strong><small>Rail Operations</small></span>
+          </button>
+          <div className="professional-header-actions">
+            <span className="professional-status"><i /> Operational</span>
+            <button type="button" onClick={onManagerAccess} className="professional-header-link">Managers</button>
+            <button type="button" onClick={() => { window.location.hash = ''; }} className="professional-back-button">← Current design</button>
+          </div>
+        </div>
+      </header>
+
+      <main className="professional-shell">
+        <section className="professional-intro">
+          <div>
+            <p className="professional-eyebrow">Inland operations workspace</p>
+            <h1>Rail cutoff planning, made clear.</h1>
+            <p className="professional-subtitle">Reliable return dates and ramp cutoffs in one focused workflow.</p>
+          </div>
+          {userName && (
+            <div className="professional-user">
+              <span className="professional-avatar">{userName.trim().charAt(0).toUpperCase()}</span>
+              <span><small>Signed in as</small><strong>{userName}</strong></span>
+            </div>
+          )}
+        </section>
+
+        <section className="professional-workspace">
+          <div className="professional-tabs" role="tablist" aria-label="Cutoff tools">
+            {[
+              { id: 'calculator', label: 'US Rail Ramp Cuts', short: 'US Rail Cuts' },
+              { id: 'cpkc', label: 'Canada Rail Ramp Cuts', short: 'Canada Rail Cuts' },
+            ].map((item) => (
+              <button key={item.id} type="button" role="tab" aria-selected={tab === item.id} onClick={() => { setCanadaPort(''); setTab(item.id); }} className={tab === item.id ? 'is-active' : ''}>
+                <span className="professional-tab-dot" />
+                {mobileDevice ? item.short : item.label}
+              </button>
+            ))}
+          </div>
+          <div className="professional-form-surface">
+            {tab === 'calculator'
+              ? <LookupForm onCanadaPort={goCanada} />
+              : <PortScheduleLookup onUpdateRamps={onManagerAccess} initialPort={canadaPort} />}
+          </div>
+        </section>
+
+        {mobileDevice && (
+          <button type="button" onClick={onLockMobile} className="professional-end-demo">
+            {mobileOwnerAccess ? 'End mobile access' : 'End mobile demo'}
+          </button>
+        )}
+        <footer className="professional-footer"><span>Inland Cutoff Guide</span><span>Preview concept · v {APP_VERSION}</span></footer>
+      </main>
+    </div>
+  );
+}
+
 export default function App() {
   const [installOpen, setInstallOpen] = useState(false);
   const [requestOpen, setRequestOpen] = useState(false);
@@ -1261,6 +1332,9 @@ export default function App() {
   if (hash === '#managers') {
     return <ManagersPage />;
   }
+  if (hash === '#professional') {
+    return <ProfessionalPreview userName={userName} mobileDevice={mobileDevice} mobileOwnerAccess={mobileOwnerAccess} onLockMobile={lockMobileDemo} onManagerAccess={() => { window.location.hash = '#managers'; }} />;
+  }
   return (
     <div className="min-h-screen bg-[#EDE6D6] dark:bg-slate-900 flex flex-col">
       {/* Banner constrained to just past the content edges (~5% wider each side). */}
@@ -1333,7 +1407,14 @@ export default function App() {
               )}
             </div>
           )}
-          <TopControls compact={compactView} mobile={mobileDevice} showInstall={!pwaInstalled && !mobileDevice} onManagerAccess={() => { window.location.hash = '#managers'; }} />
+          <div className="flex flex-wrap items-center gap-2">
+            <TopControls compact={compactView} mobile={mobileDevice} showInstall={!pwaInstalled && !mobileDevice} onManagerAccess={() => { window.location.hash = '#managers'; }} />
+            {!mobileDevice && (
+              <button type="button" onClick={() => { window.location.hash = '#professional'; }} className="rounded-lg border border-[#002D72]/20 bg-white px-3 py-2 text-xs font-extrabold text-[#002D72] shadow-sm transition hover:border-[#EB6608] hover:text-[#c45405]">
+                Preview new design →
+              </button>
+            )}
+          </div>
         </header>
       </div>
 
