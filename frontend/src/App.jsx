@@ -36,6 +36,7 @@ import doviberDavisPoint from './assets/doviber-davis-point.webp';
 import guideMe from './assets/guide-me.webp';
 import vintageErd from './assets/vintage-erd.webp';
 import hapagLloydLogo from './assets/hapag-lloyd-logo.png';
+import hapagLloydLogoWhite from './assets/hapag-lloyd-logo-white.png';
 import './index.css';
 
 import versionData from './version.json'; // committed; regenerate with `node gen-version.mjs`
@@ -1139,7 +1140,7 @@ function ProfessionalPreview({ userName, userEmail, mobileDevice, onManagerAcces
       <header className="professional-header">
         <div className="professional-header-inner">
           <button type="button" onClick={() => { window.location.hash = ''; }} className="professional-wordmark" aria-label="Return to the current Inland Cutoff Guide">
-            <img src={hapagLloydLogo} alt="Hapag-Lloyd" className="professional-brand-logo" />
+            <img src={dark ? hapagLloydLogoWhite : hapagLloydLogo} alt="Hapag-Lloyd" className="professional-brand-logo" />
             <span className="professional-product-name"><strong>Inland Cutoff Guide</strong><small>Rail Operations</small></span>
           </button>
           <div className="professional-header-actions">
