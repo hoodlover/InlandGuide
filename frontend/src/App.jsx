@@ -1149,7 +1149,6 @@ function ProfessionalPreview({ userName, userEmail, mobileDevice, onManagerAcces
             <button type="button" onClick={toggleTheme} className="professional-header-link" aria-label={dark ? 'Use light appearance' : 'Use semi-dark appearance'}>
               {dark ? '☀ Light' : '◐ Dusk'}
             </button>
-            <button type="button" onClick={() => { window.location.hash = '#original'; }} className="professional-back-button">← Current design</button>
           </div>
         </div>
       </header>
@@ -1188,7 +1187,10 @@ function ProfessionalPreview({ userName, userEmail, mobileDevice, onManagerAcces
           </div>
         </section>
 
-        <footer className="professional-footer"><span>Inland Cutoff Guide</span><span>Preview concept · v {APP_VERSION}</span></footer>
+        <footer className="professional-footer">
+          <span>Inland Cutoff Guide</span>
+          <span><a href="#original">Current version</a><b aria-hidden="true"> · </b>Preview concept · v {APP_VERSION}</span>
+        </footer>
       </main>
       <NamePrompt
         open={!userName || !userEmail || nameEditorOpen}
