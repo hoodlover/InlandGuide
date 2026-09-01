@@ -1139,7 +1139,7 @@ function ProfessionalPreview({ userName, userEmail, mobileDevice, onManagerAcces
     <div className="professional-preview min-h-screen">
       <header className="professional-header">
         <div className="professional-header-inner">
-          <button type="button" onClick={() => { window.location.hash = ''; }} className="professional-wordmark" aria-label="Return to the current Inland Cutoff Guide">
+          <button type="button" onClick={() => { window.location.hash = '#original'; }} className="professional-wordmark" aria-label="Open the original Inland Cutoff Guide design">
             <img src={dark ? hapagLloydLogoWhite : hapagLloydLogo} alt="Hapag-Lloyd" className="professional-brand-logo" />
             <span className="professional-product-name"><strong>Inland Cutoff Guide</strong><small>Rail Operations</small></span>
           </button>
@@ -1149,7 +1149,7 @@ function ProfessionalPreview({ userName, userEmail, mobileDevice, onManagerAcces
             <button type="button" onClick={toggleTheme} className="professional-header-link" aria-label={dark ? 'Use light appearance' : 'Use semi-dark appearance'}>
               {dark ? '☀ Light' : '◐ Dusk'}
             </button>
-            <button type="button" onClick={() => { window.location.hash = ''; }} className="professional-back-button">← Current design</button>
+            <button type="button" onClick={() => { window.location.hash = '#original'; }} className="professional-back-button">← Current design</button>
           </div>
         </div>
       </header>
@@ -1295,7 +1295,7 @@ export default function App() {
   if (hash === '#managers') {
     return <ManagersPage />;
   }
-  if (hash === '#professional') {
+  if (hash !== '#original') {
     return (
       <ProfessionalPreview
         userName={userName}
