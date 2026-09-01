@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-08-31",
-  "pulledAt": "2026-08-31T18:25:43.729Z",
+  "generatedAt": "2026-09-01",
+  "pulledAt": "2026-09-01T15:45:26.161Z",
   "ports": {
     "montreal": {
       "name": "Port of Montreal",
@@ -354,8 +354,8 @@
     "montreal-racine": {
       "name": "Montreal — Racine",
       "rail": "CN",
-      "runDate": "Mon 31-Aug",
-      "generatedAt": "2026-08-31",
+      "runDate": "Tue 1-Sep",
+      "generatedAt": "2026-09-01",
       "cities": [
         "Toronto (Brampton)",
         "Chicago",
@@ -414,7 +414,7 @@
           "terminal": "",
           "eta": "",
           "etd": "",
-          "railPortCutoff": "03-Sep",
+          "railPortCutoff": "04-Sep",
           "comments": "",
           "cutoffs": {
             "Toronto (Brampton)": "Tue, Sep-29",
@@ -686,8 +686,8 @@
     "montreal-cast": {
       "name": "Montreal — Cast",
       "rail": "CN",
-      "runDate": "Mon 31-Aug",
-      "generatedAt": "2026-08-31",
+      "runDate": "Tue 1-Sep",
+      "generatedAt": "2026-09-01",
       "cities": [
         "Toronto (Brampton)",
         "Chicago",
@@ -706,38 +706,6 @@
       ],
       "cutTimes": {},
       "vessels": [
-        {
-          "vessel": "GENOA EXPRESS",
-          "terminal": "",
-          "eta": "",
-          "etd": "",
-          "railPortCutoff": "30-Aug",
-          "comments": "",
-          "cutoffs": {
-            "Toronto (Brampton)": "Fri, Aug-28",
-            "Chicago": "Wed, Aug-26",
-            "Detroit": "Wed, Aug-26",
-            "Indianapolis": "Fri, Aug-21",
-            "Winnipeg": "Sun, Aug-23",
-            "Calgary": "Thu, Aug-20",
-            "Edmonton": "Sat, Aug-22",
-            "Saskatoon": "Thu, Aug-20",
-            "Regina": "Mon, Aug-17",
-            "Vancouver": "Thu, Aug-20"
-          },
-          "erds": {
-            "Toronto (Brampton)": "Aug-24",
-            "Chicago": "Aug-21",
-            "Detroit": "Aug-21",
-            "Indianapolis": "Aug-16",
-            "Winnipeg": "Aug-18",
-            "Calgary": "Aug-15",
-            "Edmonton": "Aug-17",
-            "Saskatoon": "Sat, Aug-15",
-            "Regina": "Wed, Aug-12",
-            "Vancouver": "Aug-15"
-          }
-        },
         {
           "vessel": "OOCL ST LAWRENCE",
           "terminal": "",
@@ -1095,8 +1063,8 @@
     "montreal-viau": {
       "name": "Montreal — Viau",
       "rail": "CN",
-      "runDate": "Mon 31-Aug",
-      "generatedAt": "2026-08-31",
+      "runDate": "Tue 1-Sep",
+      "generatedAt": "2026-09-01",
       "cities": [
         "Toronto (Brampton)",
         "Chicago",
@@ -1115,38 +1083,6 @@
       ],
       "cutTimes": {},
       "vessels": [
-        {
-          "vessel": "MSC RENAISSANCE III",
-          "terminal": "",
-          "eta": "",
-          "etd": "",
-          "railPortCutoff": "27-Aug",
-          "comments": "",
-          "cutoffs": {
-            "Toronto (Brampton)": "Thu, Sep-24",
-            "Chicago": "Tue, Sep-22",
-            "Detroit": "Tue, Sep-22",
-            "Indianapolis": "Fri, Sep-18",
-            "Winnipeg": "Fri, Sep-18",
-            "Calgary": "Tue, Sep-15",
-            "Edmonton": "Thu, Sep-17",
-            "Saskatoon": "Tue, Sep-15",
-            "Regina": "Tue, Sep-15",
-            "Vancouver": "Tue, Sep-15"
-          },
-          "erds": {
-            "Toronto (Brampton)": "Sep-18",
-            "Chicago": "Sep-17",
-            "Detroit": "Sep-17",
-            "Indianapolis": "Sep-13",
-            "Winnipeg": "Sep-13",
-            "Calgary": "Sep-10",
-            "Edmonton": "Sep-12",
-            "Saskatoon": "Sep-10",
-            "Regina": "Sep-10",
-            "Vancouver": "Sep-10"
-          }
-        },
         {
           "vessel": "MSC ENGLAND",
           "terminal": "",
@@ -1251,28 +1187,28 @@
           "railPortCutoff": "10-Sep",
           "comments": "",
           "cutoffs": {
-            "Toronto (Brampton)": "Wed, Sep-09",
-            "Chicago": "Sun, Sep-06",
-            "Detroit": "Sun, Sep-06",
-            "Indianapolis": "Mon, Aug-31",
-            "Winnipeg": "Fri, Sep-04",
-            "Calgary": "Tue, Sep-01",
-            "Edmonton": "Wed, Sep-02",
-            "Saskatoon": "Mon, Aug-31",
-            "Regina": "Mon, Aug-31",
-            "Vancouver": "Mon, Aug-31"
+            "Toronto (Brampton)": "Thu, Oct-08",
+            "Chicago": "Tue, Oct-06",
+            "Detroit": "Tue, Oct-06",
+            "Indianapolis": "Fri, Oct-02",
+            "Winnipeg": "Fri, Oct-02",
+            "Calgary": "Tue, Sep-29",
+            "Edmonton": "Thu, Oct-01",
+            "Saskatoon": "Tue, Sep-29",
+            "Regina": "Tue, Sep-29",
+            "Vancouver": "Tue, Sep-29"
           },
           "erds": {
-            "Toronto (Brampton)": "Sep-03",
-            "Chicago": "Sep-01",
-            "Detroit": "Sep-01",
-            "Indianapolis": "Aug-26",
-            "Winnipeg": "Aug-30",
-            "Calgary": "Aug-27",
-            "Edmonton": "Aug-28",
-            "Saskatoon": "Aug-26",
-            "Regina": "Aug-26",
-            "Vancouver": "Aug-26"
+            "Toronto (Brampton)": "Oct-02",
+            "Chicago": "Oct-01",
+            "Detroit": "Oct-01",
+            "Indianapolis": "Sep-27",
+            "Winnipeg": "Sep-27",
+            "Calgary": "Sep-24",
+            "Edmonton": "Sep-26",
+            "Saskatoon": "Sep-24",
+            "Regina": "Sep-24",
+            "Vancouver": "Sep-24"
           }
         },
         {
@@ -1337,6 +1273,38 @@
             "Saskatoon": "Sep-02",
             "Regina": "Sep-02",
             "Vancouver": "Sep-02"
+          }
+        },
+        {
+          "vessel": "MSC RENAISSANCE III",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "26-Sep",
+          "comments": "",
+          "cutoffs": {
+            "Toronto (Brampton)": "Fri, Sep-25",
+            "Chicago": "Wed, Sep-23",
+            "Detroit": "Wed, Sep-23",
+            "Indianapolis": "Fri, Sep-18",
+            "Winnipeg": "Sun, Sep-20",
+            "Calgary": "Thu, Sep-17",
+            "Edmonton": "Fri, Sep-18",
+            "Saskatoon": "Wed, Sep-16",
+            "Regina": "Wed, Sep-16",
+            "Vancouver": "Wed, Sep-16"
+          },
+          "erds": {
+            "Toronto (Brampton)": "Sep-19",
+            "Chicago": "Sep-18",
+            "Detroit": "Sep-18",
+            "Indianapolis": "Sep-13",
+            "Winnipeg": "Sep-15",
+            "Calgary": "Sep-12",
+            "Edmonton": "Sep-13",
+            "Saskatoon": "Sep-11",
+            "Regina": "Sep-11",
+            "Vancouver": "Sep-11"
           }
         },
         {
@@ -2535,8 +2503,8 @@
     "prince-rupert": {
       "name": "Prince Rupert",
       "rail": "CN",
-      "runDate": "Mon 31-Aug",
-      "generatedAt": "2026-08-31",
+      "runDate": "Tue 1-Sep",
+      "generatedAt": "2026-09-01",
       "cities": [
         "TORONTO (MALPORT)",
         "MONTREAL",
@@ -3192,14 +3160,58 @@
             "NEW ORLEANS": "13-Sep",
             "ARCADIA": "17-Sep"
           }
+        },
+        {
+          "vessel": "COSCO AUCKLAND",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "02-Oct",
+          "comments": "",
+          "cutoffs": {
+            "TORONTO (MALPORT)": "Fri, Sep-25",
+            "MONTREAL": "Thu, Sep-24",
+            "WINNIPEG": "Fri, Sep-25",
+            "SASKATOON": "Thu, Sep-24",
+            "REGINA": "Sat, Sep-19",
+            "CALGARY": "Sat, Sep-26",
+            "EDMONTON": "Sat, Sep-26",
+            "PRINCE GEORGE": "Mon, Sep-28",
+            "CHIPPEWA FALLS": "Sun, Sep-20",
+            "JOLIET": "Thu, Sep-24",
+            "INDIANAPOLIS": "Mon, Sep-21",
+            "CHICAGO": "Thu, Sep-24",
+            "DETROIT": "Mon, Sep-21",
+            "MEMPHIS": "Mon, Sep-21",
+            "NEW ORLEANS": "Tue, Sep-22",
+            "ARCADIA": "Thu, Sep-24"
+          },
+          "erds": {
+            "TORONTO (MALPORT)": "20-Sep",
+            "MONTREAL": "19-Sep",
+            "WINNIPEG": "20-Sep",
+            "SASKATOON": "19-Sep",
+            "REGINA": "14-Sep",
+            "CALGARY": "21-Sep",
+            "EDMONTON": "21-Sep",
+            "PRINCE GEORGE": "23-Sep",
+            "CHIPPEWA FALLS": "15-Sep",
+            "JOLIET": "19-Sep",
+            "INDIANAPOLIS": "16-Sep",
+            "CHICAGO": "19-Sep",
+            "DETROIT": "16-Sep",
+            "MEMPHIS": "16-Sep",
+            "NEW ORLEANS": "17-Sep",
+            "ARCADIA": "19-Sep"
+          }
         }
       ]
     },
     "centerm": {
       "name": "Centerm",
       "rail": "CN",
-      "runDate": "Mon 31-Aug",
-      "generatedAt": "2026-08-31",
+      "runDate": "Tue 1-Sep",
+      "generatedAt": "2026-09-01",
       "cities": [
         "TORONTO (MALPORT)",
         "MONTREAL",
@@ -3231,40 +3243,6 @@
         "SASKATOON": "1700 hrs (1500 Sat & Sun)"
       },
       "vessels": [
-        {
-          "vessel": "GSL SOFIA",
-          "terminal": "",
-          "eta": "",
-          "etd": "",
-          "railPortCutoff": "28-Aug",
-          "comments": "",
-          "cutoffs": {
-            "TORONTO (MALPORT)": "Thu, Aug-20",
-            "MONTREAL": "Tue, Aug-18",
-            "CHICAGO": "Tue, Aug-18",
-            "DETROIT": "Wed, Aug-12",
-            "INDIANAPOLIS": "Sun, Aug-16",
-            "MEMPHIS": "Mon, Aug-17",
-            "NEW ORLEANS": "Mon, Aug-17",
-            "WINNIPEG": "Mon, Aug-17",
-            "CALGARY": "Wed, Aug-19",
-            "EDMONTON": "Fri, Aug-21",
-            "SASKATOON": "Tue, Aug-18"
-          },
-          "erds": {
-            "TORONTO (MALPORT)": "Aug-15",
-            "MONTREAL": "Aug-13",
-            "CHICAGO": "Aug-13",
-            "DETROIT": "Aug-07",
-            "INDIANAPOLIS": "Aug-11",
-            "MEMPHIS": "Aug-12",
-            "NEW ORLEANS": "Aug-12",
-            "WINNIPEG": "Aug-12",
-            "CALGARY": "Aug-14",
-            "EDMONTON": "Aug-16",
-            "SASKATOON": "Aug-13"
-          }
-        },
         {
           "vessel": "COSCO SANTOS",
           "terminal": "",
@@ -3739,6 +3717,40 @@
             "CALGARY": "Sep-13",
             "EDMONTON": "Sep-17",
             "SASKATOON": "Sep-13"
+          }
+        },
+        {
+          "vessel": "MAERSK SARNIA",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "02-Oct",
+          "comments": "",
+          "cutoffs": {
+            "TORONTO (MALPORT)": "Thu, Sep-24",
+            "MONTREAL": "Tue, Sep-22",
+            "CHICAGO": "Tue, Sep-22",
+            "DETROIT": "Wed, Sep-16",
+            "INDIANAPOLIS": "Sun, Sep-20",
+            "MEMPHIS": "Mon, Sep-21",
+            "NEW ORLEANS": "Mon, Sep-21",
+            "WINNIPEG": "Mon, Sep-21",
+            "CALGARY": "Wed, Sep-23",
+            "EDMONTON": "Fri, Sep-25",
+            "SASKATOON": "Tue, Sep-22"
+          },
+          "erds": {
+            "TORONTO (MALPORT)": "Sep-19",
+            "MONTREAL": "Sep-17",
+            "CHICAGO": "Sep-17",
+            "DETROIT": "Sep-11",
+            "INDIANAPOLIS": "Sep-15",
+            "MEMPHIS": "Sep-16",
+            "NEW ORLEANS": "Sep-16",
+            "WINNIPEG": "Sep-16",
+            "CALGARY": "Sep-18",
+            "EDMONTON": "Sep-20",
+            "SASKATOON": "Sep-17"
           }
         }
       ]
