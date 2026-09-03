@@ -6,6 +6,7 @@ import ManagersPage from './components/ManagersPage';
 import NamePrompt, { getUserName, getUserEmail } from './components/NamePrompt';
 import ObieEggs from './components/ObieEggs';
 import UpdateToast from './components/UpdateToast';
+import ErdBridgeButton from './components/ErdBridgeButton';
 import { obBot } from './assets/banners';
 import { IDT_TITLE } from './lib/idt';
 import truckScene from './assets/idt-truck-scene.webp';
@@ -1299,19 +1300,22 @@ export default function App() {
   }
   if (hash !== '#original') {
     return (
-      <ProfessionalPreview
-        userName={userName}
-        userEmail={userEmail}
-        mobileDevice={mobileDevice}
-        onManagerAccess={() => { window.location.hash = '#managers'; }}
-        onChangeName={() => setNameEditorOpen(true)}
-        nameEditorOpen={nameEditorOpen}
-        onCloseNameEditor={() => setNameEditorOpen(false)}
-        jokerOn={jokerOn}
-        installOpen={installOpen}
-        onCloseInstall={() => setInstallOpen(false)}
-        onSaveIdentity={(name, email) => { setUserName(name); setUserEmail(email); }}
-      />
+      <>
+        <ProfessionalPreview
+          userName={userName}
+          userEmail={userEmail}
+          mobileDevice={mobileDevice}
+          onManagerAccess={() => { window.location.hash = '#managers'; }}
+          onChangeName={() => setNameEditorOpen(true)}
+          nameEditorOpen={nameEditorOpen}
+          onCloseNameEditor={() => setNameEditorOpen(false)}
+          jokerOn={jokerOn}
+          installOpen={installOpen}
+          onCloseInstall={() => setInstallOpen(false)}
+          onSaveIdentity={(name, email) => { setUserName(name); setUserEmail(email); }}
+        />
+        <ErdBridgeButton />
+      </>
     );
   }
   return (
@@ -1437,6 +1441,7 @@ export default function App() {
         onClose={() => setNameEditorOpen(false)}
       />
       <UpdateToast />
+      <ErdBridgeButton />
       {installOpen && <InstallModal onClose={() => setInstallOpen(false)} />}
       {requestOpen && <FeatureRequestModal onClose={() => setRequestOpen(false)} />}
 
