@@ -3,6 +3,7 @@ import { calculateFromLiveMaster, loadLiveMaster } from '../lib/liveMaster';
 
 const BRIDGE_URL = 'http://127.0.0.1:47832/s8100-summary';
 const BRIDGE_CLIPBOARD_URL = 'http://127.0.0.1:47832/erd-clipboard';
+const LAST_RESULT_KEY = 'erd_tool_last_result_v1';
 
 async function copyThroughBridge(text) {
   const response = await fetch(BRIDGE_CLIPBOARD_URL, {
@@ -36,6 +37,20 @@ function resultText(data, result) {
   ].join('\n');
 }
 
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
+}
+
+function formattedResult(data, result) {
+  return `<div style="font-family:Arial,sans-serif;color:#10233f">` +
+    `<div style="font-size:18px;font-weight:700;color:#002d72">Booking ${escapeHtml(data.bookingNumber)}</div>` +
+    `<div style="margin:6px 0 12px">${escapeHtml(data.startCity)} &rarr; ${escapeHtml(data.polCity)}</div>` +
+    `<div style="border-left:5px solid #eb6608;padding:8px 12px;background:#f5f7fb">` +
+    `<b>ERD:</b> ${escapeHtml(result.erd)}<br><b>LRD:</b> ${escapeHtml(result.lrd)}<br>` +
+    `<b>Ramp Cut Time:</b> ${escapeHtml(result.rampCutTime)}<br><b>POL Cutoff:</b> ${escapeHtml(data.relevantCutoffDate)} ${escapeHtml(data.relevantCutoffTime)}<br>` +
+    `<b>Departure Terminal:</b> ${escapeHtml(data.departureTerminal || 'N/A')}</div></div>`;
+}
+
 export default function ErdBridgeButton({ standalone = false }) {
   const [state, setState] = useState({ loading: false, error: '', data: null, result: null, copied: false });
 
@@ -57,7 +72,9 @@ export default function ErdBridgeButton({ standalone = false }) {
         await copyThroughBridge(text);
         copied = true;
       } catch { /* The confirmation remains available with a manual Copy button. */ }
-      setState({ loading: false, error: '', data: { ...data, startCity, liveSource: live.source, liveModified: live.modified }, result, copied });
+      const saved = { data: { ...data, startCity, liveSource: live.source, liveModified: live.modified }, result, savedAt: new Date().toISOString() };
+      try { localStorage.setItem(LAST_RESULT_KEY, JSON.stringify(saved)); } catch { /* Last-result convenience is optional. */ }
+      setState({ loading: false, error: '', data: saved.data, result, copied });
     } catch (error) {
       const offline = error instanceof TypeError;
       setState({
@@ -80,7 +97,31 @@ export default function ErdBridgeButton({ standalone = false }) {
     }
   };
 
+  const copyFormatted = async () => {
+    if (!state.data || !state.result) return;
+    try {
+      const text = resultText(state.data, state.result);
+      const html = formattedResult(state.data, state.result);
+      await navigator.clipboard.write([new ClipboardItem({
+        'text/plain': new Blob([text], { type: 'text/plain' }),
+        'text/html': new Blob([html], { type: 'text/html' }),
+      })]);
+      setState(current => ({ ...current, copied: true }));
+    } catch {
+      setState(current => ({ ...current, error: 'Formatted copy needs clipboard permission. Choose Allow once, then click Copy formatted again.' }));
+    }
+  };
+
   const close = () => setState({ loading: false, error: '', data: null, result: null, copied: false });
+  const showLastResult = () => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(LAST_RESULT_KEY) || 'null');
+      if (!saved?.data || !saved?.result) throw new Error();
+      setState({ loading: false, error: '', data: saved.data, result: saved.result, copied: true });
+    } catch {
+      setState({ loading: false, error: 'No previous ERD result has been saved on this computer yet.', data: null, result: null, copied: false });
+    }
+  };
   const open = state.loading || state.error || state.result;
 
   useEffect(() => {
@@ -104,6 +145,7 @@ export default function ErdBridgeButton({ standalone = false }) {
         {state.loading ? <span className="text-2xl font-black text-white">···</span> : <img src="./got-erd-button.webp" alt="Got ERD?" className="h-full w-full object-contain" />}
       </button>
       {standalone ? <p className="fixed left-1/2 top-[calc(50%+62px)] z-[80] -translate-x-1/2 whitespace-nowrap text-xs font-extrabold text-white">2. Click the ERD button</p> : null}
+      {standalone ? <button type="button" onClick={showLastResult} className="fixed left-1/2 top-[calc(50%+83px)] z-[80] -translate-x-1/2 whitespace-nowrap text-[11px] font-bold text-orange-200 underline underline-offset-2 hover:text-white">Reopen last result</button> : null}
 
       {open ? (
         <div className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/45 p-4" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget && !state.loading) close(); }}>
@@ -140,7 +182,10 @@ export default function ErdBridgeButton({ standalone = false }) {
                     <div className="mt-2 flex justify-between gap-4"><span className="font-bold">Ramp cut</span><strong>{state.result.rampCutTime}</strong></div>
                   </div>
                   <p className="text-center text-sm font-bold text-emerald-700">{state.copied ? '✓ Already copied to your clipboard' : 'Ready to copy'}</p>
-                  <button type="button" onClick={copyAgain} className="w-full rounded-xl bg-[#002D72] px-4 py-3 font-bold text-white hover:bg-blue-950">Copy result</button>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button type="button" onClick={copyFormatted} className="rounded-xl bg-[#EB6608] px-3 py-3 text-sm font-bold text-white hover:bg-orange-600">✨ Copy formatted</button>
+                    <button type="button" onClick={copyAgain} className="rounded-xl bg-[#002D72] px-3 py-3 text-sm font-bold text-white hover:bg-blue-950">Copy text</button>
+                  </div>
                 </div>
               ) : null}
             </div>

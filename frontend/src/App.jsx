@@ -1286,8 +1286,17 @@ export default function App() {
   useEffect(() => {
     if (!buttonOnlyPage) return undefined;
     const previousTitle = document.title;
+    const icon = document.querySelector('link[rel~="icon"]') || document.createElement('link');
+    const previousIcon = icon.getAttribute('href');
+    icon.setAttribute('rel', 'icon');
+    icon.setAttribute('type', 'image/x-icon');
+    icon.setAttribute('href', '/favicon.ico?v=18');
+    if (!icon.parentNode) document.head.appendChild(icon);
     document.title = 'ERD Tool';
-    return () => { document.title = previousTitle; };
+    return () => {
+      document.title = previousTitle;
+      if (previousIcon) icon.setAttribute('href', previousIcon);
+    };
   }, [buttonOnlyPage]);
 
   useEffect(() => {
