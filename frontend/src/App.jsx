@@ -1286,7 +1286,7 @@ export default function App() {
   useEffect(() => {
     if (!buttonOnlyPage) return undefined;
     const previousTitle = document.title;
-    document.title = 'ERD BUTTON';
+    document.title = 'ERD Tool';
     return () => { document.title = previousTitle; };
   }, [buttonOnlyPage]);
 

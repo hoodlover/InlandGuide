@@ -92,18 +92,18 @@ export default function ErdBridgeButton({ standalone = false }) {
 
   return (
     <>
-      {standalone ? <p className="fixed left-1/2 top-[calc(50%-67px)] z-[80] -translate-x-1/2 whitespace-nowrap text-xs font-extrabold text-white">1. Open booking in S8100</p> : null}
+      {standalone ? <p className="fixed left-1/2 top-[calc(50%-78px)] z-[80] -translate-x-1/2 whitespace-nowrap text-xs font-extrabold text-white">1. Open booking in S8100</p> : null}
       <button
         type="button"
         onClick={readAndCalculate}
         disabled={state.loading}
-        className={`${standalone ? 'fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2' : 'fixed bottom-5 right-5'} z-[80] flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-[#EB6608] text-base font-black text-white shadow-[0_10px_28px_rgba(0,45,114,0.45)] transition hover:scale-105 hover:bg-orange-600 disabled:cursor-wait disabled:opacity-70`}
+        className={`${standalone ? 'fixed left-1/2 top-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2' : 'fixed bottom-5 right-5 h-20 w-20'} z-[80] flex items-center justify-center rounded-full bg-transparent p-0 shadow-[0_10px_28px_rgba(0,45,114,0.45)] transition hover:scale-105 disabled:cursor-wait disabled:opacity-70`}
         aria-label="Read the open S8100 booking and calculate ERD and LRD"
         title="Read open S8100 booking"
       >
-        {state.loading ? '···' : 'ERD?'}
+        {state.loading ? <span className="text-2xl font-black text-white">···</span> : <img src="./got-erd-button.webp" alt="Got ERD?" className="h-full w-full object-contain" />}
       </button>
-      {standalone ? <p className="fixed left-1/2 top-[calc(50%+45px)] z-[80] -translate-x-1/2 whitespace-nowrap text-xs font-extrabold text-white">2. Click the ERD button</p> : null}
+      {standalone ? <p className="fixed left-1/2 top-[calc(50%+62px)] z-[80] -translate-x-1/2 whitespace-nowrap text-xs font-extrabold text-white">2. Click the ERD button</p> : null}
 
       {open ? (
         <div className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/45 p-4" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget && !state.loading) close(); }}>
