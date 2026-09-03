@@ -1275,11 +1275,20 @@ export default function App() {
 
   // Simple hash route to the Hapag-Lloyd website mock-up.
   const [hash, setHash] = useState(() => (typeof window !== 'undefined' ? window.location.hash : ''));
+  const buttonOnlyPage = hash === '#erd-button'
+    || window.location.pathname.toLowerCase().endsWith('/erd-button.html');
   useEffect(() => {
     const onHash = () => setHash(window.location.hash);
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
+
+  useEffect(() => {
+    if (!buttonOnlyPage) return undefined;
+    const previousTitle = document.title;
+    document.title = 'ERD BUTTON';
+    return () => { document.title = previousTitle; };
+  }, [buttonOnlyPage]);
 
   useEffect(() => {
     if (pwaInstalled) setInstallOpen(false);
@@ -1291,8 +1300,6 @@ export default function App() {
     return () => window.clearTimeout(timer);
   }, [pwaInstalled, userName, userEmail]);
 
-  const buttonOnlyPage = hash === '#erd-button'
-    || window.location.pathname.toLowerCase().endsWith('/erd-button.html');
   if (buttonOnlyPage) {
     return (
       <main className="min-h-screen bg-[#002D72]">
