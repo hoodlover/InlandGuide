@@ -34,7 +34,7 @@ function resultText(data, result) {
     `Booking ${data.bookingNumber}`,
     `${data.startCity} → ${data.polCity}`,
     `POL: ${data.polLocode}`,
-    `MoT Service: ${data.motService}`,
+    `SSY: ${data.motService}`,
     `Vessel: ${data.vessel}`,
     `Relevant Cutoff: ${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim(),
     '',
@@ -132,7 +132,7 @@ export default function ErdBridgeButton() {
                   <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
                     <span className="font-bold text-slate-500">Booking</span><span className="text-right font-black text-[#002D72]">{state.data.bookingNumber}</span>
                     <span className="font-bold text-slate-500">Route</span><span className="text-right font-bold">{state.data.startCity} → {state.data.polCity}</span>
-                    <span className="font-bold text-slate-500">Service</span><span className="text-right font-bold">{state.data.motService || 'N/A'}</span>
+                    <span className="font-bold text-slate-500">SSY</span><span className="text-right font-bold">{state.data.motService || 'N/A'}</span>
                     <span className="font-bold text-slate-500">Vessel</span><span className="text-right font-bold">{state.data.vessel || 'N/A'}</span>
                     <span className="font-bold text-slate-500">POL cutoff</span><span className="text-right font-bold">{state.data.relevantCutoffDate} {state.data.relevantCutoffTime}</span>
                   </div>
