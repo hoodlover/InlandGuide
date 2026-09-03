@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { calculateERDLRD, getCities, getLoccode, getPortServices } from '../lib/cutoff';
 
 const BRIDGE_URL = 'http://127.0.0.1:47832/s8100-summary';
@@ -96,6 +96,13 @@ export default function ErdBridgeButton({ standalone = false }) {
 
   const close = () => setState({ loading: false, error: '', data: null, result: null, copied: false });
   const open = state.loading || state.error || state.result;
+
+  useEffect(() => {
+    if (!standalone) return;
+    try {
+      window.resizeTo(open ? 540 : 210, open ? 720 : 210);
+    } catch { /* Some managed browsers may keep their current window size. */ }
+  }, [open, standalone]);
 
   return (
     <>
