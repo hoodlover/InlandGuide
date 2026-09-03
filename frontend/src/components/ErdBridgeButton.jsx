@@ -40,15 +40,15 @@ function escapeHtml(value) {
 }
 
 function formattedResult(data, result) {
-  const row = (label, value) => `<tr><td style="padding:8px 10px;border-bottom:1px solid #dbe2ea;font-weight:700">${label}</td><td style="padding:8px 10px;border-bottom:1px solid #dbe2ea;text-align:right;font-weight:700">${escapeHtml(value)}</td></tr>`;
-  return `<div style="font-family:Arial,sans-serif;width:420px;max-width:100%;box-sizing:border-box;border:5px solid #002d72;border-radius:14px;background:#eb6608;padding:18px;color:#10233f">` +
-    `<div style="display:flex;justify-content:space-between;color:white;font-size:18px;font-weight:800;margin-bottom:10px"><span>${escapeHtml(data.startCity)}</span><span>${escapeHtml(data.polCity)}</span></div>` +
-    `<table style="width:100%;border-collapse:collapse;background:white;border-radius:9px;overflow:hidden;font-size:13px">` +
-    row('Booking', data.bookingNumber) + row('Vessel', data.vessel || 'N/A') + row('Earliest Return Date (ERD)', result.erd) +
-    row('Latest Return Date (LRD)', result.lrd) + row('Ramp Cut Time', result.rampCutTime) +
-    row('Relevant Cutoff', `${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim()) +
+  const row = (label, value) => `<tr><td style="padding:5px 8px;border-bottom:1px solid #dbe2ea;font-weight:700;white-space:nowrap">${label}</td><td style="padding:5px 8px;border-bottom:1px solid #dbe2ea;text-align:right;font-weight:700;white-space:nowrap">${escapeHtml(value)}</td></tr>`;
+  return `<div style="font-family:Arial,sans-serif;width:380px;max-width:100%;box-sizing:border-box;border:4px solid #002d72;border-radius:11px;background:#eb6608;padding:11px;color:#10233f">` +
+    `<div style="display:flex;justify-content:space-between;gap:8px;color:white;font-size:13px;font-weight:800;margin-bottom:7px;white-space:nowrap"><span>${escapeHtml(data.startCity)}</span><span>${escapeHtml(data.polCity)}</span></div>` +
+    `<table style="width:100%;border-collapse:collapse;background:white;border-radius:7px;overflow:hidden;font-size:11px;line-height:1.25">` +
+    row('Booking', data.bookingNumber) + row('Vessel', data.vessel || 'N/A') + row('ERD', result.erd) +
+    row('LRD', result.lrd) + row('Ramp Cut', result.rampCutTime) +
+    row('Cutoff', `${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim()) +
     row('Departure Terminal', data.departureTerminal || 'N/A') + `</table>` +
-    `<div style="margin-top:10px;text-align:right;color:#002d72;font-size:18px;font-weight:800">Hapag-Lloyd</div></div>`;
+    `<div style="margin-top:6px;text-align:right;color:#002d72;font-size:12px;font-weight:800">Hapag-Lloyd</div></div>`;
 }
 
 export default function ErdBridgeButton({ standalone = false }) {
