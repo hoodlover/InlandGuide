@@ -2,6 +2,17 @@ import React, { useState } from 'react';
 import { calculateERDLRD, getCities, getLoccode, getPortServices } from '../lib/cutoff';
 
 const BRIDGE_URL = 'http://127.0.0.1:47832/s8100-summary';
+const BRIDGE_CLIPBOARD_URL = 'http://127.0.0.1:47832/erd-clipboard';
+
+async function copyThroughBridge(text) {
+  const response = await fetch(BRIDGE_CLIPBOARD_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+    body: text,
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok || !payload.ok) throw new Error(payload.error || 'The local bridge could not update the clipboard.');
+}
 
 function toIsoDate(value) {
   const match = String(value || '').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
@@ -56,7 +67,7 @@ export default function ErdBridgeButton() {
       const text = resultText({ ...data, startCity }, result);
       let copied = false;
       try {
-        await navigator.clipboard.writeText(text);
+        await copyThroughBridge(text);
         copied = true;
       } catch { /* The confirmation remains available with a manual Copy button. */ }
       setState({ loading: false, error: '', data: { ...data, startCity }, result, copied });
@@ -75,10 +86,10 @@ export default function ErdBridgeButton() {
   const copyAgain = async () => {
     if (!state.data || !state.result) return;
     try {
-      await navigator.clipboard.writeText(resultText(state.data, state.result));
+      await copyThroughBridge(resultText(state.data, state.result));
       setState(current => ({ ...current, copied: true }));
     } catch {
-      setState(current => ({ ...current, error: 'Clipboard access was blocked; select and copy the confirmation manually.' }));
+      setState(current => ({ ...current, error: 'The local bridge could not update the clipboard. Restart V5.3 and try again.' }));
     }
   };
 
