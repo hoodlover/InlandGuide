@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { calculateERDLRD, getCities, getLoccode, getPortServices } from '../lib/cutoff';
+import { calculateFromLiveMaster, loadLiveMaster } from '../lib/liveMaster';
 
 const BRIDGE_URL = 'http://127.0.0.1:47832/s8100-summary';
 const BRIDGE_CLIPBOARD_URL = 'http://127.0.0.1:47832/erd-clipboard';
@@ -18,15 +18,6 @@ function toIsoDate(value) {
   const match = String(value || '').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (!match) return '';
   return `${match[3]}-${match[1].padStart(2, '0')}-${match[2].padStart(2, '0')}`;
-}
-
-function resolveStartCity(pol, bridgeData) {
-  const cities = getCities(pol);
-  const wantedName = String(bridgeData.startCity || '').trim().toUpperCase();
-  const wantedCode = String(bridgeData.startLocode || '').trim().toUpperCase();
-  return cities.find(city => String(city).trim().toUpperCase() === wantedName)
-    || cities.find(city => String(getLoccode(city)).trim().toUpperCase() === wantedCode)
-    || '';
 }
 
 function resultText(data, result) {
@@ -56,22 +47,17 @@ export default function ErdBridgeButton({ standalone = false }) {
       if (!response.ok || !data.ok) throw new Error(data.error || 'The local ERD bridge did not respond.');
 
       const pol = String(data.polLocode || '').trim().toUpperCase();
-      const startCity = resolveStartCity(pol, data);
-      if (!startCity) throw new Error(`The live cutoff data has no ${data.startCity || data.startLocode} → ${pol} lane.`);
-      const services = getPortServices(pol);
-      const service = services.length === 1 && services[0] === 'ALL' ? 'ALL' : data.motService;
       const cutoffDate = toIsoDate(data.relevantCutoffDate);
       if (!cutoffDate) throw new Error(`FIS returned an unreadable cutoff date: ${data.relevantCutoffDate || 'blank'}.`);
-
-      const result = calculateERDLRD(pol, startCity, service, cutoffDate, 'N', 0);
-      if (result.error) throw new Error(`${result.error}: ${startCity} → ${pol} (${service || 'no service'}).`);
+      const live = await loadLiveMaster();
+      const { startCity, result } = calculateFromLiveMaster(live, data, cutoffDate);
       const text = resultText({ ...data, startCity }, result);
       let copied = false;
       try {
         await copyThroughBridge(text);
         copied = true;
       } catch { /* The confirmation remains available with a manual Copy button. */ }
-      setState({ loading: false, error: '', data: { ...data, startCity }, result, copied });
+      setState({ loading: false, error: '', data: { ...data, startCity, liveSource: live.source, liveModified: live.modified }, result, copied });
     } catch (error) {
       const offline = error instanceof TypeError;
       setState({
@@ -100,12 +86,13 @@ export default function ErdBridgeButton({ standalone = false }) {
   useEffect(() => {
     if (!standalone) return;
     try {
-      window.resizeTo(open ? 540 : 210, open ? 720 : 210);
+      window.resizeTo(open ? 540 : 250, open ? 720 : 230);
     } catch { /* Some managed browsers may keep their current window size. */ }
   }, [open, standalone]);
 
   return (
     <>
+      {standalone ? <p className="fixed left-1/2 top-[calc(50%-67px)] z-[80] -translate-x-1/2 whitespace-nowrap text-xs font-extrabold text-white">1. Open booking in S8100</p> : null}
       <button
         type="button"
         onClick={readAndCalculate}
@@ -116,6 +103,7 @@ export default function ErdBridgeButton({ standalone = false }) {
       >
         {state.loading ? '···' : 'ERD?'}
       </button>
+      {standalone ? <p className="fixed left-1/2 top-[calc(50%+45px)] z-[80] -translate-x-1/2 whitespace-nowrap text-xs font-extrabold text-white">2. Click the ERD button</p> : null}
 
       {open ? (
         <div className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/45 p-4" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget && !state.loading) close(); }}>
@@ -144,6 +132,7 @@ export default function ErdBridgeButton({ standalone = false }) {
                     <span className="font-bold text-slate-500">Vessel</span><span className="text-right font-bold">{state.data.vessel || 'N/A'}</span>
                     <span className="font-bold text-slate-500">POL cutoff</span><span className="text-right font-bold">{state.data.relevantCutoffDate} {state.data.relevantCutoffTime}</span>
                     <span className="font-bold text-slate-500">Departure terminal</span><span className="text-right font-bold">{state.data.departureTerminal || 'N/A'}</span>
+                    <span className="font-bold text-slate-500">Data</span><span className="text-right text-xs font-bold">Live Z: master{state.data.liveModified ? ` · ${state.data.liveModified}` : ''}</span>
                   </div>
                   <div className="rounded-xl bg-[#EB6608] p-4 text-white shadow-inner">
                     <div className="flex justify-between gap-4"><span className="font-bold">ERD</span><strong className="text-lg">{state.result.erd}</strong></div>
