@@ -37,6 +37,7 @@ function resultText(data, result) {
     `SSY: ${data.motService}`,
     `Vessel: ${data.vessel}`,
     `Relevant Cutoff: ${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim(),
+    `Departure Terminal: ${data.departureTerminal || 'N/A'}`,
     '',
     `ERD: ${result.erd}`,
     `LRD: ${result.lrd}`,
@@ -44,7 +45,7 @@ function resultText(data, result) {
   ].join('\n');
 }
 
-export default function ErdBridgeButton() {
+export default function ErdBridgeButton({ standalone = false }) {
   const [state, setState] = useState({ loading: false, error: '', data: null, result: null, copied: false });
 
   const readAndCalculate = async () => {
@@ -102,7 +103,7 @@ export default function ErdBridgeButton() {
         type="button"
         onClick={readAndCalculate}
         disabled={state.loading}
-        className="fixed bottom-5 right-5 z-[80] flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-[#EB6608] text-base font-black text-white shadow-[0_10px_28px_rgba(0,45,114,0.45)] transition hover:scale-105 hover:bg-orange-600 disabled:cursor-wait disabled:opacity-70"
+        className={`${standalone ? 'fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2' : 'fixed bottom-5 right-5'} z-[80] flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-[#EB6608] text-base font-black text-white shadow-[0_10px_28px_rgba(0,45,114,0.45)] transition hover:scale-105 hover:bg-orange-600 disabled:cursor-wait disabled:opacity-70`}
         aria-label="Read the open S8100 booking and calculate ERD and LRD"
         title="Read open S8100 booking"
       >
@@ -135,6 +136,7 @@ export default function ErdBridgeButton() {
                     <span className="font-bold text-slate-500">SSY</span><span className="text-right font-bold">{state.data.motService || 'N/A'}</span>
                     <span className="font-bold text-slate-500">Vessel</span><span className="text-right font-bold">{state.data.vessel || 'N/A'}</span>
                     <span className="font-bold text-slate-500">POL cutoff</span><span className="text-right font-bold">{state.data.relevantCutoffDate} {state.data.relevantCutoffTime}</span>
+                    <span className="font-bold text-slate-500">Departure terminal</span><span className="text-right font-bold">{state.data.departureTerminal || 'N/A'}</span>
                   </div>
                   <div className="rounded-xl bg-[#EB6608] p-4 text-white shadow-inner">
                     <div className="flex justify-between gap-4"><span className="font-bold">ERD</span><strong className="text-lg">{state.result.erd}</strong></div>

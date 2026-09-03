@@ -1291,6 +1291,16 @@ export default function App() {
     return () => window.clearTimeout(timer);
   }, [pwaInstalled, userName, userEmail]);
 
+  const buttonOnlyPage = hash === '#erd-button'
+    || window.location.pathname.toLowerCase().endsWith('/erd-button.html');
+  if (buttonOnlyPage) {
+    return (
+      <main className="min-h-screen bg-[#002D72]">
+        <ErdBridgeButton standalone />
+      </main>
+    );
+  }
+
   if (hash === '#vintage-ERD-tool') {
     return <HlMockup />;
   }
