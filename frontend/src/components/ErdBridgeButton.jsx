@@ -25,8 +25,6 @@ function resultText(data, result) {
   return [
     `Booking ${data.bookingNumber}`,
     `${data.startCity} → ${data.polCity}`,
-    `POL: ${data.polLocode}`,
-    `SSY: ${data.motService}`,
     `Vessel: ${data.vessel}`,
     `Relevant Cutoff: ${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim(),
     `Departure Terminal: ${data.departureTerminal || 'N/A'}`,
@@ -42,20 +40,22 @@ function escapeHtml(value) {
 }
 
 function formattedResult(data, result) {
-  return `<div style="font-family:Arial,sans-serif;color:#10233f">` +
-    `<div style="font-size:18px;font-weight:700;color:#002d72">Booking ${escapeHtml(data.bookingNumber)}</div>` +
-    `<div style="margin:6px 0 12px">${escapeHtml(data.startCity)} &rarr; ${escapeHtml(data.polCity)}</div>` +
-    `<div style="border-left:5px solid #eb6608;padding:8px 12px;background:#f5f7fb">` +
-    `<b>ERD:</b> ${escapeHtml(result.erd)}<br><b>LRD:</b> ${escapeHtml(result.lrd)}<br>` +
-    `<b>Ramp Cut Time:</b> ${escapeHtml(result.rampCutTime)}<br><b>POL Cutoff:</b> ${escapeHtml(data.relevantCutoffDate)} ${escapeHtml(data.relevantCutoffTime)}<br>` +
-    `<b>Departure Terminal:</b> ${escapeHtml(data.departureTerminal || 'N/A')}</div></div>`;
+  const row = (label, value) => `<tr><td style="padding:8px 10px;border-bottom:1px solid #dbe2ea;font-weight:700">${label}</td><td style="padding:8px 10px;border-bottom:1px solid #dbe2ea;text-align:right;font-weight:700">${escapeHtml(value)}</td></tr>`;
+  return `<div style="font-family:Arial,sans-serif;width:420px;max-width:100%;box-sizing:border-box;border:5px solid #002d72;border-radius:14px;background:#eb6608;padding:18px;color:#10233f">` +
+    `<div style="display:flex;justify-content:space-between;color:white;font-size:18px;font-weight:800;margin-bottom:10px"><span>${escapeHtml(data.startCity)}</span><span>${escapeHtml(data.polCity)}</span></div>` +
+    `<table style="width:100%;border-collapse:collapse;background:white;border-radius:9px;overflow:hidden;font-size:13px">` +
+    row('Booking', data.bookingNumber) + row('Vessel', data.vessel || 'N/A') + row('Earliest Return Date (ERD)', result.erd) +
+    row('Latest Return Date (LRD)', result.lrd) + row('Ramp Cut Time', result.rampCutTime) +
+    row('Relevant Cutoff', `${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim()) +
+    row('Departure Terminal', data.departureTerminal || 'N/A') + `</table>` +
+    `<div style="margin-top:10px;text-align:right;color:#002d72;font-size:18px;font-weight:800">Hapag-Lloyd</div></div>`;
 }
 
 export default function ErdBridgeButton({ standalone = false }) {
-  const [state, setState] = useState({ loading: false, error: '', data: null, result: null, copied: false });
+  const [state, setState] = useState({ loading: false, error: '', data: null, result: null, copied: false, previewFormat: '' });
 
   const readAndCalculate = async () => {
-    setState({ loading: true, error: '', data: null, result: null, copied: false });
+    setState({ loading: true, error: '', data: null, result: null, copied: false, previewFormat: '' });
     try {
       const response = await fetch(BRIDGE_URL, { cache: 'no-store' });
       const data = await response.json().catch(() => ({}));
@@ -74,7 +74,7 @@ export default function ErdBridgeButton({ standalone = false }) {
       } catch { /* The confirmation remains available with a manual Copy button. */ }
       const saved = { data: { ...data, startCity, liveSource: live.source, liveModified: live.modified }, result, savedAt: new Date().toISOString() };
       try { localStorage.setItem(LAST_RESULT_KEY, JSON.stringify(saved)); } catch { /* Last-result convenience is optional. */ }
-      setState({ loading: false, error: '', data: saved.data, result, copied });
+      setState({ loading: false, error: '', data: saved.data, result, copied, previewFormat: '' });
     } catch (error) {
       const offline = error instanceof TypeError;
       setState({
@@ -82,7 +82,7 @@ export default function ErdBridgeButton({ standalone = false }) {
         error: offline ? 'Start ERD Screen Bridge V5, open the S8100 Routing tab, and try again.' : error.message,
         data: null,
         result: null,
-        copied: false,
+        copied: false, previewFormat: '',
       });
     }
   };
@@ -91,7 +91,7 @@ export default function ErdBridgeButton({ standalone = false }) {
     if (!state.data || !state.result) return;
     try {
       await copyThroughBridge(resultText(state.data, state.result));
-      setState(current => ({ ...current, copied: true }));
+      setState(current => ({ ...current, copied: true, previewFormat: 'text' }));
     } catch {
       setState(current => ({ ...current, error: 'The local bridge could not update the clipboard. Restart V5.3 and try again.' }));
     }
@@ -106,20 +106,20 @@ export default function ErdBridgeButton({ standalone = false }) {
         'text/plain': new Blob([text], { type: 'text/plain' }),
         'text/html': new Blob([html], { type: 'text/html' }),
       })]);
-      setState(current => ({ ...current, copied: true }));
+      setState(current => ({ ...current, copied: true, previewFormat: 'formatted' }));
     } catch {
       setState(current => ({ ...current, error: 'Formatted copy needs clipboard permission. Choose Allow once, then click Copy formatted again.' }));
     }
   };
 
-  const close = () => setState({ loading: false, error: '', data: null, result: null, copied: false });
+  const close = () => setState({ loading: false, error: '', data: null, result: null, copied: false, previewFormat: '' });
   const showLastResult = () => {
     try {
       const saved = JSON.parse(localStorage.getItem(LAST_RESULT_KEY) || 'null');
       if (!saved?.data || !saved?.result) throw new Error();
-      setState({ loading: false, error: '', data: saved.data, result: saved.result, copied: true });
+      setState({ loading: false, error: '', data: saved.data, result: saved.result, copied: true, previewFormat: '' });
     } catch {
-      setState({ loading: false, error: 'No previous ERD result has been saved on this computer yet.', data: null, result: null, copied: false });
+      setState({ loading: false, error: 'No previous ERD result has been saved on this computer yet.', data: null, result: null, copied: false, previewFormat: '' });
     }
   };
   const open = state.loading || state.error || state.result;
@@ -149,7 +149,7 @@ export default function ErdBridgeButton({ standalone = false }) {
 
       {open ? (
         <div className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/45 p-4" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget && !state.loading) close(); }}>
-          <section className="w-full max-w-md overflow-hidden rounded-2xl border-4 border-[#002D72] bg-white shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="erd-bridge-title">
+          <section className="max-h-[calc(100vh-2rem)] w-full max-w-md overflow-y-auto rounded-2xl border-4 border-[#002D72] bg-white shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="erd-bridge-title">
             <header className="flex items-center justify-between bg-[#002D72] px-5 py-4 text-white">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-300">Live S8100</p>
@@ -170,9 +170,8 @@ export default function ErdBridgeButton({ standalone = false }) {
                   <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
                     <span className="font-bold text-slate-500">Booking</span><span className="text-right font-black text-[#002D72]">{state.data.bookingNumber}</span>
                     <span className="font-bold text-slate-500">Route</span><span className="text-right font-bold">{state.data.startCity} → {state.data.polCity}</span>
-                    <span className="font-bold text-slate-500">SSY</span><span className="text-right font-bold">{state.data.motService || 'N/A'}</span>
                     <span className="font-bold text-slate-500">Vessel</span><span className="text-right font-bold">{state.data.vessel || 'N/A'}</span>
-                    <span className="font-bold text-slate-500">POL cutoff</span><span className="text-right font-bold">{state.data.relevantCutoffDate} {state.data.relevantCutoffTime}</span>
+                    <span className="font-bold text-slate-500">Relevant cutoff</span><span className="text-right font-bold">{state.data.relevantCutoffDate} {state.data.relevantCutoffTime}</span>
                     <span className="font-bold text-slate-500">Departure terminal</span><span className="text-right font-bold">{state.data.departureTerminal || 'N/A'}</span>
                     <span className="font-bold text-slate-500">Data</span><span className="text-right text-xs font-bold">Live Z: master{state.data.liveModified ? ` · ${state.data.liveModified}` : ''}</span>
                   </div>
@@ -186,6 +185,16 @@ export default function ErdBridgeButton({ standalone = false }) {
                     <button type="button" onClick={copyFormatted} className="rounded-xl bg-[#EB6608] px-3 py-3 text-sm font-bold text-white hover:bg-orange-600">✨ Copy formatted</button>
                     <button type="button" onClick={copyAgain} className="rounded-xl bg-[#002D72] px-3 py-3 text-sm font-bold text-white hover:bg-blue-950">Copy text</button>
                   </div>
+                  {state.previewFormat ? (
+                    <section className="rounded-xl border-2 border-emerald-400 bg-emerald-50 p-3">
+                      <p className="mb-2 font-black text-emerald-700">✓ {state.previewFormat === 'formatted' ? 'Formatted' : 'Text'} copy ready to paste</p>
+                      {state.previewFormat === 'formatted' ? (
+                        <div className="max-h-72 overflow-auto rounded-lg bg-white p-2" dangerouslySetInnerHTML={{ __html: formattedResult(state.data, state.result) }} />
+                      ) : (
+                        <pre className="max-h-72 overflow-auto whitespace-pre-wrap rounded-lg bg-white p-3 text-xs text-slate-800">{resultText(state.data, state.result)}</pre>
+                      )}
+                    </section>
+                  ) : null}
                 </div>
               ) : null}
             </div>

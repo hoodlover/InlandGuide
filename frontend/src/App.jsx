@@ -1290,7 +1290,7 @@ export default function App() {
     const previousIcon = icon.getAttribute('href');
     icon.setAttribute('rel', 'icon');
     icon.setAttribute('type', 'image/x-icon');
-    icon.setAttribute('href', '/favicon.ico?v=18');
+    icon.setAttribute('href', '/favicon.ico?v=19');
     if (!icon.parentNode) document.head.appendChild(icon);
     document.title = 'ERD Tool';
     return () => {
