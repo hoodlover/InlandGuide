@@ -155,7 +155,7 @@ export default function ErdBridgeButton({ standalone = false }) {
   useEffect(() => {
     if (!standalone) return;
     try {
-      if (!open && !manualOpen) window.resizeTo(250, 275);
+      if (!open && !manualOpen) window.resizeTo(250, 295);
       else if (manualOpen) window.resizeTo(430, 610);
       else if (state.previewFormat) window.resizeTo(460, 720);
       else if (state.loading) window.resizeTo(420, 330);
