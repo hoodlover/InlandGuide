@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { calculateFromLiveMaster, loadLiveMaster } from '../lib/liveMaster';
+import { hapagLogoDataUri } from '../assets/hapag-logo-clipboard';
 
 const BRIDGE_URL = 'http://127.0.0.1:47832/s8100-summary';
 const BRIDGE_CLIPBOARD_URL = 'http://127.0.0.1:47832/erd-clipboard';
@@ -24,13 +25,14 @@ function toIsoDate(value) {
 function resultText(data, result) {
   return [
     `Booking ${data.bookingNumber}`,
-    `${data.startCity} → ${data.polCity}`,
-    `${result.returnTerminal || 'N/A'} → ${data.departureTerminal || 'N/A'}`,
-    `Vessel: ${data.vessel}`,
-    `Port Cutoff: ${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim(),
-    '',
     `ERD: ${result.erd}`,
     `LRD: ${result.lrd} · ${result.rampCutTime}`,
+    '',
+    `${data.startCity} → ${data.polCity}`,
+    `Return Terminal: ${result.returnTerminal || 'N/A'}`,
+    `Vessel: ${data.vessel}`,
+    `Departure Terminal: ${data.departureTerminal || 'N/A'}`,
+    `Port Cutoff: ${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim(),
   ].join('\n');
 }
 
@@ -40,7 +42,7 @@ function escapeHtml(value) {
 
 function formattedResult(data, result) {
   const row = (label, value) => `<tr><td style="padding:5px 8px;border-bottom:1px solid #dbe2ea;font-weight:700;white-space:nowrap">${label}</td><td style="padding:5px 8px;border-bottom:1px solid #dbe2ea;text-align:right;font-weight:700;white-space:nowrap">${escapeHtml(value)}</td></tr>`;
-  return `<div style="font-family:Arial,sans-serif;width:380px;max-width:100%;box-sizing:border-box;border:4px solid #002d72;border-radius:11px;background:#eb6608;padding:11px;color:#10233f">` +
+  return `<div style="font-family:Arial,sans-serif;width:340px;max-width:100%;box-sizing:border-box;border:4px solid #002d72;border-radius:11px;background:#eb6608;padding:10px;color:#10233f">` +
     `<div style="display:grid;grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr);align-items:start;gap:5px;color:white;margin-bottom:7px">` +
     `<div><div style="font-size:11px;font-weight:800;white-space:nowrap">${escapeHtml(data.startCity)}</div><div style="font-size:8px;line-height:1.15;margin-top:2px">${escapeHtml(result.returnTerminal || '')}</div></div>` +
     `<div style="font-size:14px;font-weight:900;text-align:center">&rarr;</div>` +
@@ -49,7 +51,16 @@ function formattedResult(data, result) {
     row('Booking', data.bookingNumber) + row('Vessel', data.vessel || 'N/A') + row('ERD', result.erd) +
     row('LRD', `${result.lrd} · ${result.rampCutTime}`) +
     row('Port Cutoff', `${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim()) + `</table>` +
-    `<div style="margin-top:6px;text-align:right;color:#002d72;font-size:12px;font-weight:800">Hapag-Lloyd</div></div>`;
+    `<div style="margin-top:6px;text-align:right"><img src="${hapagLogoDataUri}" alt="Hapag-Lloyd" style="display:inline-block;width:105px;height:auto"></div></div>`;
+}
+
+async function copyFormattedToClipboard(data, result) {
+  const text = resultText(data, result);
+  const html = formattedResult(data, result);
+  await navigator.clipboard.write([new ClipboardItem({
+    'text/plain': new Blob([text], { type: 'text/plain' }),
+    'text/html': new Blob([html], { type: 'text/html' }),
+  })]);
 }
 
 export default function ErdBridgeButton({ standalone = false }) {
@@ -69,13 +80,17 @@ export default function ErdBridgeButton({ standalone = false }) {
       const { startCity, result } = calculateFromLiveMaster(live, data, cutoffDate);
       const text = resultText({ ...data, startCity }, result);
       let copied = false;
+      let previewFormat = '';
       try {
-        await copyThroughBridge(text);
+        await copyFormattedToClipboard({ ...data, startCity }, result);
         copied = true;
-      } catch { /* The confirmation remains available with a manual Copy button. */ }
+        previewFormat = 'formatted';
+      } catch {
+        try { await copyThroughBridge(text); copied = true; previewFormat = 'text'; } catch { /* Manual copy remains available. */ }
+      }
       const saved = { data: { ...data, startCity, liveSource: live.source, liveModified: live.modified }, result, savedAt: new Date().toISOString() };
       try { localStorage.setItem(LAST_RESULT_KEY, JSON.stringify(saved)); } catch { /* Last-result convenience is optional. */ }
-      setState({ loading: false, error: '', data: saved.data, result, copied, previewFormat: '' });
+      setState({ loading: false, error: '', data: saved.data, result, copied, previewFormat });
     } catch (error) {
       const offline = error instanceof TypeError;
       setState({
@@ -101,12 +116,7 @@ export default function ErdBridgeButton({ standalone = false }) {
   const copyFormatted = async () => {
     if (!state.data || !state.result) return;
     try {
-      const text = resultText(state.data, state.result);
-      const html = formattedResult(state.data, state.result);
-      await navigator.clipboard.write([new ClipboardItem({
-        'text/plain': new Blob([text], { type: 'text/plain' }),
-        'text/html': new Blob([html], { type: 'text/html' }),
-      })]);
+      await copyFormattedToClipboard(state.data, state.result);
       setState(current => ({ ...current, copied: true, previewFormat: 'formatted' }));
     } catch {
       setState(current => ({ ...current, error: 'Formatted copy needs clipboard permission. Choose Allow once, then click Copy formatted again.' }));
