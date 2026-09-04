@@ -1311,7 +1311,7 @@ export default function App() {
 
   if (buttonOnlyPage) {
     return (
-      <main className="min-h-screen bg-[#002D72]">
+      <main className="min-h-screen bg-[#111318]">
         <ErdBridgeButton standalone />
       </main>
     );
