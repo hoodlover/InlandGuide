@@ -48,8 +48,8 @@ function formattedResult(data, result) {
     `<div style="font-size:14px;font-weight:900;text-align:center">&rarr;</div>` +
     `<div><div style="font-size:11px;font-weight:800;text-align:right;white-space:nowrap">${escapeHtml(data.polCity)}</div><div style="font-size:8px;line-height:1.15;margin-top:2px;text-align:right">${escapeHtml(data.departureTerminal || '')}</div></div></div>` +
     `<table style="width:100%;border-collapse:collapse;background:white;border-radius:7px;overflow:hidden;font-size:11px;line-height:1.25">` +
-    row('Booking', data.bookingNumber) + row('Vessel', data.vessel || 'N/A') + row('ERD', result.erd) +
-    row('LRD', `${result.lrd} · ${result.rampCutTime}`) +
+    row('Booking', data.bookingNumber) + row('ERD', result.erd) +
+    row('LRD', `${result.lrd} · ${result.rampCutTime}`) + row('Vessel', data.vessel || 'N/A') +
     row('Port Cutoff', `${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim()) + `</table>` +
     `<div style="margin-top:6px;text-align:right"><img src="${hapagLogoDataUri}" alt="Hapag-Lloyd" style="display:inline-block;width:105px;height:auto"></div></div>`;
 }
