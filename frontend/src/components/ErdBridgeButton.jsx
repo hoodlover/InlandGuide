@@ -53,7 +53,6 @@ function resultText(data, result) {
     '',
     `${data.startCity} → ${data.polCity}`,
     `Return Terminal: ${compactRailName(result.returnTerminal) || 'N/A'}`,
-    data.canadianRail ? `Rail: ${data.canadianRail}` : '',
     result.isReefer ? 'Equipment: Reefer' : '',
     data.vessel ? `Vessel: ${data.vessel}` : '',
     data.departureTerminal ? `Departure Terminal: ${data.departureTerminal}` : '',
@@ -74,7 +73,6 @@ function formattedResult(data, result) {
     `</div><div style="overflow:hidden;border-radius:7px;background:white">` +
     row('Booking', data.bookingNumber) + row('ERD', result.erd) +
     row('LRD', withTime(result.lrd, result.rampCutTime)) + (data.vessel ? row('Vessel', data.vessel) : '') +
-    (data.canadianRail ? row('Rail', data.canadianRail) : '') +
     (result.isReefer ? row('Equipment', 'Reefer') : '') +
     row('Port Cutoff', `${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim()) + `</div>` +
     `<div style="margin-top:5px;text-align:right"><img src="${hapagLogoDataUri}" alt="Hapag-Lloyd" style="display:inline-block;width:78px;height:auto"></div></div>`;
@@ -306,10 +304,9 @@ export default function ErdBridgeButton({ standalone = false }) {
                     <span className="font-bold text-slate-500">Booking</span><span className="text-right font-black text-[#002D72]">{state.data.bookingNumber}</span>
                     <span className="font-bold text-slate-500">Route</span><span className="text-right font-bold">{state.data.startCity} → {state.data.polCity}<small className="mt-0.5 block whitespace-nowrap text-[10px] font-semibold text-slate-500">{compactRailName(state.result.returnTerminal) || 'N/A'} → {state.data.departureTerminal || 'N/A'}</small></span>
                     {state.data.vessel ? <><span className="font-bold text-slate-500">Vessel</span><span className="text-right font-bold">{state.data.vessel}</span></> : null}
-                    {state.data.canadianRail ? <><span className="font-bold text-slate-500">Rail</span><span className="text-right font-bold">{state.data.canadianRail}<small className="mt-0.5 block text-[10px] font-semibold text-slate-500">{state.data.customerPlace}</small></span></> : null}
                     {state.result.isReefer ? <><span className="font-bold text-slate-500">Equipment</span><span className="text-right font-bold">Reefer</span></> : null}
                     <span className="font-bold text-slate-500">Port cutoff</span><span className="text-right font-bold">{state.data.relevantCutoffDate} {state.data.relevantCutoffTime}</span>
-                    <span className="font-bold text-slate-500">Data</span><span className="text-right text-[11px] font-bold">Live master updated{state.data.liveModified ? ` ${shortModifiedDate(state.data.liveModified)}` : ''}</span>
+                    <span className="font-bold text-slate-500">Data</span><span className="whitespace-nowrap text-right text-[11px] font-bold">Live master updated{state.data.liveModified ? ` ${shortModifiedDate(state.data.liveModified)}` : ''}</span>
                   </div>
                   <div className="rounded-lg bg-[#EB6608] px-3 py-2.5 text-sm text-white shadow-inner">
                     <div className="flex justify-between gap-3"><span className="font-bold">ERD</span><strong>{state.result.erd}</strong></div>
