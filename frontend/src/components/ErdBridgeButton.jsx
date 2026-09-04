@@ -25,13 +25,13 @@ function resultText(data, result) {
   return [
     `Booking ${data.bookingNumber}`,
     `${data.startCity} → ${data.polCity}`,
+    `Return Terminal: ${result.returnTerminal || 'N/A'}`,
     `Vessel: ${data.vessel}`,
-    `Relevant Cutoff: ${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim(),
+    `Port Cutoff: ${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim(),
     `Departure Terminal: ${data.departureTerminal || 'N/A'}`,
     '',
     `ERD: ${result.erd}`,
-    `LRD: ${result.lrd}`,
-    `Ramp Cut Time: ${result.rampCutTime}`,
+    `LRD: ${result.lrd} · ${result.rampCutTime}`,
   ].join('\n');
 }
 
@@ -42,11 +42,14 @@ function escapeHtml(value) {
 function formattedResult(data, result) {
   const row = (label, value) => `<tr><td style="padding:5px 8px;border-bottom:1px solid #dbe2ea;font-weight:700;white-space:nowrap">${label}</td><td style="padding:5px 8px;border-bottom:1px solid #dbe2ea;text-align:right;font-weight:700;white-space:nowrap">${escapeHtml(value)}</td></tr>`;
   return `<div style="font-family:Arial,sans-serif;width:380px;max-width:100%;box-sizing:border-box;border:4px solid #002d72;border-radius:11px;background:#eb6608;padding:11px;color:#10233f">` +
-    `<div style="display:flex;justify-content:space-between;gap:8px;color:white;font-size:13px;font-weight:800;margin-bottom:7px;white-space:nowrap"><span>${escapeHtml(data.startCity)}</span><span>${escapeHtml(data.polCity)}</span></div>` +
+    `<div style="display:grid;grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr);align-items:start;gap:5px;color:white;margin-bottom:7px">` +
+    `<div><div style="font-size:11px;font-weight:800;white-space:nowrap">${escapeHtml(data.startCity)}</div><div style="font-size:8px;line-height:1.15;margin-top:2px">${escapeHtml(result.returnTerminal || '')}</div></div>` +
+    `<div style="font-size:14px;font-weight:900;text-align:center">&rarr;</div>` +
+    `<div style="font-size:11px;font-weight:800;text-align:right;white-space:nowrap">${escapeHtml(data.polCity)}</div></div>` +
     `<table style="width:100%;border-collapse:collapse;background:white;border-radius:7px;overflow:hidden;font-size:11px;line-height:1.25">` +
     row('Booking', data.bookingNumber) + row('Vessel', data.vessel || 'N/A') + row('ERD', result.erd) +
-    row('LRD', result.lrd) + row('Ramp Cut', result.rampCutTime) +
-    row('Cutoff', `${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim()) +
+    row('LRD', `${result.lrd} · ${result.rampCutTime}`) +
+    row('Port Cutoff', `${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim()) +
     row('Departure Terminal', data.departureTerminal || 'N/A') + `</table>` +
     `<div style="margin-top:6px;text-align:right;color:#002d72;font-size:12px;font-weight:800">Hapag-Lloyd</div></div>`;
 }
@@ -171,14 +174,13 @@ export default function ErdBridgeButton({ standalone = false }) {
                     <span className="font-bold text-slate-500">Booking</span><span className="text-right font-black text-[#002D72]">{state.data.bookingNumber}</span>
                     <span className="font-bold text-slate-500">Route</span><span className="text-right font-bold">{state.data.startCity} → {state.data.polCity}</span>
                     <span className="font-bold text-slate-500">Vessel</span><span className="text-right font-bold">{state.data.vessel || 'N/A'}</span>
-                    <span className="font-bold text-slate-500">Relevant cutoff</span><span className="text-right font-bold">{state.data.relevantCutoffDate} {state.data.relevantCutoffTime}</span>
+                    <span className="font-bold text-slate-500">Port cutoff</span><span className="text-right font-bold">{state.data.relevantCutoffDate} {state.data.relevantCutoffTime}</span>
                     <span className="font-bold text-slate-500">Departure terminal</span><span className="text-right font-bold">{state.data.departureTerminal || 'N/A'}</span>
                     <span className="font-bold text-slate-500">Data</span><span className="text-right text-xs font-bold">Live Z: master{state.data.liveModified ? ` · ${state.data.liveModified}` : ''}</span>
                   </div>
                   <div className="rounded-xl bg-[#EB6608] p-4 text-white shadow-inner">
                     <div className="flex justify-between gap-4"><span className="font-bold">ERD</span><strong className="text-lg">{state.result.erd}</strong></div>
-                    <div className="mt-2 flex justify-between gap-4"><span className="font-bold">LRD</span><strong className="text-lg">{state.result.lrd}</strong></div>
-                    <div className="mt-2 flex justify-between gap-4"><span className="font-bold">Ramp cut</span><strong>{state.result.rampCutTime}</strong></div>
+                    <div className="mt-2 flex justify-between gap-4"><span className="font-bold">LRD</span><strong className="text-lg">{state.result.lrd} · {state.result.rampCutTime}</strong></div>
                   </div>
                   <p className="text-center text-sm font-bold text-emerald-700">{state.copied ? '✓ Already copied to your clipboard' : 'Ready to copy'}</p>
                   <div className="grid grid-cols-2 gap-2">

@@ -10,7 +10,7 @@ function isoFromExcel(serial) {
 }
 
 function readLiveData(workbook) {
-  for (const name of ['DATABASE', 'HOLIDAYS', 'PORTSERVICES']) {
+  for (const name of ['DATABASE', 'HOLIDAYS', 'PORTSERVICES', 'RAILTERMINALS']) {
     if (!workbook.Sheets[name]) throw new Error(`The live workbook is missing its ${name} sheet.`);
   }
 
@@ -46,7 +46,13 @@ function readLiveData(workbook) {
       if (!portServices[pol].includes(service)) portServices[pol].push(service);
     });
   }
-  return { lanes, holidays, portServices };
+  const railTerminals = {};
+  for (const row of XLSX.utils.sheet_to_json(workbook.Sheets.RAILTERMINALS, { header: 1, raw: true })) {
+    const name = String(row[0] || '').trim();
+    const rampMC = String(row[1] || '').trim().toUpperCase();
+    if (name && rampMC && !railTerminals[rampMC]) railTerminals[rampMC] = name;
+  }
+  return { lanes, holidays, portServices, railTerminals };
 }
 
 function toISO(date) {
@@ -109,6 +115,7 @@ export function calculateFromLiveMaster(live, bridgeData, cutoffDate) {
       erd: erd.toLocaleDateString('en-US', { weekday: 'short', month: 'numeric', day: 'numeric' }),
       lrd: lrd.toLocaleDateString('en-US', { weekday: 'short', month: 'numeric', day: 'numeric' }),
       rampCutTime: formatCutTime(lane.rampCutTime), rampMC: lane.rampMC, railroad: railroadFromCode(lane.rampMC),
+      returnTerminal: live.railTerminals[String(lane.rampMC || '').trim().toUpperCase()] || lane.rampMC,
     },
   };
 }
