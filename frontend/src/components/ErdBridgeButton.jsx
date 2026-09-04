@@ -30,16 +30,16 @@ function escapeHtml(value) {
 }
 
 function formattedResult(data, result) {
-  const row = (label, value) => `<div style="padding:4px 7px;border-bottom:1px solid #dbe2ea;background:#fff;font-size:11px;line-height:1.3;white-space:nowrap"><strong>${label}:</strong>&nbsp;&nbsp;${escapeHtml(value)}</div>`;
-  return `<div style="font-family:Arial,sans-serif;width:340px;max-width:100%;box-sizing:border-box;border:4px solid #002d72;border-radius:11px;background:#eb6608;padding:10px;color:#10233f">` +
+  const row = (label, value) => `<div style="padding:4px 6px;border-bottom:1px solid #dbe2ea;background:#fff;font-size:9px;line-height:1.25;white-space:nowrap"><strong>${label}:</strong>&nbsp;${escapeHtml(value)}</div>`;
+  return `<div style="font-family:Arial,sans-serif;width:255px;max-width:100%;box-sizing:border-box;border:3px solid #002d72;border-radius:9px;background:#eb6608;padding:8px;color:#10233f">` +
     `<div style="color:white;margin-bottom:7px;line-height:1.25">` +
-    `<div style="font-size:11px;font-weight:800;white-space:nowrap">${escapeHtml(data.startCity)}&nbsp;&nbsp;&rarr;&nbsp;&nbsp;${escapeHtml(data.polCity)}</div>` +
-    `<div style="font-size:8px;margin-top:2px">${escapeHtml(result.returnTerminal || '')}&nbsp;&nbsp;&rarr;&nbsp;&nbsp;${escapeHtml(data.departureTerminal || '')}</div>` +
+    `<div style="font-size:9px;font-weight:800;white-space:nowrap">${escapeHtml(data.startCity)}&nbsp;&rarr;&nbsp;${escapeHtml(data.polCity)}</div>` +
+    `<div style="font-size:6.5px;margin-top:2px;white-space:nowrap">${escapeHtml(result.returnTerminal || '')}&nbsp;&rarr;&nbsp;${escapeHtml(data.departureTerminal || '')}</div>` +
     `</div><div style="overflow:hidden;border-radius:7px;background:white">` +
     row('Booking', data.bookingNumber) + row('ERD', result.erd) +
     row('LRD', `${result.lrd} · ${result.rampCutTime}`) + row('Vessel', data.vessel || 'N/A') +
     row('Port Cutoff', `${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim()) + `</div>` +
-    `<div style="margin-top:6px;text-align:right"><img src="${hapagLogoDataUri}" alt="Hapag-Lloyd" style="display:inline-block;width:105px;height:auto"></div></div>`;
+    `<div style="margin-top:5px;text-align:right"><img src="${hapagLogoDataUri}" alt="Hapag-Lloyd" style="display:inline-block;width:78px;height:auto"></div></div>`;
 }
 
 async function copyFormattedToClipboard(data, result) {
