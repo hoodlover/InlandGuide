@@ -13,6 +13,25 @@ function toIsoDate(value) {
   return `${match[3]}-${match[1].padStart(2, '0')}-${match[2].padStart(2, '0')}`;
 }
 
+function parseManualDate(value) {
+  const parts = String(value || '').trim().split(/[/\-.]/).map(part => part.trim()).filter(Boolean);
+  if (parts.length < 1 || parts.length > 3) return null;
+  const now = new Date();
+  let month = parts.length === 1 ? now.getMonth() + 1 : Number(parts[0]);
+  const day = Number(parts.length === 1 ? parts[0] : parts[1]);
+  let year = parts.length === 3 ? Number(parts[2]) : now.getFullYear();
+  if (year < 100) year += 2000;
+  // During December, a short Jan/Feb/Mar date means the upcoming year.
+  if (parts.length === 2 && now.getMonth() === 11 && month <= 3) year += 1;
+  if (![month, day, year].every(Number.isInteger) || month < 1 || month > 12 || day < 1 || day > 31) return null;
+  const date = new Date(year, month - 1, day);
+  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return null;
+  return {
+    iso: `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
+    display: `${month}/${day}/${year}`,
+  };
+}
+
 function resultText(data, result) {
   return [
     `Booking ${data.bookingNumber}`,
@@ -110,8 +129,9 @@ export default function ErdBridgeButton({ standalone = false }) {
   const calculateManual = async event => {
     event.preventDefault();
     const lane = manualMaster?.lanes?.[Number(manual.lane)];
-    if (!lane || !manual.pol || !manual.cutoffDate) {
-      setState(current => ({ ...current, error: 'Choose a port, starting city, and port-cut date.' }));
+    const parsedDate = parseManualDate(manual.cutoffDate);
+    if (!lane || !manual.pol || !parsedDate) {
+      setState(current => ({ ...current, error: 'Choose a port and starting city, then enter a valid date such as 5, 7/5, or 7/5/2026.' }));
       return;
     }
     try {
@@ -124,12 +144,12 @@ export default function ErdBridgeButton({ standalone = false }) {
         motService: String(lane.ssy || 'ALL').split(',')[0].trim(),
         vessel: '',
         departureTerminal: '',
-        relevantCutoffDate: new Date(`${manual.cutoffDate}T12:00:00`).toLocaleDateString('en-US'),
+        relevantCutoffDate: parsedDate.display,
         relevantCutoffTime: '',
         equipmentType: manual.isReefer ? 'Reefer' : 'Dry',
         isReefer: manual.isReefer,
       };
-      const { startCity, result } = calculateFromLiveMaster(manualMaster, bridgeData, manual.cutoffDate);
+      const { startCity, result } = calculateFromLiveMaster(manualMaster, bridgeData, parsedDate.iso);
       const data = { ...bridgeData, startCity, liveSource: manualMaster.source, liveModified: manualMaster.modified };
       const saved = { data, result, savedAt: new Date().toISOString() };
       try { localStorage.setItem(LAST_RESULT_KEY, JSON.stringify(saved)); } catch { /* Optional convenience. */ }
@@ -205,8 +225,8 @@ export default function ErdBridgeButton({ standalone = false }) {
                     <option value="">Choose starting city</option>{manualLanes.map(({ lane, index }) => <option key={`${index}-${lane.name}`} value={index}>{lane.name}{lane.rampMC ? ` — ${lane.rampMC}` : ''}{lane.ssy && lane.ssy !== 'ALL' ? ` (${lane.ssy})` : ''}</option>)}
                   </select>
                 </label>
-                <label className="block text-xs font-bold">Port-cut date
-                  <input type="date" value={manual.cutoffDate} onChange={event => setManual(current => ({ ...current, cutoffDate: event.target.value }))} className="mt-1 w-full rounded-md border border-slate-600 bg-slate-900 px-3 py-2 text-sm" required />
+                <label className="block text-xs font-bold">Port-cut date <span className="font-normal text-slate-400">(DD, M/D, or full date)</span>
+                  <input type="text" value={manual.cutoffDate} onChange={event => setManual(current => ({ ...current, cutoffDate: event.target.value }))} placeholder="5 or 7/5" className="mt-1 w-full rounded-md border border-slate-600 bg-slate-900 px-3 py-2 text-sm" inputMode="numeric" required />
                 </label>
                 <label className="block text-xs font-bold">Booking number <span className="font-normal text-slate-400">(optional)</span>
                   <input value={manual.bookingNumber} onChange={event => setManual(current => ({ ...current, bookingNumber: event.target.value }))} className="mt-1 w-full rounded-md border border-slate-600 bg-slate-900 px-3 py-2 text-sm" inputMode="numeric" />
