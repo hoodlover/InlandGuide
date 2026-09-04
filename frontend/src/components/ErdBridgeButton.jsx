@@ -100,7 +100,12 @@ export default function ErdBridgeButton({ standalone = false }) {
       const response = await fetch(BRIDGE_URL, { cache: 'no-store' });
       const bridgeData = await response.json().catch(() => ({}));
       if (!response.ok || !bridgeData.ok) throw new Error(bridgeData.error || 'The local ERD bridge did not respond.');
-      const data = { ...bridgeData, isReefer: reefer, equipmentType: reefer ? 'Reefer' : 'Dry' };
+      const detectedReefer = Boolean(bridgeData.isReefer);
+      const data = {
+        ...bridgeData,
+        isReefer: reefer || detectedReefer,
+        equipmentType: reefer || detectedReefer ? 'Reefer' : 'Dry',
+      };
 
       const pol = String(data.polLocode || '').trim().toUpperCase();
       const cutoffDate = toIsoDate(data.relevantCutoffDate);
