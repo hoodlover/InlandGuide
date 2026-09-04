@@ -3,7 +3,7 @@ import { calculateFromLiveMaster, loadLiveMaster } from '../lib/liveMaster';
 import { calculateCanadaBooking } from '../lib/canadaBooking';
 import { hapagLogoDataUri } from '../assets/hapag-logo-clipboard';
 
-const BRIDGE_URL = 'http://127.0.0.1:47832/s8100-summary';
+const BRIDGE_URL = 'http://127.0.0.1:47832/s8100-summary?equipment=skip';
 const LAST_RESULT_KEY = 'erd_tool_last_result_v1';
 const withTime = (date, time) => [date, time].filter(Boolean).join(' · ');
 
@@ -60,13 +60,15 @@ export default function ErdBridgeButton({ standalone = false }) {
   const [manualOpen, setManualOpen] = useState(false);
   const [manualMaster, setManualMaster] = useState(null);
   const [manual, setManual] = useState({ pol: '', lane: '', cutoffDate: '', bookingNumber: '', isReefer: false });
+  const [reefer, setReefer] = useState(false);
 
   const readAndCalculate = async () => {
     setState({ loading: true, error: '', data: null, result: null, copied: false, previewFormat: '' });
     try {
       const response = await fetch(BRIDGE_URL, { cache: 'no-store' });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok || !data.ok) throw new Error(data.error || 'The local ERD bridge did not respond.');
+      const bridgeData = await response.json().catch(() => ({}));
+      if (!response.ok || !bridgeData.ok) throw new Error(bridgeData.error || 'The local ERD bridge did not respond.');
+      const data = { ...bridgeData, isReefer: reefer, equipmentType: reefer ? 'Reefer' : 'Dry' };
 
       const pol = String(data.polLocode || '').trim().toUpperCase();
       const cutoffDate = toIsoDate(data.relevantCutoffDate);
@@ -153,7 +155,7 @@ export default function ErdBridgeButton({ standalone = false }) {
   useEffect(() => {
     if (!standalone) return;
     try {
-      if (!open && !manualOpen) window.resizeTo(250, 250);
+      if (!open && !manualOpen) window.resizeTo(250, 275);
       else if (manualOpen) window.resizeTo(430, 610);
       else if (state.previewFormat) window.resizeTo(460, 720);
       else if (state.loading) window.resizeTo(420, 330);
@@ -181,8 +183,9 @@ export default function ErdBridgeButton({ standalone = false }) {
         {state.loading ? <span className="text-2xl font-black text-white">···</span> : <img src="./got-erd-button.webp" alt="Got ERD?" className="h-full w-full object-contain" />}
       </button>
       {standalone ? <p className="fixed left-1/2 top-[calc(50%+56px)] z-[80] -translate-x-1/2 whitespace-nowrap text-xs font-extrabold text-white">2. Click the ERD button</p> : null}
-      {standalone ? <button type="button" onClick={showLastResult} className="fixed left-1/2 top-[calc(50%+77px)] z-[80] -translate-x-1/2 whitespace-nowrap text-[11px] font-bold text-orange-200 hover:text-white">Reopen last result</button> : null}
-      {standalone ? <button type="button" onClick={openManual} className="fixed left-1/2 top-[calc(50%+96px)] z-[80] -translate-x-1/2 whitespace-nowrap text-[11px] font-bold text-slate-300 hover:text-white">Manual check</button> : null}
+      {standalone ? <div className="fixed left-1/2 top-[calc(50%+77px)] z-[80] flex -translate-x-1/2 overflow-hidden rounded-full border border-white/25 text-[10px] font-black"><button type="button" onClick={() => setReefer(false)} className={`px-3 py-1 ${!reefer ? 'bg-white text-slate-950' : 'bg-transparent text-slate-300'}`}>Dry</button><button type="button" onClick={() => setReefer(true)} className={`px-3 py-1 ${reefer ? 'bg-[#EB6608] text-white' : 'bg-transparent text-slate-300'}`}>Reefer</button></div> : null}
+      {standalone ? <button type="button" onClick={showLastResult} className="fixed left-1/2 top-[calc(50%+108px)] z-[80] -translate-x-1/2 whitespace-nowrap text-[11px] font-bold text-orange-200 hover:text-white">Reopen last result</button> : null}
+      {standalone ? <button type="button" onClick={openManual} className="fixed left-1/2 top-[calc(50%+127px)] z-[80] -translate-x-1/2 whitespace-nowrap text-[11px] font-bold text-slate-300 hover:text-white">Manual check</button> : null}
 
       {manualOpen ? (
         <div className="fixed inset-0 z-[95] flex items-center justify-center bg-black/70 p-3">
