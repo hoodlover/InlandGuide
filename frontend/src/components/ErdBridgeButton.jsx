@@ -207,11 +207,14 @@ export default function ErdBridgeButton({ standalone = false }) {
   useEffect(() => {
     if (!standalone) return;
     try {
-      if (!open && !manualOpen) window.resizeTo(250, 265);
-      else if (manualOpen) window.resizeTo(430, 610);
-      else if (state.previewFormat) window.resizeTo(460, 720);
-      else if (state.loading) window.resizeTo(420, 330);
-      else window.resizeTo(440, 540);
+      let size;
+      if (!open && !manualOpen) size = [250, 265];
+      else if (manualOpen) size = [430, 610];
+      else if (state.previewFormat) size = [460, 720];
+      else if (state.loading) size = [420, 330];
+      else size = [440, 540];
+      if (window.chrome?.webview) window.chrome.webview.postMessage(`resize:${size[0]}:${size[1]}`);
+      else window.resizeTo(size[0], size[1]);
     } catch { /* Some managed browsers may keep their current window size. */ }
   }, [open, manualOpen, standalone, state.loading, state.previewFormat]);
 
