@@ -25,10 +25,9 @@ function resultText(data, result) {
   return [
     `Booking ${data.bookingNumber}`,
     `${data.startCity} → ${data.polCity}`,
-    `Return Terminal: ${result.returnTerminal || 'N/A'}`,
+    `${result.returnTerminal || 'N/A'} → ${data.departureTerminal || 'N/A'}`,
     `Vessel: ${data.vessel}`,
     `Port Cutoff: ${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim(),
-    `Departure Terminal: ${data.departureTerminal || 'N/A'}`,
     '',
     `ERD: ${result.erd}`,
     `LRD: ${result.lrd} · ${result.rampCutTime}`,
@@ -45,12 +44,11 @@ function formattedResult(data, result) {
     `<div style="display:grid;grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr);align-items:start;gap:5px;color:white;margin-bottom:7px">` +
     `<div><div style="font-size:11px;font-weight:800;white-space:nowrap">${escapeHtml(data.startCity)}</div><div style="font-size:8px;line-height:1.15;margin-top:2px">${escapeHtml(result.returnTerminal || '')}</div></div>` +
     `<div style="font-size:14px;font-weight:900;text-align:center">&rarr;</div>` +
-    `<div style="font-size:11px;font-weight:800;text-align:right;white-space:nowrap">${escapeHtml(data.polCity)}</div></div>` +
+    `<div><div style="font-size:11px;font-weight:800;text-align:right;white-space:nowrap">${escapeHtml(data.polCity)}</div><div style="font-size:8px;line-height:1.15;margin-top:2px;text-align:right">${escapeHtml(data.departureTerminal || '')}</div></div></div>` +
     `<table style="width:100%;border-collapse:collapse;background:white;border-radius:7px;overflow:hidden;font-size:11px;line-height:1.25">` +
     row('Booking', data.bookingNumber) + row('Vessel', data.vessel || 'N/A') + row('ERD', result.erd) +
     row('LRD', `${result.lrd} · ${result.rampCutTime}`) +
-    row('Port Cutoff', `${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim()) +
-    row('Departure Terminal', data.departureTerminal || 'N/A') + `</table>` +
+    row('Port Cutoff', `${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim()) + `</table>` +
     `<div style="margin-top:6px;text-align:right;color:#002d72;font-size:12px;font-weight:800">Hapag-Lloyd</div></div>`;
 }
 
@@ -172,10 +170,9 @@ export default function ErdBridgeButton({ standalone = false }) {
                 <div className="space-y-4">
                   <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
                     <span className="font-bold text-slate-500">Booking</span><span className="text-right font-black text-[#002D72]">{state.data.bookingNumber}</span>
-                    <span className="font-bold text-slate-500">Route</span><span className="text-right font-bold">{state.data.startCity} → {state.data.polCity}</span>
+                    <span className="font-bold text-slate-500">Route</span><span className="text-right font-bold">{state.data.startCity} → {state.data.polCity}<small className="mt-0.5 block text-[10px] font-semibold text-slate-500">{state.result.returnTerminal || 'N/A'} → {state.data.departureTerminal || 'N/A'}</small></span>
                     <span className="font-bold text-slate-500">Vessel</span><span className="text-right font-bold">{state.data.vessel || 'N/A'}</span>
                     <span className="font-bold text-slate-500">Port cutoff</span><span className="text-right font-bold">{state.data.relevantCutoffDate} {state.data.relevantCutoffTime}</span>
-                    <span className="font-bold text-slate-500">Departure terminal</span><span className="text-right font-bold">{state.data.departureTerminal || 'N/A'}</span>
                     <span className="font-bold text-slate-500">Data</span><span className="text-right text-xs font-bold">Live Z: master{state.data.liveModified ? ` · ${state.data.liveModified}` : ''}</span>
                   </div>
                   <div className="rounded-xl bg-[#EB6608] p-4 text-white shadow-inner">
