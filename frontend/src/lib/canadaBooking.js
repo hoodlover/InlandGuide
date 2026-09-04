@@ -1,4 +1,4 @@
-import { formatDate, generatedAt, getCities, getCutoff, getCutTime, getERD, getPortInfo, getVessels, getVesselMeta } from './cpkc';
+import { formatDate, generatedAt, getCities, getCutoff, getCutTime, getERD, getPortInfo, getVessels } from './cpkc';
 
 export const CANADA_RAIL_LINKS = {
   'CP Rail': 'https://www.cpkcr.com/en/customer-resources/shipping-guides-resources#id-AAAB963170242246EEC2726E8F39E78F:~:text=Port%20schedules',
@@ -45,7 +45,6 @@ export function calculateCanadaBooking(data) {
   if (!city) throw new Error(`${data.startCity || 'This starting city'} is not listed in the latest ${info?.name || slug} schedule.`);
   const cutoff = getCutoff(slug, vessel, city);
   if (!cutoff) throw new Error(`${vessel} has no published ${city} cutoff in the latest ${info?.name || slug} schedule.`);
-  const meta = getVesselMeta(slug, vessel);
   const ref = info?.generatedAt || generatedAt;
   return {
     result: {
@@ -56,7 +55,6 @@ export function calculateCanadaBooking(data) {
       equipmentType: data.equipmentType || '',
       isReefer: Boolean(data.isReefer),
       canadianRail: data.canadianRail,
-      railPortCutoff: formatDate(meta?.railPortCutoff || '', ref),
       scheduleName: info?.name || slug,
       scheduleRunDate: info?.runDate || '',
       railLink,
