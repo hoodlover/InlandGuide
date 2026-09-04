@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { calculateFromLiveMaster, loadLiveMaster } from '../lib/liveMaster';
+import { calculateCanadaBooking } from '../lib/canadaBooking';
 import { hapagLogoDataUri } from '../assets/hapag-logo-clipboard';
 
 const BRIDGE_URL = 'http://127.0.0.1:47832/s8100-summary';
 const LAST_RESULT_KEY = 'erd_tool_last_result_v1';
+const withTime = (date, time) => [date, time].filter(Boolean).join(' · ');
 
 function toIsoDate(value) {
   const match = String(value || '').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
@@ -15,7 +17,8 @@ function resultText(data, result) {
   return [
     `Booking ${data.bookingNumber}`,
     `ERD: ${result.erd}`,
-    `LRD: ${result.lrd} · ${result.rampCutTime}`,
+    `LRD: ${withTime(result.lrd, result.rampCutTime)}`,
+    result.railPortCutoff ? `Rail Port Cutoff: ${result.railPortCutoff}` : '',
     '',
     `${data.startCity} → ${data.polCity}`,
     `Return Terminal: ${result.returnTerminal || 'N/A'}`,
@@ -38,8 +41,9 @@ function formattedResult(data, result) {
     `<div style="font-size:6.5px;margin-top:2px;white-space:nowrap">${escapeHtml(result.returnTerminal || '')}${data.departureTerminal ? `&nbsp;&rarr;&nbsp;${escapeHtml(data.departureTerminal)}` : ''}</div>` +
     `</div><div style="overflow:hidden;border-radius:7px;background:white">` +
     row('Booking', data.bookingNumber) + row('ERD', result.erd) +
-    row('LRD', `${result.lrd} · ${result.rampCutTime}`) + (data.vessel ? row('Vessel', data.vessel) : '') +
+    row('LRD', withTime(result.lrd, result.rampCutTime)) + (data.vessel ? row('Vessel', data.vessel) : '') +
     (data.canadianRail ? row('Rail', data.canadianRail) : '') +
+    (result.railPortCutoff ? row('Rail Port Cutoff', result.railPortCutoff) : '') +
     row('Port Cutoff', `${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim()) + `</div>` +
     `<div style="margin-top:5px;text-align:right"><img src="${hapagLogoDataUri}" alt="Hapag-Lloyd" style="display:inline-block;width:78px;height:auto"></div></div>`;
 }
@@ -70,8 +74,11 @@ export default function ErdBridgeButton({ standalone = false }) {
       const cutoffDate = toIsoDate(data.relevantCutoffDate);
       if (!cutoffDate) throw new Error(`FIS returned an unreadable cutoff date: ${data.relevantCutoffDate || 'blank'}.`);
       const live = await loadLiveMaster();
-      const { startCity, result } = calculateFromLiveMaster(live, data, cutoffDate);
-      const saved = { data: { ...data, startCity, liveSource: live.source, liveModified: live.modified }, result, savedAt: new Date().toISOString() };
+      const canada = pol.startsWith('CA') && data.canadianRail ? calculateCanadaBooking(data) : null;
+      const calculated = canada || calculateFromLiveMaster(live, data, cutoffDate);
+      const startCity = calculated.startCity || data.startCity;
+      const result = calculated.result;
+      const saved = { data: { ...data, startCity, liveSource: canada?.source || live.source, liveModified: canada?.modified || live.modified }, result, savedAt: new Date().toISOString() };
       try { localStorage.setItem(LAST_RESULT_KEY, JSON.stringify(saved)); } catch { /* Last-result convenience is optional. */ }
       let copied = false;
       try { await copyFormattedToClipboard(saved.data, result); copied = true; } catch { /* The browser permission message remains visible. */ }
@@ -240,11 +247,12 @@ export default function ErdBridgeButton({ standalone = false }) {
                     {state.data.canadianRail ? <><span className="font-bold text-slate-500">Rail</span><span className="text-right font-bold">{state.data.canadianRail}<small className="mt-0.5 block text-[10px] font-semibold text-slate-500">{state.data.customerPlace}</small></span></> : null}
                     <span className="font-bold text-slate-500">Equipment</span><span className="text-right font-bold">{state.result.equipmentType || 'Not detected'}{state.result.isReefer ? ' · Reefer' : ''}</span>
                     <span className="font-bold text-slate-500">Port cutoff</span><span className="text-right font-bold">{state.data.relevantCutoffDate} {state.data.relevantCutoffTime}</span>
+                    {state.result.railPortCutoff ? <><span className="font-bold text-slate-500">Rail port cutoff</span><span className="text-right font-bold">{state.result.railPortCutoff}</span></> : null}
                     <span className="font-bold text-slate-500">Data</span><span className="text-right text-[11px] font-bold">Live master updated{state.data.liveModified ? ` ${state.data.liveModified}` : ''}</span>
                   </div>
                   <div className="rounded-lg bg-[#EB6608] px-3 py-2.5 text-sm text-white shadow-inner">
                     <div className="flex justify-between gap-3"><span className="font-bold">ERD</span><strong>{state.result.erd}</strong></div>
-                    <div className="mt-1.5 flex justify-between gap-3"><span className="font-bold">LRD</span><strong>{state.result.lrd} · {state.result.rampCutTime}</strong></div>
+                    <div className="mt-1.5 flex justify-between gap-3"><span className="font-bold">LRD</span><strong>{withTime(state.result.lrd, state.result.rampCutTime)}</strong></div>
                   </div>
                   <p className={`text-center text-xs font-bold ${state.copied ? 'text-emerald-700' : 'text-amber-700'}`}>{state.copied ? '✓ Already copied to your clipboard — ready to paste' : 'Clipboard permission is needed. Choose Allow, then click ERD again.'}</p>
                 </div>
