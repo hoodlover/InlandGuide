@@ -92,7 +92,6 @@ export default function ErdBridgeButton({ standalone = false }) {
   const [manualOpen, setManualOpen] = useState(false);
   const [manualMaster, setManualMaster] = useState(null);
   const [manual, setManual] = useState({ pol: '', city: '', terminal: '', ssy: '', cutoffDate: '', bookingNumber: '', isReefer: false });
-  const [reefer, setReefer] = useState(false);
 
   const readAndCalculate = async () => {
     setState({ loading: true, error: '', data: null, result: null, copied: false, previewFormat: '' });
@@ -103,8 +102,8 @@ export default function ErdBridgeButton({ standalone = false }) {
       const detectedReefer = Boolean(bridgeData.isReefer);
       const data = {
         ...bridgeData,
-        isReefer: reefer || detectedReefer,
-        equipmentType: reefer || detectedReefer ? 'Reefer' : 'Dry',
+        isReefer: detectedReefer,
+        equipmentType: detectedReefer ? 'Reefer' : 'Dry',
       };
 
       const pol = String(data.polLocode || '').trim().toUpperCase();
@@ -237,7 +236,7 @@ export default function ErdBridgeButton({ standalone = false }) {
       >
         {state.loading ? <span className="text-2xl font-black text-white">···</span> : <img src="./got-erd-button.webp" alt="Got ERD?" className="h-full w-full object-contain" />}
       </button>
-      {standalone ? <div className="fixed left-1/2 top-[calc(50%+38px)] z-[80] flex -translate-x-1/2 items-center gap-2 whitespace-nowrap"><span className="text-xs font-extrabold text-white">2. Click the ERD button</span><label className="flex cursor-pointer items-center gap-1 text-[9px] font-bold text-slate-300"><input type="checkbox" checked={reefer} onChange={event => setReefer(event.target.checked)} className="h-3 w-3 accent-[#EB6608]" />Reefer?</label></div> : null}
+      {standalone ? <p className="fixed left-1/2 top-[calc(50%+38px)] z-[80] -translate-x-1/2 whitespace-nowrap text-xs font-extrabold text-white">2. Click the ERD button</p> : null}
       {standalone ? <button type="button" onClick={showLastResult} className="fixed left-1/2 top-[calc(50%+59px)] z-[80] -translate-x-1/2 whitespace-nowrap text-[11px] font-bold text-orange-200 hover:text-white">Reopen last result</button> : null}
       {standalone ? <button type="button" onClick={openManual} className="fixed left-1/2 top-[calc(50%+78px)] z-[80] -translate-x-1/2 whitespace-nowrap text-[11px] font-bold text-slate-300 hover:text-white">Manual check</button> : null}
 
