@@ -3,18 +3,7 @@ import { calculateFromLiveMaster, loadLiveMaster } from '../lib/liveMaster';
 import { hapagLogoDataUri } from '../assets/hapag-logo-clipboard';
 
 const BRIDGE_URL = 'http://127.0.0.1:47832/s8100-summary';
-const BRIDGE_CLIPBOARD_URL = 'http://127.0.0.1:47832/erd-clipboard';
 const LAST_RESULT_KEY = 'erd_tool_last_result_v1';
-
-async function copyThroughBridge(text) {
-  const response = await fetch(BRIDGE_CLIPBOARD_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-    body: text,
-  });
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok || !payload.ok) throw new Error(payload.error || 'The local bridge could not update the clipboard.');
-}
 
 function toIsoDate(value) {
   const match = String(value || '').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
@@ -78,19 +67,9 @@ export default function ErdBridgeButton({ standalone = false }) {
       if (!cutoffDate) throw new Error(`FIS returned an unreadable cutoff date: ${data.relevantCutoffDate || 'blank'}.`);
       const live = await loadLiveMaster();
       const { startCity, result } = calculateFromLiveMaster(live, data, cutoffDate);
-      const text = resultText({ ...data, startCity }, result);
-      let copied = false;
-      let previewFormat = '';
-      try {
-        await copyFormattedToClipboard({ ...data, startCity }, result);
-        copied = true;
-        previewFormat = 'formatted';
-      } catch {
-        try { await copyThroughBridge(text); copied = true; previewFormat = 'text'; } catch { /* Manual copy remains available. */ }
-      }
       const saved = { data: { ...data, startCity, liveSource: live.source, liveModified: live.modified }, result, savedAt: new Date().toISOString() };
       try { localStorage.setItem(LAST_RESULT_KEY, JSON.stringify(saved)); } catch { /* Last-result convenience is optional. */ }
-      setState({ loading: false, error: '', data: saved.data, result, copied, previewFormat });
+      setState({ loading: false, error: '', data: saved.data, result, copied: false, previewFormat: '' });
     } catch (error) {
       const offline = error instanceof TypeError;
       setState({
@@ -100,16 +79,6 @@ export default function ErdBridgeButton({ standalone = false }) {
         result: null,
         copied: false, previewFormat: '',
       });
-    }
-  };
-
-  const copyAgain = async () => {
-    if (!state.data || !state.result) return;
-    try {
-      await copyThroughBridge(resultText(state.data, state.result));
-      setState(current => ({ ...current, copied: true, previewFormat: 'text' }));
-    } catch {
-      setState(current => ({ ...current, error: 'The local bridge could not update the clipboard. Restart V5.3 and try again.' }));
     }
   };
 
@@ -138,9 +107,12 @@ export default function ErdBridgeButton({ standalone = false }) {
   useEffect(() => {
     if (!standalone) return;
     try {
-      window.resizeTo(open ? 540 : 250, open ? 720 : 230);
+      if (!open) window.resizeTo(250, 230);
+      else if (state.previewFormat) window.resizeTo(460, 720);
+      else if (state.loading) window.resizeTo(420, 330);
+      else window.resizeTo(440, 540);
     } catch { /* Some managed browsers may keep their current window size. */ }
-  }, [open, standalone]);
+  }, [open, standalone, state.loading, state.previewFormat]);
 
   return (
     <>
@@ -160,43 +132,39 @@ export default function ErdBridgeButton({ standalone = false }) {
 
       {open ? (
         <div className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/45 p-4" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget && !state.loading) close(); }}>
-          <section className="max-h-[calc(100vh-2rem)] w-full max-w-md overflow-y-auto rounded-2xl border-4 border-[#002D72] bg-white shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="erd-bridge-title">
-            <header className="flex items-center justify-between bg-[#002D72] px-5 py-4 text-white">
+          <section className="max-h-[calc(100vh-1rem)] w-full max-w-sm overflow-y-auto rounded-xl border-[3px] border-[#002D72] bg-white shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="erd-bridge-title">
+            <header className="flex items-center justify-between bg-[#002D72] px-4 py-3 text-white">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-300">Live S8100</p>
-                <h2 id="erd-bridge-title" className="text-xl font-black">ERD / LRD Confirmation</h2>
+                <h2 id="erd-bridge-title" className="text-lg font-black">ERD / LRD Confirmation</h2>
               </div>
               {!state.loading ? <button type="button" onClick={close} className="rounded-full px-3 py-1 text-2xl leading-none hover:bg-white/15" aria-label="Close">×</button> : null}
             </header>
 
-            <div className="p-5">
-              {state.loading ? <p className="py-10 text-center font-bold text-[#002D72]">Reading the open S8100 booking…</p> : null}
+            <div className="p-4">
+              {state.loading ? <p className="py-7 text-center text-sm font-bold text-[#002D72]">Reading the open S8100 booking…</p> : null}
               {state.error ? (
                 <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
                   {state.error}
                 </div>
               ) : null}
               {state.data && state.result ? (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+                <div className="space-y-3">
+                  <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 text-xs">
                     <span className="font-bold text-slate-500">Booking</span><span className="text-right font-black text-[#002D72]">{state.data.bookingNumber}</span>
                     <span className="font-bold text-slate-500">Route</span><span className="text-right font-bold">{state.data.startCity} → {state.data.polCity}<small className="mt-0.5 block text-[10px] font-semibold text-slate-500">{state.result.returnTerminal || 'N/A'} → {state.data.departureTerminal || 'N/A'}</small></span>
                     <span className="font-bold text-slate-500">Vessel</span><span className="text-right font-bold">{state.data.vessel || 'N/A'}</span>
                     <span className="font-bold text-slate-500">Port cutoff</span><span className="text-right font-bold">{state.data.relevantCutoffDate} {state.data.relevantCutoffTime}</span>
-                    <span className="font-bold text-slate-500">Data</span><span className="text-right text-xs font-bold">Live Z: master{state.data.liveModified ? ` · ${state.data.liveModified}` : ''}</span>
+                    <span className="font-bold text-slate-500">Data</span><span className="text-right text-[11px] font-bold">Live master updated{state.data.liveModified ? ` ${state.data.liveModified}` : ''}</span>
                   </div>
-                  <div className="rounded-xl bg-[#EB6608] p-4 text-white shadow-inner">
-                    <div className="flex justify-between gap-4"><span className="font-bold">ERD</span><strong className="text-lg">{state.result.erd}</strong></div>
-                    <div className="mt-2 flex justify-between gap-4"><span className="font-bold">LRD</span><strong className="text-lg">{state.result.lrd} · {state.result.rampCutTime}</strong></div>
+                  <div className="rounded-lg bg-[#EB6608] px-3 py-2.5 text-sm text-white shadow-inner">
+                    <div className="flex justify-between gap-3"><span className="font-bold">ERD</span><strong>{state.result.erd}</strong></div>
+                    <div className="mt-1.5 flex justify-between gap-3"><span className="font-bold">LRD</span><strong>{state.result.lrd} · {state.result.rampCutTime}</strong></div>
                   </div>
-                  <p className="text-center text-sm font-bold text-emerald-700">{state.copied ? '✓ Already copied to your clipboard' : 'Ready to copy'}</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button type="button" onClick={copyFormatted} className="rounded-xl bg-[#EB6608] px-3 py-3 text-sm font-bold text-white hover:bg-orange-600">✨ Copy formatted</button>
-                    <button type="button" onClick={copyAgain} className="rounded-xl bg-[#002D72] px-3 py-3 text-sm font-bold text-white hover:bg-blue-950">Copy text</button>
-                  </div>
+                  <button type="button" onClick={copyFormatted} className="mx-auto block rounded-lg bg-[#EB6608] px-5 py-2 text-xs font-bold text-white hover:bg-orange-600">✨ Copy formatted</button>
                   {state.previewFormat ? (
-                    <section className="rounded-xl border-2 border-emerald-400 bg-emerald-50 p-3">
-                      <p className="mb-2 font-black text-emerald-700">✓ {state.previewFormat === 'formatted' ? 'Formatted' : 'Text'} copy ready to paste</p>
+                    <section className="rounded-lg border-2 border-emerald-400 bg-emerald-50 p-2.5">
+                      <p className="mb-2 text-sm font-black text-emerald-700">✓ {state.previewFormat === 'formatted' ? 'Formatted' : 'Text'} copy ready to paste</p>
                       {state.previewFormat === 'formatted' ? (
                         <div className="max-h-72 overflow-auto rounded-lg bg-white p-2" dangerouslySetInnerHTML={{ __html: formattedResult(state.data, state.result) }} />
                       ) : (
