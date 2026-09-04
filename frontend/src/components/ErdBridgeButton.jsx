@@ -30,13 +30,12 @@ function escapeHtml(value) {
 }
 
 function formattedResult(data, result) {
-  const row = (label, value) => `<div style="display:block;border-bottom:1px solid #dbe2ea;background:#fff;font-size:11px;line-height:1.25;white-space:nowrap"><span style="display:inline-block;box-sizing:border-box;width:52%;padding:5px 8px;font-weight:700">${label}</span><span style="display:inline-block;box-sizing:border-box;width:48%;padding:5px 8px;text-align:right;font-weight:700">${escapeHtml(value)}</span></div>`;
+  const row = (label, value) => `<div style="padding:4px 7px;border-bottom:1px solid #dbe2ea;background:#fff;font-size:11px;line-height:1.3;white-space:nowrap"><strong>${label}:</strong>&nbsp;&nbsp;${escapeHtml(value)}</div>`;
   return `<div style="font-family:Arial,sans-serif;width:340px;max-width:100%;box-sizing:border-box;border:4px solid #002d72;border-radius:11px;background:#eb6608;padding:10px;color:#10233f">` +
-    `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;table-layout:fixed;border:0;color:white;margin-bottom:7px"><tr>` +
-    `<td style="width:46%;border:0;vertical-align:top"><div style="font-size:11px;font-weight:800;white-space:nowrap">${escapeHtml(data.startCity)}</div><div style="font-size:8px;line-height:1.15;margin-top:2px">${escapeHtml(result.returnTerminal || '')}</div></td>` +
-    `<td style="width:8%;border:0;vertical-align:top;text-align:center;font-size:14px;font-weight:900">&rarr;</td>` +
-    `<td style="width:46%;border:0;vertical-align:top;text-align:right"><div style="font-size:11px;font-weight:800;white-space:nowrap">${escapeHtml(data.polCity)}</div><div style="font-size:8px;line-height:1.15;margin-top:2px">${escapeHtml(data.departureTerminal || '')}</div></td>` +
-    `</tr></table><div style="overflow:hidden;border-radius:7px;background:white">` +
+    `<div style="color:white;margin-bottom:7px;line-height:1.25">` +
+    `<div style="font-size:11px;font-weight:800;white-space:nowrap">${escapeHtml(data.startCity)}&nbsp;&nbsp;&rarr;&nbsp;&nbsp;${escapeHtml(data.polCity)}</div>` +
+    `<div style="font-size:8px;margin-top:2px">${escapeHtml(result.returnTerminal || '')}&nbsp;&nbsp;&rarr;&nbsp;&nbsp;${escapeHtml(data.departureTerminal || '')}</div>` +
+    `</div><div style="overflow:hidden;border-radius:7px;background:white">` +
     row('Booking', data.bookingNumber) + row('ERD', result.erd) +
     row('LRD', `${result.lrd} · ${result.rampCutTime}`) + row('Vessel', data.vessel || 'N/A') +
     row('Port Cutoff', `${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim()) + `</div>` +
