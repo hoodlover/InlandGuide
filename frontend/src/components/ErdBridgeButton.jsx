@@ -155,7 +155,7 @@ export default function ErdBridgeButton({ standalone = false }) {
   useEffect(() => {
     if (!standalone) return;
     try {
-      if (!open && !manualOpen) window.resizeTo(250, 295);
+      if (!open && !manualOpen) window.resizeTo(250, 265);
       else if (manualOpen) window.resizeTo(430, 610);
       else if (state.previewFormat) window.resizeTo(460, 720);
       else if (state.loading) window.resizeTo(420, 330);
@@ -182,10 +182,9 @@ export default function ErdBridgeButton({ standalone = false }) {
       >
         {state.loading ? <span className="text-2xl font-black text-white">···</span> : <img src="./got-erd-button.webp" alt="Got ERD?" className="h-full w-full object-contain" />}
       </button>
-      {standalone ? <p className="fixed left-1/2 top-[calc(50%+56px)] z-[80] -translate-x-1/2 whitespace-nowrap text-xs font-extrabold text-white">2. Click the ERD button</p> : null}
-      {standalone ? <div className="fixed left-1/2 top-[calc(50%+77px)] z-[80] flex -translate-x-1/2 overflow-hidden rounded-full border border-white/25 text-[10px] font-black"><button type="button" onClick={() => setReefer(false)} className={`px-3 py-1 ${!reefer ? 'bg-white text-slate-950' : 'bg-transparent text-slate-300'}`}>Dry</button><button type="button" onClick={() => setReefer(true)} className={`px-3 py-1 ${reefer ? 'bg-[#EB6608] text-white' : 'bg-transparent text-slate-300'}`}>Reefer</button></div> : null}
-      {standalone ? <button type="button" onClick={showLastResult} className="fixed left-1/2 top-[calc(50%+108px)] z-[80] -translate-x-1/2 whitespace-nowrap text-[11px] font-bold text-orange-200 hover:text-white">Reopen last result</button> : null}
-      {standalone ? <button type="button" onClick={openManual} className="fixed left-1/2 top-[calc(50%+127px)] z-[80] -translate-x-1/2 whitespace-nowrap text-[11px] font-bold text-slate-300 hover:text-white">Manual check</button> : null}
+      {standalone ? <div className="fixed left-1/2 top-[calc(50%+56px)] z-[80] flex -translate-x-1/2 items-center gap-2 whitespace-nowrap"><span className="text-xs font-extrabold text-white">2. Click the ERD button</span><label className="flex cursor-pointer items-center gap-1 text-[9px] font-bold text-slate-300"><input type="checkbox" checked={reefer} onChange={event => setReefer(event.target.checked)} className="h-3 w-3 accent-[#EB6608]" />Reefer?</label></div> : null}
+      {standalone ? <button type="button" onClick={showLastResult} className="fixed left-1/2 top-[calc(50%+77px)] z-[80] -translate-x-1/2 whitespace-nowrap text-[11px] font-bold text-orange-200 hover:text-white">Reopen last result</button> : null}
+      {standalone ? <button type="button" onClick={openManual} className="fixed left-1/2 top-[calc(50%+96px)] z-[80] -translate-x-1/2 whitespace-nowrap text-[11px] font-bold text-slate-300 hover:text-white">Manual check</button> : null}
 
       {manualOpen ? (
         <div className="fixed inset-0 z-[95] flex items-center justify-center bg-black/70 p-3">
