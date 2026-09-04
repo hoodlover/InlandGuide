@@ -216,6 +216,11 @@ export default function ErdBridgeButton({ standalone = false }) {
   }, [open, manualOpen, standalone, state.loading, state.previewFormat]);
 
   const manualPorts = manualMaster ? [...new Set(manualMaster.lanes.map(lane => lane.pol))].sort() : [];
+  const manualPortGroups = [
+    { label: 'United States', ports: manualPorts.filter(pol => pol.startsWith('US')) },
+    { label: 'Canada', ports: manualPorts.filter(pol => pol.startsWith('CA')) },
+    { label: 'Mexico', ports: manualPorts.filter(pol => pol.startsWith('MX')) },
+  ].filter(group => group.ports.length);
   const manualCities = manualMaster ? [...new Set(manualMaster.lanes.filter(lane => lane.pol === manual.pol).map(lane => lane.name))].sort() : [];
   const selectedCityLanes = manualMaster ? manualMaster.lanes.filter(lane => lane.pol === manual.pol && lane.name === manual.city) : [];
   const manualSsys = [...new Set(selectedCityLanes.flatMap(lane => String(lane.ssy || '').split(',').map(value => value.trim()).filter(Boolean)))];
@@ -251,7 +256,10 @@ export default function ErdBridgeButton({ standalone = false }) {
               <form onSubmit={calculateManual} className="space-y-3 p-4">
                 <label className="block text-xs font-bold">Port of loading
                   <select value={manual.pol} onChange={event => setManual(current => ({ ...current, pol: event.target.value, city: '', terminal: '', ssy: '' }))} className="mt-1 w-full rounded-md border border-slate-600 bg-slate-900 px-3 py-2 text-sm" required>
-                    <option value="">Choose port</option>{manualPorts.map(pol => <option key={pol} value={pol}>{pol}</option>)}
+                    <option value="">Choose port</option>
+                    {manualPortGroups.map(group => <optgroup key={group.label} label={`──── ${group.label} ────`}>
+                      {group.ports.map(pol => <option key={pol} value={pol}>{pol}</option>)}
+                    </optgroup>)}
                   </select>
                 </label>
                 <label className="block text-xs font-bold">Starting city / rail ramp
