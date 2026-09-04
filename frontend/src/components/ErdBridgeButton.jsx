@@ -8,6 +8,18 @@ const BRIDGE_URL = 'http://127.0.0.1:47832/s8100-summary?equipment=skip';
 const LAST_RESULT_KEY = 'erd_tool_last_result_v1';
 const withTime = (date, time) => [date, time].filter(Boolean).join(' · ');
 
+function compactRailName(value) {
+  return String(value || '')
+    .replace(/^UNION\s+PACIFIC\b/i, 'UP')
+    .replace(/^NORFOLK\s+SOUTHERN\b/i, 'NS')
+    .replace(/^BURLINGTON\s+NORTHERN(?:\s+SANTA\s+FE)?\b/i, 'BNSF');
+}
+
+function shortModifiedDate(value) {
+  const match = String(value || '').match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  return match ? `${Number(match[2])}/${Number(match[3])}/${match[1].slice(-2)}` : String(value || '');
+}
+
 function toIsoDate(value) {
   const match = String(value || '').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (!match) return '';
@@ -40,7 +52,7 @@ function resultText(data, result) {
     `LRD: ${withTime(result.lrd, result.rampCutTime)}`,
     '',
     `${data.startCity} → ${data.polCity}`,
-    `Return Terminal: ${result.returnTerminal || 'N/A'}`,
+    `Return Terminal: ${compactRailName(result.returnTerminal) || 'N/A'}`,
     data.canadianRail ? `Rail: ${data.canadianRail}` : '',
     result.isReefer ? 'Equipment: Reefer' : '',
     data.vessel ? `Vessel: ${data.vessel}` : '',
@@ -58,7 +70,7 @@ function formattedResult(data, result) {
   return `<div style="font-family:Arial,sans-serif;width:255px;max-width:100%;box-sizing:border-box;border:3px solid #002d72;border-radius:9px;background:#eb6608;padding:8px;color:#10233f">` +
     `<div style="color:white;margin-bottom:7px;line-height:1.25">` +
     `<div style="font-size:9px;font-weight:800;white-space:nowrap">${escapeHtml(data.startCity)}&nbsp;&rarr;&nbsp;${escapeHtml(data.polCity)}</div>` +
-    `<div style="font-size:6.5px;margin-top:2px;white-space:nowrap">${escapeHtml(result.returnTerminal || '')}${data.departureTerminal ? `&nbsp;&rarr;&nbsp;${escapeHtml(data.departureTerminal)}` : ''}</div>` +
+    `<div style="font-size:6.5px;margin-top:2px;white-space:nowrap">${escapeHtml(compactRailName(result.returnTerminal))}${data.departureTerminal ? `&nbsp;&rarr;&nbsp;${escapeHtml(data.departureTerminal)}` : ''}</div>` +
     `</div><div style="overflow:hidden;border-radius:7px;background:white">` +
     row('Booking', data.bookingNumber) + row('ERD', result.erd) +
     row('LRD', withTime(result.lrd, result.rampCutTime)) + (data.vessel ? row('Vessel', data.vessel) : '') +
@@ -179,6 +191,15 @@ export default function ErdBridgeButton({ standalone = false }) {
       setState({ loading: false, error: 'No previous ERD result has been saved on this computer yet.', data: null, result: null, copied: false, previewFormat: '' });
     }
   };
+  const recopyResult = async () => {
+    if (!state.data || !state.result) return;
+    try {
+      await copyFormattedToClipboard(state.data, state.result);
+      setState(current => ({ ...current, copied: true }));
+    } catch {
+      setState(current => ({ ...current, copied: false }));
+    }
+  };
   const open = state.loading || state.error || state.result;
 
   useEffect(() => {
@@ -283,18 +304,18 @@ export default function ErdBridgeButton({ standalone = false }) {
                 <div className="space-y-3">
                   <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 text-xs">
                     <span className="font-bold text-slate-500">Booking</span><span className="text-right font-black text-[#002D72]">{state.data.bookingNumber}</span>
-                    <span className="font-bold text-slate-500">Route</span><span className="text-right font-bold">{state.data.startCity} → {state.data.polCity}<small className="mt-0.5 block text-[10px] font-semibold text-slate-500">{state.result.returnTerminal || 'N/A'} → {state.data.departureTerminal || 'N/A'}</small></span>
+                    <span className="font-bold text-slate-500">Route</span><span className="text-right font-bold">{state.data.startCity} → {state.data.polCity}<small className="mt-0.5 block whitespace-nowrap text-[10px] font-semibold text-slate-500">{compactRailName(state.result.returnTerminal) || 'N/A'} → {state.data.departureTerminal || 'N/A'}</small></span>
                     {state.data.vessel ? <><span className="font-bold text-slate-500">Vessel</span><span className="text-right font-bold">{state.data.vessel}</span></> : null}
                     {state.data.canadianRail ? <><span className="font-bold text-slate-500">Rail</span><span className="text-right font-bold">{state.data.canadianRail}<small className="mt-0.5 block text-[10px] font-semibold text-slate-500">{state.data.customerPlace}</small></span></> : null}
                     {state.result.isReefer ? <><span className="font-bold text-slate-500">Equipment</span><span className="text-right font-bold">Reefer</span></> : null}
                     <span className="font-bold text-slate-500">Port cutoff</span><span className="text-right font-bold">{state.data.relevantCutoffDate} {state.data.relevantCutoffTime}</span>
-                    <span className="font-bold text-slate-500">Data</span><span className="text-right text-[11px] font-bold">Live master updated{state.data.liveModified ? ` ${state.data.liveModified}` : ''}</span>
+                    <span className="font-bold text-slate-500">Data</span><span className="text-right text-[11px] font-bold">Live master updated{state.data.liveModified ? ` ${shortModifiedDate(state.data.liveModified)}` : ''}</span>
                   </div>
                   <div className="rounded-lg bg-[#EB6608] px-3 py-2.5 text-sm text-white shadow-inner">
                     <div className="flex justify-between gap-3"><span className="font-bold">ERD</span><strong>{state.result.erd}</strong></div>
                     <div className="mt-1.5 flex justify-between gap-3"><span className="font-bold">LRD</span><strong>{withTime(state.result.lrd, state.result.rampCutTime)}</strong></div>
                   </div>
-                  <p className={`text-center text-xs font-bold ${state.copied ? 'text-emerald-700' : 'text-amber-700'}`}>{state.copied ? '✓ Already copied to your clipboard — ready to paste' : 'Clipboard permission is needed. Choose Allow, then click ERD again.'}</p>
+                  {state.copied ? <button type="button" onClick={recopyResult} className="block w-full text-center text-xs font-bold text-emerald-700 hover:text-emerald-800">✓ Already copied to your clipboard — click to copy again</button> : <p className="text-center text-xs font-bold text-amber-700">Clipboard permission is needed. Choose Allow, then click ERD again.</p>}
                 </div>
               ) : null}
             </div>
