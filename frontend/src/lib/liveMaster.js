@@ -106,7 +106,8 @@ export function calculateFromLiveMaster(live, bridgeData, cutoffDate) {
   lrd.setDate(lrd.getDate() - lane.transit - lane.ssyAdjustment);
   rollBack(lrd, holidaySet);
   const erd = new Date(lrd);
-  erd.setDate(erd.getDate() - lane.window);
+  const reeferAdjustment = bridgeData.isReefer && lane.reefer !== 'N' ? lane.windowReefer : 0;
+  erd.setDate(erd.getDate() - lane.window - reeferAdjustment);
   rollBack(erd, holidaySet);
 
   return {
@@ -116,6 +117,9 @@ export function calculateFromLiveMaster(live, bridgeData, cutoffDate) {
       lrd: lrd.toLocaleDateString('en-US', { weekday: 'short', month: 'numeric', day: 'numeric' }),
       rampCutTime: formatCutTime(lane.rampCutTime), rampMC: lane.rampMC, railroad: railroadFromCode(lane.rampMC),
       returnTerminal: live.railTerminals[String(lane.rampMC || '').trim().toUpperCase()] || lane.rampMC,
+      equipmentType: bridgeData.equipmentType || '',
+      isReefer: Boolean(bridgeData.isReefer),
+      reeferAdjustment,
     },
   };
 }
