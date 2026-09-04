@@ -41,6 +41,7 @@ function resultText(data, result) {
     `${data.startCity} → ${data.polCity}`,
     `Return Terminal: ${result.returnTerminal || 'N/A'}`,
     data.canadianRail ? `Rail: ${data.canadianRail}` : '',
+    result.isReefer ? 'Equipment: Reefer' : '',
     data.vessel ? `Vessel: ${data.vessel}` : '',
     data.departureTerminal ? `Departure Terminal: ${data.departureTerminal}` : '',
     `Port Cutoff: ${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim(),
@@ -61,6 +62,7 @@ function formattedResult(data, result) {
     row('Booking', data.bookingNumber) + row('ERD', result.erd) +
     row('LRD', withTime(result.lrd, result.rampCutTime)) + (data.vessel ? row('Vessel', data.vessel) : '') +
     (data.canadianRail ? row('Rail', data.canadianRail) : '') +
+    (result.isReefer ? row('Equipment', 'Reefer') : '') +
     row('Port Cutoff', `${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim()) + `</div>` +
     `<div style="margin-top:5px;text-align:right"><img src="${hapagLogoDataUri}" alt="Hapag-Lloyd" style="display:inline-block;width:78px;height:auto"></div></div>`;
 }
@@ -78,7 +80,7 @@ export default function ErdBridgeButton({ standalone = false }) {
   const [state, setState] = useState({ loading: false, error: '', data: null, result: null, copied: false, previewFormat: '' });
   const [manualOpen, setManualOpen] = useState(false);
   const [manualMaster, setManualMaster] = useState(null);
-  const [manual, setManual] = useState({ pol: '', lane: '', cutoffDate: '', bookingNumber: '', isReefer: false });
+  const [manual, setManual] = useState({ pol: '', city: '', ssy: '', cutoffDate: '', bookingNumber: '', isReefer: false });
   const [reefer, setReefer] = useState(false);
 
   const readAndCalculate = async () => {
@@ -128,7 +130,9 @@ export default function ErdBridgeButton({ standalone = false }) {
   };
   const calculateManual = async event => {
     event.preventDefault();
-    const lane = manualMaster?.lanes?.[Number(manual.lane)];
+    const cityLanes = manualMaster?.lanes?.filter(lane => lane.pol === manual.pol && lane.name === manual.city) || [];
+    const lane = cityLanes.find(item => String(item.ssy || '').split(',').map(value => value.trim().toUpperCase()).includes(manual.ssy.toUpperCase()))
+      || (cityLanes.length === 1 ? cityLanes[0] : null);
     const parsedDate = parseManualDate(manual.cutoffDate);
     if (!lane || !manual.pol || !parsedDate) {
       setState(current => ({ ...current, error: 'Choose a port and starting city, then enter a valid date such as 5, 7/5, or 7/5/2026.' }));
@@ -141,7 +145,7 @@ export default function ErdBridgeButton({ standalone = false }) {
         polCity: manual.pol,
         startLocode: lane.loccode,
         startCity: lane.name,
-        motService: String(lane.ssy || 'ALL').split(',')[0].trim(),
+        motService: manual.ssy || String(lane.ssy || 'ALL').split(',')[0].trim(),
         vessel: '',
         departureTerminal: '',
         relevantCutoffDate: parsedDate.display,
@@ -184,10 +188,10 @@ export default function ErdBridgeButton({ standalone = false }) {
   }, [open, manualOpen, standalone, state.loading, state.previewFormat]);
 
   const manualPorts = manualMaster ? [...new Set(manualMaster.lanes.map(lane => lane.pol))].sort() : [];
-  const manualLanes = manualMaster ? manualMaster.lanes
-    .map((lane, index) => ({ lane, index }))
-    .filter(item => item.lane.pol === manual.pol)
-    .sort((a, b) => a.lane.name.localeCompare(b.lane.name)) : [];
+  const manualCities = manualMaster ? [...new Set(manualMaster.lanes.filter(lane => lane.pol === manual.pol).map(lane => lane.name))].sort() : [];
+  const selectedCityLanes = manualMaster ? manualMaster.lanes.filter(lane => lane.pol === manual.pol && lane.name === manual.city) : [];
+  const manualSsys = [...new Set(selectedCityLanes.flatMap(lane => String(lane.ssy || '').split(',').map(value => value.trim()).filter(Boolean)))];
+  const needsSsy = selectedCityLanes.length > 1;
 
   return (
     <>
@@ -216,15 +220,20 @@ export default function ErdBridgeButton({ standalone = false }) {
             {state.loading ? <p className="p-8 text-center text-sm font-bold">Opening the live master…</p> : (
               <form onSubmit={calculateManual} className="space-y-3 p-4">
                 <label className="block text-xs font-bold">Port of loading
-                  <select value={manual.pol} onChange={event => setManual(current => ({ ...current, pol: event.target.value, lane: '' }))} className="mt-1 w-full rounded-md border border-slate-600 bg-slate-900 px-3 py-2 text-sm" required>
+                  <select value={manual.pol} onChange={event => setManual(current => ({ ...current, pol: event.target.value, city: '', ssy: '' }))} className="mt-1 w-full rounded-md border border-slate-600 bg-slate-900 px-3 py-2 text-sm" required>
                     <option value="">Choose port</option>{manualPorts.map(pol => <option key={pol} value={pol}>{pol}</option>)}
                   </select>
                 </label>
                 <label className="block text-xs font-bold">Starting city / rail ramp
-                  <select value={manual.lane} onChange={event => setManual(current => ({ ...current, lane: event.target.value }))} className="mt-1 w-full rounded-md border border-slate-600 bg-slate-900 px-3 py-2 text-sm" required disabled={!manual.pol}>
-                    <option value="">Choose starting city</option>{manualLanes.map(({ lane, index }) => <option key={`${index}-${lane.name}`} value={index}>{lane.name}{lane.rampMC ? ` — ${lane.rampMC}` : ''}{lane.ssy && lane.ssy !== 'ALL' ? ` (${lane.ssy})` : ''}</option>)}
+                  <select value={manual.city} onChange={event => setManual(current => ({ ...current, city: event.target.value, ssy: '' }))} className="mt-1 w-full rounded-md border border-slate-600 bg-slate-900 px-3 py-2 text-sm" required disabled={!manual.pol}>
+                    <option value="">Choose starting city</option>{manualCities.map(city => <option key={city} value={city}>{city}</option>)}
                   </select>
                 </label>
+                {needsSsy ? <label className="block text-xs font-bold">SSY / service
+                  <select value={manual.ssy} onChange={event => setManual(current => ({ ...current, ssy: event.target.value }))} className="mt-1 w-full rounded-md border border-slate-600 bg-slate-900 px-3 py-2 text-sm" required>
+                    <option value="">Choose SSY</option>{manualSsys.map(ssy => <option key={ssy} value={ssy}>{ssy.toUpperCase() === 'ALL' ? 'ALL / other services' : ssy}</option>)}
+                  </select>
+                </label> : null}
                 <label className="block text-xs font-bold">Port-cut date <span className="font-normal text-slate-400">(DD, M/D, or full date)</span>
                   <input type="text" value={manual.cutoffDate} onChange={event => setManual(current => ({ ...current, cutoffDate: event.target.value }))} placeholder="5 or 7/5" className="mt-1 w-full rounded-md border border-slate-600 bg-slate-900 px-3 py-2 text-sm" inputMode="numeric" required />
                 </label>
@@ -265,7 +274,7 @@ export default function ErdBridgeButton({ standalone = false }) {
                     <span className="font-bold text-slate-500">Route</span><span className="text-right font-bold">{state.data.startCity} → {state.data.polCity}<small className="mt-0.5 block text-[10px] font-semibold text-slate-500">{state.result.returnTerminal || 'N/A'} → {state.data.departureTerminal || 'N/A'}</small></span>
                     {state.data.vessel ? <><span className="font-bold text-slate-500">Vessel</span><span className="text-right font-bold">{state.data.vessel}</span></> : null}
                     {state.data.canadianRail ? <><span className="font-bold text-slate-500">Rail</span><span className="text-right font-bold">{state.data.canadianRail}<small className="mt-0.5 block text-[10px] font-semibold text-slate-500">{state.data.customerPlace}</small></span></> : null}
-                    <span className="font-bold text-slate-500">Equipment</span><span className="text-right font-bold">{state.result.equipmentType || 'Not detected'}{state.result.isReefer ? ' · Reefer' : ''}</span>
+                    {state.result.isReefer ? <><span className="font-bold text-slate-500">Equipment</span><span className="text-right font-bold">Reefer</span></> : null}
                     <span className="font-bold text-slate-500">Port cutoff</span><span className="text-right font-bold">{state.data.relevantCutoffDate} {state.data.relevantCutoffTime}</span>
                     <span className="font-bold text-slate-500">Data</span><span className="text-right text-[11px] font-bold">Live master updated{state.data.liveModified ? ` ${state.data.liveModified}` : ''}</span>
                   </div>
