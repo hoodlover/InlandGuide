@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { calculateFromLiveMaster, loadLiveMaster } from '../lib/liveMaster';
 import { calculateCanadaBooking } from '../lib/canadaBooking';
+import { getTerminalOptions, getTerminals, ssyForTerminal, terminalLabel } from '../lib/cutoff';
 import { hapagLogoDataUri } from '../assets/hapag-logo-clipboard';
 
 const BRIDGE_URL = 'http://127.0.0.1:47832/s8100-summary?equipment=skip';
@@ -80,7 +81,7 @@ export default function ErdBridgeButton({ standalone = false }) {
   const [state, setState] = useState({ loading: false, error: '', data: null, result: null, copied: false, previewFormat: '' });
   const [manualOpen, setManualOpen] = useState(false);
   const [manualMaster, setManualMaster] = useState(null);
-  const [manual, setManual] = useState({ pol: '', city: '', ssy: '', cutoffDate: '', bookingNumber: '', isReefer: false });
+  const [manual, setManual] = useState({ pol: '', city: '', terminal: '', ssy: '', cutoffDate: '', bookingNumber: '', isReefer: false });
   const [reefer, setReefer] = useState(false);
 
   const readAndCalculate = async () => {
@@ -131,11 +132,15 @@ export default function ErdBridgeButton({ standalone = false }) {
   const calculateManual = async event => {
     event.preventDefault();
     const cityLanes = manualMaster?.lanes?.filter(lane => lane.pol === manual.pol && lane.name === manual.city) || [];
-    const lane = cityLanes.find(item => String(item.ssy || '').split(',').map(value => value.trim().toUpperCase()).includes(manual.ssy.toUpperCase()))
+    const terminalConfig = getTerminals(manual.pol);
+    const selectedSsy = terminalConfig
+      ? ssyForTerminal(manual.pol, manual.city, manual.terminal)
+      : manual.ssy;
+    const lane = cityLanes.find(item => String(item.ssy || '').split(',').map(value => value.trim().toUpperCase()).includes(selectedSsy.toUpperCase()))
       || (cityLanes.length === 1 ? cityLanes[0] : null);
     const parsedDate = parseManualDate(manual.cutoffDate);
-    if (!lane || !manual.pol || !parsedDate) {
-      setState(current => ({ ...current, error: 'Choose a port and starting city, then enter a valid date such as 5, 7/5, or 7/5/2026.' }));
+    if (!lane || !manual.pol || (terminalConfig && !manual.terminal) || !parsedDate) {
+      setState(current => ({ ...current, error: 'Choose a port, starting city, and terminal when shown, then enter a valid date such as 5, 7/5, or 7/5/2026.' }));
       return;
     }
     try {
@@ -145,9 +150,9 @@ export default function ErdBridgeButton({ standalone = false }) {
         polCity: manual.pol,
         startLocode: lane.loccode,
         startCity: lane.name,
-        motService: manual.ssy || String(lane.ssy || 'ALL').split(',')[0].trim(),
+        motService: selectedSsy || String(lane.ssy || 'ALL').split(',')[0].trim(),
         vessel: '',
-        departureTerminal: '',
+        departureTerminal: manual.terminal ? terminalLabel(manual.terminal) : '',
         relevantCutoffDate: parsedDate.display,
         relevantCutoffTime: '',
         equipmentType: manual.isReefer ? 'Reefer' : 'Dry',
@@ -191,7 +196,9 @@ export default function ErdBridgeButton({ standalone = false }) {
   const manualCities = manualMaster ? [...new Set(manualMaster.lanes.filter(lane => lane.pol === manual.pol).map(lane => lane.name))].sort() : [];
   const selectedCityLanes = manualMaster ? manualMaster.lanes.filter(lane => lane.pol === manual.pol && lane.name === manual.city) : [];
   const manualSsys = [...new Set(selectedCityLanes.flatMap(lane => String(lane.ssy || '').split(',').map(value => value.trim()).filter(Boolean)))];
-  const needsSsy = selectedCityLanes.length > 1;
+  const manualTerminals = manual.pol ? getTerminals(manual.pol) : null;
+  const manualTerminalOptions = manualTerminals ? getTerminalOptions(manual.pol) : [];
+  const needsSsy = selectedCityLanes.length > 1 && !manualTerminals;
 
   return (
     <>
@@ -220,15 +227,20 @@ export default function ErdBridgeButton({ standalone = false }) {
             {state.loading ? <p className="p-8 text-center text-sm font-bold">Opening the live master…</p> : (
               <form onSubmit={calculateManual} className="space-y-3 p-4">
                 <label className="block text-xs font-bold">Port of loading
-                  <select value={manual.pol} onChange={event => setManual(current => ({ ...current, pol: event.target.value, city: '', ssy: '' }))} className="mt-1 w-full rounded-md border border-slate-600 bg-slate-900 px-3 py-2 text-sm" required>
+                  <select value={manual.pol} onChange={event => setManual(current => ({ ...current, pol: event.target.value, city: '', terminal: '', ssy: '' }))} className="mt-1 w-full rounded-md border border-slate-600 bg-slate-900 px-3 py-2 text-sm" required>
                     <option value="">Choose port</option>{manualPorts.map(pol => <option key={pol} value={pol}>{pol}</option>)}
                   </select>
                 </label>
                 <label className="block text-xs font-bold">Starting city / rail ramp
-                  <select value={manual.city} onChange={event => setManual(current => ({ ...current, city: event.target.value, ssy: '' }))} className="mt-1 w-full rounded-md border border-slate-600 bg-slate-900 px-3 py-2 text-sm" required disabled={!manual.pol}>
+                  <select value={manual.city} onChange={event => setManual(current => ({ ...current, city: event.target.value, terminal: '', ssy: '' }))} className="mt-1 w-full rounded-md border border-slate-600 bg-slate-900 px-3 py-2 text-sm" required disabled={!manual.pol}>
                     <option value="">Choose starting city</option>{manualCities.map(city => <option key={city} value={city}>{city}</option>)}
                   </select>
                 </label>
+                {manualTerminals && manual.city ? <label className="block text-xs font-bold">Port terminal
+                  <select value={manual.terminal} onChange={event => setManual(current => ({ ...current, terminal: event.target.value }))} className="mt-1 w-full rounded-md border border-slate-600 bg-slate-900 px-3 py-2 text-sm" required>
+                    <option value="">Choose terminal</option>{manualTerminalOptions.map(option => <option key={option.value} value={option.value}>{option.label} — {option.sub}</option>)}
+                  </select>
+                </label> : null}
                 {needsSsy ? <label className="block text-xs font-bold">SSY / service
                   <select value={manual.ssy} onChange={event => setManual(current => ({ ...current, ssy: event.target.value }))} className="mt-1 w-full rounded-md border border-slate-600 bg-slate-900 px-3 py-2 text-sm" required>
                     <option value="">Choose SSY</option>{manualSsys.map(ssy => <option key={ssy} value={ssy}>{ssy.toUpperCase() === 'ALL' ? 'ALL / other services' : ssy}</option>)}
