@@ -30,16 +30,16 @@ function escapeHtml(value) {
 }
 
 function formattedResult(data, result) {
-  const row = (label, value) => `<tr><td style="padding:5px 8px;border-bottom:1px solid #dbe2ea;font-weight:700;white-space:nowrap">${label}</td><td style="padding:5px 8px;border-bottom:1px solid #dbe2ea;text-align:right;font-weight:700;white-space:nowrap">${escapeHtml(value)}</td></tr>`;
+  const row = (label, value) => `<div style="display:block;border-bottom:1px solid #dbe2ea;background:#fff;font-size:11px;line-height:1.25;white-space:nowrap"><span style="display:inline-block;box-sizing:border-box;width:52%;padding:5px 8px;font-weight:700">${label}</span><span style="display:inline-block;box-sizing:border-box;width:48%;padding:5px 8px;text-align:right;font-weight:700">${escapeHtml(value)}</span></div>`;
   return `<div style="font-family:Arial,sans-serif;width:340px;max-width:100%;box-sizing:border-box;border:4px solid #002d72;border-radius:11px;background:#eb6608;padding:10px;color:#10233f">` +
-    `<div style="display:grid;grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr);align-items:start;gap:5px;color:white;margin-bottom:7px">` +
-    `<div><div style="font-size:11px;font-weight:800;white-space:nowrap">${escapeHtml(data.startCity)}</div><div style="font-size:8px;line-height:1.15;margin-top:2px">${escapeHtml(result.returnTerminal || '')}</div></div>` +
-    `<div style="font-size:14px;font-weight:900;text-align:center">&rarr;</div>` +
-    `<div><div style="font-size:11px;font-weight:800;text-align:right;white-space:nowrap">${escapeHtml(data.polCity)}</div><div style="font-size:8px;line-height:1.15;margin-top:2px;text-align:right">${escapeHtml(data.departureTerminal || '')}</div></div></div>` +
-    `<table style="width:100%;border-collapse:collapse;background:white;border-radius:7px;overflow:hidden;font-size:11px;line-height:1.25">` +
+    `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;table-layout:fixed;border:0;color:white;margin-bottom:7px"><tr>` +
+    `<td style="width:46%;border:0;vertical-align:top"><div style="font-size:11px;font-weight:800;white-space:nowrap">${escapeHtml(data.startCity)}</div><div style="font-size:8px;line-height:1.15;margin-top:2px">${escapeHtml(result.returnTerminal || '')}</div></td>` +
+    `<td style="width:8%;border:0;vertical-align:top;text-align:center;font-size:14px;font-weight:900">&rarr;</td>` +
+    `<td style="width:46%;border:0;vertical-align:top;text-align:right"><div style="font-size:11px;font-weight:800;white-space:nowrap">${escapeHtml(data.polCity)}</div><div style="font-size:8px;line-height:1.15;margin-top:2px">${escapeHtml(data.departureTerminal || '')}</div></td>` +
+    `</tr></table><div style="overflow:hidden;border-radius:7px;background:white">` +
     row('Booking', data.bookingNumber) + row('ERD', result.erd) +
     row('LRD', `${result.lrd} · ${result.rampCutTime}`) + row('Vessel', data.vessel || 'N/A') +
-    row('Port Cutoff', `${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim()) + `</table>` +
+    row('Port Cutoff', `${data.relevantCutoffDate} ${data.relevantCutoffTime}`.trim()) + `</div>` +
     `<div style="margin-top:6px;text-align:right"><img src="${hapagLogoDataUri}" alt="Hapag-Lloyd" style="display:inline-block;width:105px;height:auto"></div></div>`;
 }
 
@@ -69,7 +69,9 @@ export default function ErdBridgeButton({ standalone = false }) {
       const { startCity, result } = calculateFromLiveMaster(live, data, cutoffDate);
       const saved = { data: { ...data, startCity, liveSource: live.source, liveModified: live.modified }, result, savedAt: new Date().toISOString() };
       try { localStorage.setItem(LAST_RESULT_KEY, JSON.stringify(saved)); } catch { /* Last-result convenience is optional. */ }
-      setState({ loading: false, error: '', data: saved.data, result, copied: false, previewFormat: '' });
+      let copied = false;
+      try { await copyFormattedToClipboard(saved.data, result); copied = true; } catch { /* The browser permission message remains visible. */ }
+      setState({ loading: false, error: '', data: saved.data, result, copied, previewFormat: '' });
     } catch (error) {
       const offline = error instanceof TypeError;
       setState({
@@ -79,16 +81,6 @@ export default function ErdBridgeButton({ standalone = false }) {
         result: null,
         copied: false, previewFormat: '',
       });
-    }
-  };
-
-  const copyFormatted = async () => {
-    if (!state.data || !state.result) return;
-    try {
-      await copyFormattedToClipboard(state.data, state.result);
-      setState(current => ({ ...current, copied: true, previewFormat: 'formatted' }));
-    } catch {
-      setState(current => ({ ...current, error: 'Formatted copy needs clipboard permission. Choose Allow once, then click Copy formatted again.' }));
     }
   };
 
@@ -161,17 +153,7 @@ export default function ErdBridgeButton({ standalone = false }) {
                     <div className="flex justify-between gap-3"><span className="font-bold">ERD</span><strong>{state.result.erd}</strong></div>
                     <div className="mt-1.5 flex justify-between gap-3"><span className="font-bold">LRD</span><strong>{state.result.lrd} · {state.result.rampCutTime}</strong></div>
                   </div>
-                  <button type="button" onClick={copyFormatted} className="mx-auto block rounded-lg bg-[#EB6608] px-5 py-2 text-xs font-bold text-white hover:bg-orange-600">✨ Copy formatted</button>
-                  {state.previewFormat ? (
-                    <section className="rounded-lg border-2 border-emerald-400 bg-emerald-50 p-2.5">
-                      <p className="mb-2 text-sm font-black text-emerald-700">✓ {state.previewFormat === 'formatted' ? 'Formatted' : 'Text'} copy ready to paste</p>
-                      {state.previewFormat === 'formatted' ? (
-                        <div className="max-h-72 overflow-auto rounded-lg bg-white p-2" dangerouslySetInnerHTML={{ __html: formattedResult(state.data, state.result) }} />
-                      ) : (
-                        <pre className="max-h-72 overflow-auto whitespace-pre-wrap rounded-lg bg-white p-3 text-xs text-slate-800">{resultText(state.data, state.result)}</pre>
-                      )}
-                    </section>
-                  ) : null}
+                  <p className={`text-center text-xs font-bold ${state.copied ? 'text-emerald-700' : 'text-amber-700'}`}>{state.copied ? '✓ Already copied to your clipboard — ready to paste' : 'Clipboard permission is needed. Choose Allow, then click ERD again.'}</p>
                 </div>
               ) : null}
             </div>
