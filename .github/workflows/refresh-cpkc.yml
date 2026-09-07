@@ -1,6 +1,6 @@
 name: Refresh CPKC port schedules
 
-# Hourly during the Eastern business day: download the CPKC/CN port-schedule PDFs and inspect the
+# At 10 AM and 2 PM Eastern: download the CPKC/CN port-schedule PDFs and inspect the
 # published/last-updated dates printed in them. Only when a date or schedule
 # actually changes do we rebuild the offline app, commit, and trigger Vercel.
 #
@@ -9,10 +9,9 @@ name: Refresh CPKC port schedules
 # than sending any alert. No notifications are sent from here.
 
 on:
-  # GitHub cron is UTC. Cover both EDT (12:00-21:00 UTC) and EST
-  # (13:00-22:00 UTC), then gate the job to 08:00-17:00 America/New_York.
+  # GitHub cron is UTC. Cover EDT and EST, then gate to 10:00/14:00 Eastern.
   schedule:
-    - cron: '0 12-22 * * *'
+    - cron: '0 14,15,18,19 * * *'
   workflow_dispatch: {}
 
 permissions:
@@ -35,11 +34,11 @@ jobs:
             exit 0
           fi
           eastern_hour="$(TZ=America/New_York date +%H)"
-          if (( 10#$eastern_hour >= 8 && 10#$eastern_hour <= 17 )); then
+          if (( 10#$eastern_hour == 10 || 10#$eastern_hour == 14 )); then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
-            echo "Skipping: ${eastern_hour}:00 is outside 08:00-17:00 Eastern."
+            echo "Skipping: ${eastern_hour}:00 is outside 10:00/14:00 Eastern."
           fi
 
       - uses: actions/checkout@v4
