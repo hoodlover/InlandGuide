@@ -1,5 +1,32 @@
 {
   "installCommand": "npm install && cd frontend && npm install --legacy-peer-deps",
   "buildCommand": "cd frontend && npm run build",
-  "outputDirectory": "frontend/dist"
+  "outputDirectory": "frontend/dist",
+  "headers": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "inlandguide.hapagidt.com" }],
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/admin",
+      "has": [{ "type": "host", "value": "inlandguide.hapagidt.com" }],
+      "destination": "/index.html"
+    },
+    {
+      "source": "/sw.js",
+      "has": [{ "type": "host", "value": "inlandguide.hapagidt.com" }],
+      "destination": "/retirement-sw.js"
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        { "type": "host", "value": "inlandguide.hapagidt.com" },
+        { "type": "header", "key": "accept", "value": ".*text/html.*" }
+      ],
+      "destination": "/retired.html"
+    }
+  ]
 }

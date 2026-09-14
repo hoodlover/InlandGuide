@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <meta name="robots" content="noindex">
+  <title>Inland Guide is being retired</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; min-height: 100svh; display: grid; place-items: center; background: #000; color: #fff; font-family: Arial, sans-serif; }
+    main { width: min(100%, 680px); padding: 48px 24px; text-align: center; }
+    h1 { font-size: clamp(26px, 5vw, 40px); line-height: 1.2; overflow-wrap: anywhere; margin: 0 0 24px; }
+    h1 span { display: block; }
+    h1 .title-line { display: flex; align-items: center; justify-content: center; gap: 16px; }
+    .title-line img { width: clamp(52px, 10vw, 80px); height: auto; flex-shrink: 0; }
+    .domain { color: #ff6600; margin-top: 18px; }
+    .retiring { margin-top: 10px; }
+    .admin-logo { position: fixed; right: 20px; bottom: 20px; padding: 0; border: 0; background: transparent; cursor: pointer; }
+    .admin-logo img { display: block; width: 54px; height: auto; }
+    .admin-logo:focus-visible { outline: 2px solid #ff6600; outline-offset: 5px; }
+    p { color: #d4d4d4; font-size: 19px; line-height: 1.6; margin: 0 0 28px; }
+    a { display: inline-block; padding: 15px 22px; border-radius: 6px; background: #fff; color: #000; font-weight: bold; text-decoration: none; line-height: 1.4; }
+    a:hover { background: #dedede; }
+    a:focus-visible { outline: 3px solid #fff; outline-offset: 5px; }
+    .redirect { margin: 24px 0 0; font-size: 14px; color: #a3a3a3; }
+    .fine-print { margin: 20px 0 0; font-size: 10px; line-height: 1.5; color: #888; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1><span class="title-line"><img src="/retirement-erd-guide.png" alt="ERD Guide"><span>INLAND GUIDE</span></span><span class="domain">inlandguide.hapagidt.com</span><span class="retiring">is being retired</span></h1>
+    <p>For now, please use the current Inland Guide on SharePoint.</p>
+    <a id="guide" href="https://hlag.sharepoint.com/:x:/r/sites/RegionNorthAmerica/_layouts/15/Doc.aspx?sourcedoc=%7B4D8B588D-44C4-4527-AC77-86D7D76BF6A7%7D&amp;file=InlandCutoffGuide.xlsm&amp;action=default&amp;mobileredirect=true">Open Inland Guide on SharePoint</a>
+    <p class="redirect" id="redirect" hidden>Taking you to SharePoint in 5 seconds…</p>
+    <p class="fine-print">Contact Lance Cobb if interested in a new option</p>
+  </main>
+  <button class="admin-logo" id="admin-logo" aria-label="Administrator access"><img src="/retirement-logo.png" alt="Hapag-Lloyd"></button>
+  <script>
+    var preview = location.hostname === '127.0.0.1' || location.hostname === 'localhost';
+    document.getElementById('redirect').hidden = false;
+    var redirectTimer = preview ? null : setTimeout(function () { location.replace(document.getElementById('guide').href); }, 5000);
+    var clicks = 0;
+    var lastClick = 0;
+    document.getElementById('admin-logo').addEventListener('click', function () {
+      clearTimeout(redirectTimer);
+      document.getElementById('redirect').hidden = true;
+      var now = Date.now();
+      clicks = now - lastClick < 1200 ? clicks + 1 : 1;
+      lastClick = now;
+      if (clicks === 3) location.assign('/admin#managers');
+    });
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function (registrations) {
+        return Promise.all(registrations.map(function (registration) { return registration.unregister(); }));
+      }).catch(function () {});
+    }
+    if ('caches' in window) {
+      caches.keys().then(function (keys) {
+        return Promise.all(keys.filter(function (key) { return key.startsWith('icg-'); }).map(function (key) { return caches.delete(key); }));
+      }).catch(function () {});
+    }
+  </script>
+</body>
+</html>
