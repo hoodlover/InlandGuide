@@ -3,6 +3,7 @@
   "private": true,
   "description": "Dependencies for the Vercel serverless functions in api/",
   "dependencies": {
-    "@libsql/client": "^0.17.4"
+    "@libsql/client": "^0.17.4",
+    "@vercel/functions": "^3.9.7"
   }
 }
