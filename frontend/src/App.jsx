@@ -1285,7 +1285,7 @@ export default function App() {
   }, [pwaInstalled]);
 
   useEffect(() => {
-    if (pwaInstalled || !userName || !userEmail) return undefined;
+    if (window.__INLAND_PORTABLE__ || pwaInstalled || !userName || !userEmail) return undefined;
     const timer = window.setTimeout(() => setInstallOpen(true), 3 * 60 * 1000);
     return () => window.clearTimeout(timer);
   }, [pwaInstalled, userName, userEmail]);
@@ -1436,7 +1436,7 @@ export default function App() {
         }}
         onClose={() => setNameEditorOpen(false)}
       />
-      <UpdateToast />
+      {!window.__INLAND_PORTABLE__ && <UpdateToast />}
       {installOpen && <InstallModal onClose={() => setInstallOpen(false)} />}
       {requestOpen && <FeatureRequestModal onClose={() => setRequestOpen(false)} />}
 

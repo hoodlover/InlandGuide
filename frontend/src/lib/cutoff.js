@@ -1,13 +1,21 @@
 // Client-side port of the backend calculation logic.
 // The data is a committed snapshot exported from the Excel DATABASE sheet.
-import rawLanes from '../data/lanes.json';
-import holidays from '../data/holidays.json';
+import bundledLanes from '../data/lanes.json';
+import bundledHolidays from '../data/holidays.json';
 import terminals from '../data/terminals.json';
-import portTerminals from '../data/portmc.json';
-import portServices from '../data/port-services.json';
+import bundledPortTerminals from '../data/portmc.json';
+import bundledPortServices from '../data/port-services.json';
 import terminalInfo from '../data/terminal-info.json';
-import masterStatus from '../data/master-status.json';
+import bundledMasterStatus from '../data/master-status.json';
 import nameOverridesJson from '../data/name-overrides.json';
+
+// The portable launcher injects validated data before the application starts.
+const portableMaster = window.__INLAND_PORTABLE__;
+const rawLanes = portableMaster?.data.lanes || bundledLanes;
+const holidays = portableMaster?.data.holidays || bundledHolidays;
+const portTerminals = portableMaster?.data.portmc || bundledPortTerminals;
+const portServices = portableMaster?.data.portServices || bundledPortServices;
+const masterStatus = portableMaster ? { publishedAt: portableMaster.modifiedAt } : bundledMasterStatus;
 
 // Manager-published display names (Managers Hub → Rename ports & terminals).
 // Display only — codes stay authoritative so lanes keep matching the master.

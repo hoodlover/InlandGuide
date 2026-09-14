@@ -14,6 +14,26 @@ export default function UpdateToast() {
   const [newVersion, setNewVersion] = useState('');
 
   useEffect(() => {
+    if (window.__INLAND_PORTABLE__) {
+      let stopped = false;
+      const checkMaster = async () => {
+        try {
+          const response = await fetch('/portable-status', { cache: 'no-store' });
+          const status = await response.json();
+          if (stopped) return;
+          if (!status.ok) setNewVersion('Master unavailable — reopen the guide after OneDrive finishes syncing');
+          else if (status.sourceHash !== window.__INLAND_PORTABLE__.sourceHash) setNewVersion('Updated master workbook');
+          else setNewVersion('');
+        } catch { if (!stopped) setNewVersion('Launcher stopped — double-click Open Inland Guide again'); }
+      };
+      const timer = setInterval(checkMaster, 60000);
+      window.addEventListener('focus', checkMaster);
+      return () => {
+        stopped = true;
+        clearInterval(timer);
+        window.removeEventListener('focus', checkMaster);
+      };
+    }
     // The offline double-click build (file://) and localhost dev have no
     // deployed version.json worth comparing against.
     if (!location.protocol.startsWith('http')) return undefined;
@@ -70,8 +90,8 @@ export default function UpdateToast() {
       <div className="flex items-center gap-3 rounded-xl bg-[#002D72] px-4 py-3 text-white shadow-[0_10px_30px_rgba(0,0,0,0.45)]">
         <span className="text-xl" aria-hidden="true">✨</span>
         <span className="text-sm">
-          A new version of the guide is ready
-          <span className="ml-1 font-mono text-xs text-white/60">v {newVersion}</span>
+          {window.__INLAND_PORTABLE__ ? newVersion : <>A new version of the guide is ready
+            <span className="ml-1 font-mono text-xs text-white/60">v {newVersion}</span></>}
         </span>
         <button
           type="button"

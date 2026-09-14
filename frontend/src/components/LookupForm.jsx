@@ -23,6 +23,7 @@ const RAIL_EMAIL_DUPLICATE_WINDOW_MS = 2 * 60 * 1000;
 let lastRailEmail = { key: '', at: 0 };
 
 function logUsage(res, bookingNumber) {
+  if (window.__INLAND_PORTABLE__) return;
   const key = `${res.erd}|${res.lrd}`;
   const now = Date.now();
   if (key === lastLogged.key && now - lastLogged.at < DUPLICATE_WINDOW_MS) return;

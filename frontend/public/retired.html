@@ -25,6 +25,13 @@
     a:focus-visible { outline: 3px solid #fff; outline-offset: 5px; }
     .redirect { margin: 24px 0 0; font-size: 14px; color: #a3a3a3; }
     .fine-print { margin: 20px 0 0; font-size: 10px; line-height: 1.5; color: #888; }
+    .portable { margin-top: 36px; padding-top: 26px; border-top: 1px solid #333; text-align: left; }
+    .portable h2 { font-size: 21px; margin: 0 0 14px; color: #ff6600; }
+    .portable p, .portable li { font-size: 15px; line-height: 1.6; }
+    .portable p { margin: 12px 0 0; }
+    .portable ol { padding-left: 22px; margin: 0; }
+    .portable li { margin: 9px 0; }
+    .portable code { overflow-wrap: anywhere; color: #fff; }
   </style>
 </head>
 <body>
@@ -32,19 +39,24 @@
     <h1><span class="title-line"><img src="/retirement-erd-guide.png" alt="ERD Guide"><span>INLAND GUIDE</span></span><span class="domain">inlandguide.hapagidt.com</span><span class="retiring">is being retired</span></h1>
     <p>For now, please use the current Inland Guide on SharePoint.</p>
     <a id="guide" href="https://hlag.sharepoint.com/:x:/r/sites/RegionNorthAmerica/_layouts/15/Doc.aspx?sourcedoc=%7B4D8B588D-44C4-4527-AC77-86D7D76BF6A7%7D&amp;file=InlandCutoffGuide.xlsm&amp;action=default&amp;mobileredirect=true">Open Inland Guide on SharePoint</a>
-    <p class="redirect" id="redirect" hidden>Taking you to SharePoint in 5 seconds…</p>
-    <p class="fine-print">Contact Lance Cobb if interested in a new option</p>
+    <section class="portable" aria-labelledby="portable-title">
+      <h2 id="portable-title">Use the standalone Inland Guide</h2>
+      <ol>
+        <li>Open File Explorer and go to <code>Z:\Inland Guide Lookup Tool</code>.</li>
+        <li>Copy <strong>Inland-Guide-Portable.zip</strong> to your Desktop or Documents.</li>
+        <li>Right-click the ZIP and choose <strong>Extract All</strong>.</li>
+        <li>Open the extracted <strong>Inland Guide</strong> folder and double-click <strong>Open Inland Guide.vbs</strong>. The guide opens in your browser.</li>
+      </ol>
+      <p>No installation or master file selection is needed. The launcher reads your OneDrive-synced <strong>InlandCutoffGuide.xlsm</strong>. If it is not synced yet, follow the instructions shown when the guide opens.</p>
+      <p>Keep the extracted folder together. Master changes become available after OneDrive syncs; the guide offers a refresh when the data changes.</p>
+      <p class="fine-print">Contact Lance Cobb if you need help.</p>
+    </section>
   </main>
   <button class="admin-logo" id="admin-logo" aria-label="Administrator access"><img src="/retirement-logo.png" alt="Hapag-Lloyd"></button>
   <script>
-    var preview = location.hostname === '127.0.0.1' || location.hostname === 'localhost';
-    document.getElementById('redirect').hidden = false;
-    var redirectTimer = preview ? null : setTimeout(function () { location.replace(document.getElementById('guide').href); }, 5000);
     var clicks = 0;
     var lastClick = 0;
     document.getElementById('admin-logo').addEventListener('click', function () {
-      clearTimeout(redirectTimer);
-      document.getElementById('redirect').hidden = true;
       var now = Date.now();
       clicks = now - lastClick < 1200 ? clicks + 1 : 1;
       lastClick = now;
