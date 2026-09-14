@@ -14,7 +14,9 @@ $sourceZip = Join-Path $SourcePackage 'GOT-ERD-Tool-v1.0.18.zip'
 $expected = (Get-Content -LiteralPath (Join-Path $SourcePackage 'GOT-ERD-Tool-v1.0.18.sha256') -Raw).Trim()
 if ((Get-FileHash -LiteralPath $sourceZip -Algorithm SHA256).Hash -ne $expected) { throw 'Original ERD ZIP failed verification.' }
 Copy-Item -LiteralPath $sourceZip -Destination (Join-Path $stageRoot 'original-GOT-ERD-Tool-v1.0.18.zip')
-Copy-Item -LiteralPath 'Z:\ERD Tool.bat' -Destination (Join-Path $stageRoot 'original-ERD Tool.bat')
+if (Test-Path -LiteralPath 'Z:\ERD Tool.bat') {
+    Copy-Item -LiteralPath 'Z:\ERD Tool.bat' -Destination (Join-Path $stageRoot 'original-ERD Tool.bat')
+}
 Expand-Archive -LiteralPath $sourceZip -DestinationPath $payloadRoot
 $runtimeRoot = Join-Path $payloadRoot 'GOT-ERD-Tool'
 $launchPath = Join-Path $runtimeRoot 'Launch-Floating-Erd.ps1'
