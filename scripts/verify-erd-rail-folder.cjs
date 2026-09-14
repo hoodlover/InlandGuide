@@ -11,6 +11,14 @@ let identical = 0;
 for (const [name, bytes] of Object.entries(before)) {
   assert.ok(after[name], `Missing runtime file: ${name}`);
   if (name.endsWith('Launch-Floating-Erd.ps1')) continue;
+  if (name.endsWith('erd-button.html')) {
+    const blue = 'backgroundColor:"#EB6608",color:"#002D72",fontWeight:800,fontSize:14';
+    const black = 'backgroundColor:"#EB6608",color:"#000000",fontWeight:800,fontSize:14';
+    const html = Buffer.from(after[name]).toString('utf8');
+    assert.ok(html.includes(black) && !html.includes(blue), 'ERD result text must be black');
+    assert.equal(html, Buffer.from(bytes).toString('utf8').replaceAll(blue, black));
+    continue;
+  }
   assert.deepEqual(Buffer.from(after[name]), Buffer.from(bytes), name);
   identical++;
 }
@@ -26,4 +34,4 @@ for (const [name, bytes] of Object.entries(after)) {
   assert.ok(!buffer.includes(Buffer.from('InlandCutoffGuide-DontTouch')) &&
     !buffer.includes(Buffer.from('InlandCutoffGuide-DontTouch', 'utf16le')), `${name} still depends on old folder`);
 }
-console.log(`PASS: ${identical} original runtime files identical; launcher/config changed. ${copy.lanes.length} master lanes validated. Runtime master paths no longer use the old folder.`);
+console.log(`PASS: ${identical} original runtime files identical; launcher/config and black result text verified. ${copy.lanes.length} master lanes validated. Runtime master paths no longer use the old folder.`);
