@@ -16,7 +16,12 @@ for (const [name, bytes] of Object.entries(before)) {
     const black = 'backgroundColor:"#EB6608",color:"#000000"';
     const html = Buffer.from(after[name]).toString('utf8');
     assert.ok(html.includes(black) && !html.includes(blue), 'ERD result text must be black');
-    assert.equal(html, Buffer.from(bytes).toString('utf8').replaceAll(blue, black));
+    assert.equal(html, Buffer.from(bytes).toString('utf8').replaceAll(blue, black)
+      .replaceAll('X=()=>fetch(Wm,{cache:"no-store"})', 'X=()=>fetch(P?Wm:Wm+"&solo=1",{cache:"no-store"})'));
+    continue;
+  }
+  if (/Internal-Reader-cleanup[\\/](ERD-Web-Reader\.exe|Program\.cs)$/.test(name)) {
+    assert.deepEqual(Buffer.from(after[name]), fs.readFileSync(path.join(__dirname, 'erd-solo-speed', name.split(/[\\/]/).pop())));
     continue;
   }
   assert.deepEqual(Buffer.from(after[name]), Buffer.from(bytes), name);
