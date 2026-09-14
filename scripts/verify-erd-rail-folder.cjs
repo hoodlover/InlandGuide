@@ -12,8 +12,8 @@ for (const [name, bytes] of Object.entries(before)) {
   assert.ok(after[name], `Missing runtime file: ${name}`);
   if (name.endsWith('Launch-Floating-Erd.ps1')) continue;
   if (name.endsWith('erd-button.html')) {
-    const blue = 'backgroundColor:"#EB6608",color:"#002D72",fontWeight:800,fontSize:14';
-    const black = 'backgroundColor:"#EB6608",color:"#000000",fontWeight:800,fontSize:14';
+    const blue = 'backgroundColor:"#EB6608",color:"#002D72"';
+    const black = 'backgroundColor:"#EB6608",color:"#000000"';
     const html = Buffer.from(after[name]).toString('utf8');
     assert.ok(html.includes(black) && !html.includes(blue), 'ERD result text must be black');
     assert.equal(html, Buffer.from(bytes).toString('utf8').replaceAll(blue, black));

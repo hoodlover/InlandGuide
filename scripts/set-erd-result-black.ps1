@@ -16,8 +16,8 @@ Copy-Item -LiteralPath $zipPath -Destination (Join-Path $stage 'original.zip')
 Copy-Item -LiteralPath (Join-Path $PackageFolder $hashName) -Destination (Join-Path $stage 'original.sha256')
 $newZip = Join-Path $stage $zipName
 Copy-Item -LiteralPath $zipPath -Destination $newZip
-$old = 'backgroundColor:"#EB6608",color:"#002D72",fontWeight:800,fontSize:14'
-$black = 'backgroundColor:"#EB6608",color:"#000000",fontWeight:800,fontSize:14'
+$old = 'backgroundColor:"#EB6608",color:"#002D72"'
+$black = 'backgroundColor:"#EB6608",color:"#000000"'
 $archive = [IO.Compression.ZipFile]::Open($newZip, [IO.Compression.ZipArchiveMode]::Update)
 try {
     $entries = @($archive.Entries | Where-Object { $_.FullName -like '*erd-button.html' })

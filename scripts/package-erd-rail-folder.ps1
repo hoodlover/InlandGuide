@@ -21,8 +21,8 @@ Expand-Archive -LiteralPath $sourceZip -DestinationPath $payloadRoot
 $runtimeRoot = Join-Path $payloadRoot 'GOT-ERD-Tool'
 $resultHtmlPath = Join-Path $runtimeRoot 'Web-App\erd-button.html'
 $resultHtml = [IO.File]::ReadAllText($resultHtmlPath)
-$blueResult = 'backgroundColor:"#EB6608",color:"#002D72",fontWeight:800,fontSize:14'
-$blackResult = 'backgroundColor:"#EB6608",color:"#000000",fontWeight:800,fontSize:14'
+$blueResult = 'backgroundColor:"#EB6608",color:"#002D72"'
+$blackResult = 'backgroundColor:"#EB6608",color:"#000000"'
 if (-not $resultHtml.Contains($blueResult) -and -not $resultHtml.Contains($blackResult)) { throw 'Expected ERD result style missing.' }
 [IO.File]::WriteAllText($resultHtmlPath, $resultHtml.Replace($blueResult, $blackResult), [Text.UTF8Encoding]::new($false))
 $launchPath = Join-Path $runtimeRoot 'Launch-Floating-Erd.ps1'
