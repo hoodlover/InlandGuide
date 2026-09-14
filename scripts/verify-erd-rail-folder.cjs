@@ -17,7 +17,7 @@ for (const [name, bytes] of Object.entries(before)) {
     const html = Buffer.from(after[name]).toString('utf8');
     assert.ok(html.includes(black) && !html.includes(blue), 'ERD result text must be black');
     assert.equal(html, Buffer.from(bytes).toString('utf8').replaceAll(blue, black)
-      .replaceAll('X=()=>fetch(Wm,{cache:"no-store"})', 'X=()=>fetch(P?Wm:Wm+"&solo=1",{cache:"no-store"})'));
+      .replaceAll('X=()=>fetch(Wm,{cache:"no-store"})', 'X=()=>fetch(Wm+"&solo=1",{cache:"no-store"})'));
     continue;
   }
   if (/Internal-Reader-cleanup[\\/](ERD-Web-Reader\.exe|Program\.cs)$/.test(name)) {

@@ -22,8 +22,9 @@ try {
     $htmlEntry = @($zip.Entries | Where-Object FullName -like '*erd-button.html')
     if ($htmlEntry.Count -ne 1) { throw 'Expected one HTML entry.' }
     $r = [IO.StreamReader]::new($htmlEntry[0].Open()); $html = $r.ReadToEnd(); $r.Dispose()
+    $html = $html.Replace('X=()=>fetch(P?Wm:Wm+"&solo=1",{cache:"no-store"})', 'X=()=>fetch(Wm+"&solo=1",{cache:"no-store"})')
     $before = 'X=()=>fetch(Wm,{cache:"no-store"})'
-    $after = 'X=()=>fetch(P?Wm:Wm+"&solo=1",{cache:"no-store"})'
+    $after = 'X=()=>fetch(Wm+"&solo=1",{cache:"no-store"})'
     if (-not $html.Contains($before) -and -not $html.Contains($after)) { throw 'Expected solo fetch anchor missing.' }
     $html = $html.Replace($before, $after)
     $black = 'backgroundColor:"#EB6608",color:"#000000"'

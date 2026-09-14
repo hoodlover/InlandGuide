@@ -30,8 +30,9 @@ $speedReader = Join-Path $speedRoot 'ERD-Web-Reader.exe'
 if ((Get-FileHash $speedReader).Hash -ne '9739BE8C07775271EAD6127C499145088458F02119273E887C7F02CE9279E90E') { throw 'Tested solo reader hash mismatch.' }
 Copy-Item (Join-Path $speedRoot 'ERD-Web-Reader.exe'), (Join-Path $speedRoot 'Program.cs') (Join-Path $runtimeRoot 'Internal-Reader-cleanup') -Force
 $resultHtml = [IO.File]::ReadAllText($resultHtmlPath)
+$resultHtml = $resultHtml.Replace('X=()=>fetch(P?Wm:Wm+"&solo=1",{cache:"no-store"})', 'X=()=>fetch(Wm+"&solo=1",{cache:"no-store"})')
 $soloBefore = 'X=()=>fetch(Wm,{cache:"no-store"})'
-$soloAfter = 'X=()=>fetch(P?Wm:Wm+"&solo=1",{cache:"no-store"})'
+$soloAfter = 'X=()=>fetch(Wm+"&solo=1",{cache:"no-store"})'
 if (-not $resultHtml.Contains($soloBefore) -and -not $resultHtml.Contains($soloAfter)) { throw 'Expected solo fetch missing.' }
 [IO.File]::WriteAllText($resultHtmlPath, $resultHtml.Replace($soloBefore, $soloAfter), [Text.UTF8Encoding]::new($false))
 $launchPath = Join-Path $runtimeRoot 'Launch-Floating-Erd.ps1'
