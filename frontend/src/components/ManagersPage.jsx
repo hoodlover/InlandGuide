@@ -813,7 +813,7 @@ export default function ManagersPage() {
       try {
         if (window.showSaveFilePicker) {
           const handle = await window.showSaveFilePicker({
-            suggestedName: 'InlandCutoffGuideMASTER.xlsm',
+            suggestedName: 'master.xlsm',
             types: [{
               description: 'Excel Macro-Enabled Workbook',
               accept: { 'application/vnd.ms-excel.sheet.macroEnabled.12': ['.xlsm'] },
@@ -826,7 +826,7 @@ export default function ManagersPage() {
           const url = URL.createObjectURL(verified.file);
           const link = document.createElement('a');
           link.href = url;
-          link.download = 'InlandCutoffGuideMASTER.xlsm';
+          link.download = 'master.xlsm';
           link.click();
           setTimeout(() => URL.revokeObjectURL(url), 1000);
         }
@@ -1184,7 +1184,7 @@ export default function ManagersPage() {
         )}
 
         <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
-          Download the workbook from SharePoint first. The workbook itself stays on this computer; only validated calculator rows are sent to the secure deployment workflow. When saving, choose Z:\InlandCutoffGuide-DontTouch.
+          Download the workbook from SharePoint first. The workbook itself stays on this computer; only validated calculator rows are sent to the secure deployment workflow. When saving, replace master.xlsm in Z:\Rail Tools by Lance\ERD Tool. Teammates with older ERD installations still need the previous shared master until they update.
         </p>
       </ToolPanel>
       {showPublishObie && (

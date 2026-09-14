@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param([string]$OutputDirectory = 'Z:\Inland Guide Lookup Tool')
+param([string]$OutputDirectory = 'Z:\Rail Tools by Lance\Inland Guide Lookup Tool')
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $buildRoot = Join-Path $repoRoot ('release-staging\inland-portable-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))

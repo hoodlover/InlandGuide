@@ -80,7 +80,7 @@ async function injected() {
     assert.equal(foreignHostStatus, 403);
     const retired = await (await fetch(`${base}/retired.html`)).text();
     assert.match(retired, /Extract All/);
-    assert.match(retired, /Z:\\Inland Guide Lookup Tool/);
+    assert.match(retired, /Z:\\Rail Tools by Lance\\Inland Guide Lookup Tool/);
     assert.doesNotMatch(retired, /location\.replace/);
     console.log(`PASS: ${expected.lanes.length} master lanes, holidays, port mappings/services, ${new Set(assets).size} image assets, changed master, missing/invalid master, recovery, local-only API, soft-block instructions.`);
   } finally {

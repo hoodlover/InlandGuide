@@ -1,6 +1,6 @@
 INLAND GUIDE — PORTABLE WINDOWS VERSION
 
-1. Copy Inland-Guide-Portable.zip from Z:\Inland Guide Lookup Tool to your Desktop or Documents.
+1. Copy Inland-Guide-Portable.zip from Z:\Rail Tools by Lance\Inland Guide Lookup Tool to your Desktop or Documents.
 2. Right-click the ZIP, choose Extract All, and finish extracting it.
 3. Open the extracted Inland Guide folder and double-click Open Inland Guide.vbs.
 4. The guide opens in your default browser. You can make a desktop shortcut to the VBS file.
