@@ -2360,7 +2360,7 @@
     "rampMC": "APPREG 001",
     "rampCutTime": 0.5833333333333334,
     "transit": 3,
-    "window": 3,
+    "window": 7,
     "ssyAdjustment": 0,
     "reefer": "N",
     "windowReefer": 0
@@ -2373,7 +2373,7 @@
     "rampMC": "BLUER 023",
     "rampCutTime": 0.5833333333333334,
     "transit": 3,
-    "window": 3,
+    "window": 7,
     "ssyAdjustment": 0,
     "reefer": "N",
     "windowReefer": 0
