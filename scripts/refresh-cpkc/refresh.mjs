@@ -31,6 +31,12 @@ const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Se
 
 // A cutoff cell looks like "Mon 29-Jun 18:30"; ETA/ETD/Rail-Port cells like "Tue 7-Jul".
 const DATETIME_RE = /^[A-Z][a-z]{2}\s+\d{1,2}-[A-Z][a-z]{2}\s+\d{1,2}:\d{2}$/;
+// CPKC occasionally leaks an unformatted Excel datetime into an otherwise
+// formatted schedule (for example "9/31/2026 12:00:00 PM").  It is still a
+// cutoff cell, even when the railroad's published calendar date is invalid.
+// Preserve it verbatim so one source-data typo cannot freeze the whole port.
+const EXCEL_DATETIME_RE = /^\d{1,2}\/\d{1,2}\/\d{4}\s+\d{1,2}:\d{2}(?::\d{2})?\s+[AP]M$/i;
+const isCPKCCutoff = value => DATETIME_RE.test(value) || EXCEL_DATETIME_RE.test(value);
 
 // CN date formats: cut-off cells "Fri, Jul-03"; ERD / port-cutoff cells "28-Jun".
 const CN_CUT_RE = /^[A-Za-z]{3},\s*[A-Za-z]{3}-\d{1,2}$/;
@@ -106,7 +112,7 @@ function parseVessels(rows, h, slug, errors) {
   const out = [];
   for (const r of rows) {
     if (r.y >= h.headerY) continue; // header + anything above it
-    const cutoffItems = r.items.filter(it => DATETIME_RE.test(it.s) && it.x > h.comments.x);
+    const cutoffItems = r.items.filter(it => isCPKCCutoff(it.s) && it.x > h.comments.x);
     if (cutoffItems.length === 0) continue; // not a data row
 
     const bucket = new Map(); // label -> [{x,s}]
@@ -133,10 +139,10 @@ function parseVessels(rows, h, slug, errors) {
         errors.push(`  ${vessel}: ${items.length} values collided in "${ca.label}" [${items.map(i => i.s).join(' | ')}]`);
       }
       const v = items.map(i => i.s).join(' ').trim();
-      if (v && !DATETIME_RE.test(v)) {
+      if (v && !isCPKCCutoff(v)) {
         errors.push(`  ${vessel}: non-date value "${v}" in "${ca.label}"`);
       }
-      cutoffs[ca.label] = DATETIME_RE.test(v) ? v : '';
+      cutoffs[ca.label] = isCPKCCutoff(v) ? v : '';
     }
 
     out.push({

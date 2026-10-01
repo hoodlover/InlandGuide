@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Combobox from './Combobox';
-import { getPorts, getVessels, getCities, getVesselMeta, getCutoff, getERD, getPortInfo, getCutTime, formatDate, pulledAt, refreshNeeded, cityDisplay } from '../lib/cpkc';
+import { getPorts, getVessels, getCities, getVesselMeta, getCutoff, getERD, getPortInfo, getCutTime, formatDate, pulledAt, refreshNeeded, cityDisplay, refreshPublishedSchedules } from '../lib/cpkc';
 import { hlLogo } from '../assets/hlLogo';
 import { hlLogoOrange } from '../assets/hlLogoOrange';
 import { SalesforceIcon, OutlookIcon, TeamsIcon, TextIcon } from './BrandIcons';
@@ -48,6 +48,14 @@ function outlookLogoBlock() {
 }
 
 export default function PortScheduleLookup({ onUpdateRamps, initialPort, professional = false }) {
+  const [, setScheduleVersion] = useState(0);
+  useEffect(() => {
+    let active = true;
+    refreshPublishedSchedules()
+      .then(changed => { if (active && changed) setScheduleVersion(version => version + 1); })
+      .catch(() => {}); // bundled schedules remain available when offline
+    return () => { active = false; };
+  }, []);
   const ports = getPorts();
   // Preselect the port handed off from the US tab; else auto-select when there's
   // only one port.

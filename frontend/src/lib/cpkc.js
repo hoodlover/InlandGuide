@@ -22,8 +22,34 @@ const MONTHS = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7,
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-export const generatedAt = schedules.generatedAt || '';
-export const pulledAt = schedules.pulledAt || '';
+export let generatedAt = schedules.generatedAt || '';
+export let pulledAt = schedules.pulledAt || '';
+
+const LIVE_SCHEDULE_URL = 'https://raw.githubusercontent.com/hoodlover/InlandGuide/main/frontend/src/data/cpkc-schedules.json';
+
+// The installed Windows floater is served from localhost and cannot receive a
+// new bundled snapshot until the next installer release. Pull the same
+// validated snapshot used by the web app at runtime, while retaining the
+// bundled data as a fully offline fallback.
+export async function refreshPublishedSchedules() {
+  const response = await fetch(LIVE_SCHEDULE_URL, { cache: 'no-store' });
+  if (!response.ok) throw new Error(`Rail schedule service returned HTTP ${response.status}`);
+  const next = await response.json();
+  if (!next || !next.ports || typeof next.ports !== 'object' || !Object.keys(next.ports).length) {
+    throw new Error('Rail schedule service returned an invalid snapshot');
+  }
+  const currentPull = Date.parse(schedules.pulledAt || '');
+  const nextPull = Date.parse(next.pulledAt || '');
+  if (next.pulledAt === schedules.pulledAt || (Number.isFinite(currentPull) && Number.isFinite(nextPull) && nextPull < currentPull)) {
+    return false;
+  }
+  schedules.generatedAt = next.generatedAt || '';
+  schedules.pulledAt = next.pulledAt || '';
+  schedules.ports = next.ports;
+  generatedAt = schedules.generatedAt;
+  pulledAt = schedules.pulledAt;
+  return true;
+}
 
 // [{ slug, name, rail }] for the port picker.
 export function getPorts() {
@@ -139,6 +165,18 @@ export function getCutoff(slug, vessel, city) {
 // omits the year, so pick the year (ref-1 / ref / ref+1) whose date lands closest
 // to the schedule's own generation date — this survives Dec/Jan wrap-around.
 export function parseCutoff(cutoffStr, refISO = generatedAt) {
+  const excel = String(cutoffStr).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})(?::\d{2})?\s+([AP]M)$/i);
+  if (excel) {
+    const month = Number(excel[1]) - 1;
+    const day = Number(excel[2]);
+    const year = Number(excel[3]);
+    let hour = Number(excel[4]) % 12;
+    if (excel[6].toUpperCase() === 'PM') hour += 12;
+    const d = new Date(year, month, day, hour, Number(excel[5]));
+    // Do not let JavaScript silently roll an invalid published date (such as
+    // Sep 31) into the next month. The UI will display that source value raw.
+    return d.getFullYear() === year && d.getMonth() === month && d.getDate() === day ? d : null;
+  }
   const m = String(cutoffStr).match(/(\d{1,2})-([A-Z][a-z]{2})(?:\s+(\d{1,2}):(\d{2}))?/);
   if (!m) return null;
   const day = Number(m[1]);
@@ -185,6 +223,13 @@ function weekdayFor(month0, day, refISO) {
 export function formatDate(str, refISO = generatedAt) {
   if (!str) return str || '';
   const s = String(str).trim();
+  const excelDate = parseCutoff(s, refISO);
+  if (/^\d{1,2}\/\d{1,2}\/\d{4}\s+/i.test(s)) {
+    if (!excelDate) return s;
+    const hh = excelDate.getHours();
+    const mm = String(excelDate.getMinutes()).padStart(2, '0');
+    return `${WEEKDAYS[excelDate.getDay()]}, ${excelDate.getMonth() + 1}/${excelDate.getDate()} ${hh}:${mm}`;
+  }
   const tm = s.match(/(\d{1,2}):(\d{2})/);
   const time = tm ? `${tm[1]}:${tm[2]}` : '';
   let day, month0;
