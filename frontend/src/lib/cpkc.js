@@ -25,7 +25,7 @@ const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Se
 export let generatedAt = schedules.generatedAt || '';
 export let pulledAt = schedules.pulledAt || '';
 
-const LIVE_SCHEDULE_URL = 'https://raw.githubusercontent.com/hoodlover/InlandGuide/main/frontend/src/data/cpkc-schedules.json';
+const LIVE_SCHEDULE_URL = 'https://inland-guide.vercel.app/api/rail-schedules';
 
 // The installed Windows floater is served from localhost and cannot receive a
 // new bundled snapshot until the next installer release. Pull the same
