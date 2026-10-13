@@ -140,7 +140,7 @@
     ]
   },
   "USLAX": {
-    "mode": "ssy",
+    "mode": "terminal",
     "terminals": [
       {
         "code": "APMTER 009",
@@ -160,7 +160,7 @@
     ]
   },
   "USLGB": {
-    "mode": "ssy",
+    "mode": "terminal",
     "terminals": [
       {
         "code": "YUSENT 002",

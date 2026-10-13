@@ -820,7 +820,7 @@
   },
   {
     "pol": "USLAX",
-    "ssy": "CCE,AL5,PS1,PS3,PS4,PS5,PS6,PS7,FTP,MPS,PS8,WC1,WC2,WC5",
+    "ssy": "ALL",
     "name": "ATLANTA, GA",
     "loccode": "USATL",
     "rampMC": "BURLIN 408",
@@ -898,7 +898,7 @@
   },
   {
     "pol": "USLAX",
-    "ssy": "CCE,AL5,PS1,PS3,PS4,PS5,PS6,PS7,FTP,MPS,PS8,WC1,WC2,WC5",
+    "ssy": "ALL",
     "name": "DALLAS, TX",
     "loccode": "USDAL",
     "rampMC": "UNIONP 081",
@@ -911,7 +911,7 @@
   },
   {
     "pol": "USLAX",
-    "ssy": "CCE,WC1,WC2,WC5,US2 ",
+    "ssy": "ALL",
     "name": "DENVER, CO",
     "loccode": "USDEN",
     "rampMC": "UNIONP 026",
@@ -924,7 +924,7 @@
   },
   {
     "pol": "USLAX",
-    "ssy": "CCE,WC1,WC2,WC5,US2 ",
+    "ssy": "ALL",
     "name": "JOLIET, IL",
     "loccode": "USJOT",
     "rampMC": "UNIONP 170",
@@ -937,7 +937,7 @@
   },
   {
     "pol": "USLAX",
-    "ssy": "MPS,PS3,PS5,AL5,CCE,FTP,PS4,PS6,PS6,PS7,WC1,WC2,WC5",
+    "ssy": "ALL",
     "name": "HOUSTON, TX",
     "loccode": "USHOU",
     "rampMC": "UNIONP 015",
@@ -950,7 +950,7 @@
   },
   {
     "pol": "USLAX",
-    "ssy": "FP1,FP2,FTP,MPS,PS4,PS5,PS7,PS8,WC1,WC2,WC5",
+    "ssy": "ALL",
     "name": "KANSAS CITY, KS",
     "loccode": "USKCK",
     "rampMC": "UNIONP 078",
@@ -963,7 +963,7 @@
   },
   {
     "pol": "USLAX",
-    "ssy": "WC5",
+    "ssy": "ALL",
     "name": "LAREDO, TX",
     "loccode": "USLRD",
     "rampMC": "UNIONP 046",
@@ -1015,7 +1015,7 @@
   },
   {
     "pol": "USLAX",
-    "ssy": "CCE,WC1,WC2,WC5,US2 ",
+    "ssy": "ALL",
     "name": "COUNCIL BLUFFS, IA",
     "loccode": "USCBF",
     "rampMC": "UNIONP 096",
@@ -1028,7 +1028,7 @@
   },
   {
     "pol": "USLAX",
-    "ssy": "FP1,FTP,PS5,PS8,WC1,WC2,WC5",
+    "ssy": "ALL",
     "name": "SALT LAKE CITY, UT",
     "loccode": "USSLC",
     "rampMC": "UNIONP 012",
@@ -1041,7 +1041,7 @@
   },
   {
     "pol": "USLAX",
-    "ssy": "PS3,PS5,PS6,PS8,FTP,MPS,PS4,AL5,PS7,CCE,WC1,WC2,WC5",
+    "ssy": "ALL",
     "name": "SAN ANTONIO, TX",
     "loccode": "USSAT",
     "rampMC": "UNIONP 197",
@@ -1054,7 +1054,7 @@
   },
   {
     "pol": "USLAX",
-    "ssy": "FTP,FP1,PS3,PS4,PS5,PS6,PS8,WC1,WC2,WC5",
+    "ssy": "ALL",
     "name": "SANTA TERESA, NM",
     "loccode": "USSXT",
     "rampMC": "UNIONP 192",
@@ -1067,7 +1067,7 @@
   },
   {
     "pol": "USLAX",
-    "ssy": "FP1,FTP,PS5,PS6,FP2,PS7,PS8,WSN,WC1,WC2,WC5",
+    "ssy": "ALL",
     "name": "EAST SAINT LOUIS, MO",
     "loccode": "USESL",
     "rampMC": "UNIONP 023",
@@ -1080,7 +1080,7 @@
   },
   {
     "pol": "USLAX",
-    "ssy": "PS3,PS5,PS6,PS8,FTP,MPS,PS4,AL5,PS7,CCE,WC1,WC2,WC5",
+    "ssy": "ALL",
     "name": "PHOENIX, AZ",
     "loccode": "USPHX",
     "rampMC": "DUNCAN 018",
@@ -1158,7 +1158,7 @@
   },
   {
     "pol": "USLGB",
-    "ssy": "AL5,CCE,FTP,MCA,MPS,PS1,PS3,PS4,PS5,PS6,PS7,PS8",
+    "ssy": "ALL",
     "name": "DALLAS, TX",
     "loccode": "USDAL",
     "rampMC": "UNIONP 081",
@@ -1171,7 +1171,7 @@
   },
   {
     "pol": "USLGB",
-    "ssy": "CCE,WC1,WC2,WC5,US2, WC6",
+    "ssy": "ALL",
     "name": "DENVER, CO",
     "loccode": "USDEN",
     "rampMC": "UNIONP 026",
@@ -1184,7 +1184,7 @@
   },
   {
     "pol": "USLGB",
-    "ssy": "FP1,FTP,PS5,PS6,FP2,PS7,PS8",
+    "ssy": "ALL",
     "name": "EAST SAINT LOUIS, MO",
     "loccode": "USESL",
     "rampMC": "UNIONP 023",
@@ -1197,7 +1197,7 @@
   },
   {
     "pol": "USLGB",
-    "ssy": "PS3,PS6,FTP,CCE,PS1,PS4,PS5,PS8,AL5,MPS,PS7",
+    "ssy": "ALL",
     "name": "JOLIET, IL",
     "loccode": "USJOT",
     "rampMC": "UNIONP 170",
@@ -1210,7 +1210,7 @@
   },
   {
     "pol": "USLGB",
-    "ssy": "WSN,WC6",
+    "ssy": "ALL",
     "name": "JOLIET, IL",
     "loccode": "USJOT",
     "rampMC": "UNIONP 170",
@@ -1223,7 +1223,7 @@
   },
   {
     "pol": "USLGB",
-    "ssy": "AL5,CCE,FTP,MCA,MPS,PS1,PS3,PS4,PS5,PS6,PS7,WSN",
+    "ssy": "ALL",
     "name": "HOUSTON, TX",
     "loccode": "USHOU",
     "rampMC": "UNIONP 015",
@@ -1236,7 +1236,7 @@
   },
   {
     "pol": "USLGB",
-    "ssy": "FP1,FP2,FTP,MPS,PS4,PS5,PS7,PS8",
+    "ssy": "ALL",
     "name": "KANSAS CITY, KS",
     "loccode": "USKCK",
     "rampMC": "UNIONP 078",
@@ -1249,7 +1249,7 @@
   },
   {
     "pol": "USLGB",
-    "ssy": "AL5,CCE,FTP,MCA,MPS,PS1,PS3,PS4,PS5,PS6,WC5",
+    "ssy": "ALL",
     "name": "LAREDO, TX",
     "loccode": "USLRD",
     "rampMC": "UNIONP 046",
@@ -1288,7 +1288,7 @@
   },
   {
     "pol": "USLGB",
-    "ssy": "FP1,FTP,PS5,PS8,WSN",
+    "ssy": "ALL",
     "name": "SALT LAKE CITY, UT",
     "loccode": "USSLC",
     "rampMC": "UNIONP 012",
@@ -1301,7 +1301,7 @@
   },
   {
     "pol": "USLGB",
-    "ssy": "AL5,CCE,FTP,MCA,MPS,PS1,PS3,PS4,PS5,PS6,PS7,PS8",
+    "ssy": "ALL",
     "name": "SAN ANTONIO, TX",
     "loccode": "USSAT",
     "rampMC": "UNIONP 197",
@@ -1314,7 +1314,7 @@
   },
   {
     "pol": "USLGB",
-    "ssy": "FTP,FP1,PS3,PS4,PS5,PS6,PS8",
+    "ssy": "ALL",
     "name": "SANTA TERESA, NM",
     "loccode": "USSXT",
     "rampMC": "UNIONP 192",
@@ -1340,7 +1340,7 @@
   },
   {
     "pol": "USLGB",
-    "ssy": "AL5,CCE,FTP,MCA,MPS,PS1,PS3,PS4,PS5,PS6,PS7,PS8,WSN",
+    "ssy": "ALL",
     "name": "PHOENIX, AZ",
     "loccode": "USPHX",
     "rampMC": "DUNCAN 018",
@@ -2126,7 +2126,7 @@
     "rampMC": "NORFOL 061",
     "rampCutTime": 0.5833333333333334,
     "transit": 7,
-    "window": 3,
+    "window": 5,
     "ssyAdjustment": 0,
     "reefer": "Y",
     "windowReefer": 0
