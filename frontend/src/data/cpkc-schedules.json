@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-10-22",
-  "pulledAt": "2026-10-22T18:25:58.330Z",
+  "pulledAt": "2026-10-23T18:12:17.391Z",
   "ports": {
     "montreal": {
       "name": "Port of Montreal",
@@ -719,7 +719,9 @@
             "Vancouver": "Nov-07"
           }
         }
-      ]
+      ],
+      "parseError": "fetch failed",
+      "notUpdatedAt": "2026-10-23T18:12:17.391Z"
     },
     "montreal-cast": {
       "name": "Montreal — Cast",
@@ -1128,7 +1130,9 @@
             "Vancouver": "Nov-05"
           }
         }
-      ]
+      ],
+      "parseError": "fetch failed",
+      "notUpdatedAt": "2026-10-23T18:12:17.391Z"
     },
     "montreal-viau": {
       "name": "Montreal — Viau",
@@ -1409,7 +1413,9 @@
             "Vancouver": "Nov-05"
           }
         }
-      ]
+      ],
+      "parseError": "fetch failed",
+      "notUpdatedAt": "2026-10-23T18:12:17.391Z"
     },
     "metro-vancouver": {
       "name": "Port of Metro Vancouver",
@@ -3495,7 +3501,9 @@
             "ARCADIA": "08-Nov"
           }
         }
-      ]
+      ],
+      "parseError": "fetch failed",
+      "notUpdatedAt": "2026-10-23T18:12:17.391Z"
     },
     "centerm": {
       "name": "Centerm",
@@ -4145,7 +4153,9 @@
             "SASKATOON": "Nov-08"
           }
         }
-      ]
+      ],
+      "parseError": "fetch failed",
+      "notUpdatedAt": "2026-10-23T18:12:17.391Z"
     }
   }
 }
