@@ -9,9 +9,10 @@ name: Refresh CPKC port schedules
 # than sending any alert. No notifications are sent from here.
 
 on:
-  # GitHub cron is UTC. Cover EDT and EST, then gate to 10:00/14:00 Eastern.
+  # The timezone handles DST; delayed runs must still refresh the schedules.
   schedule:
-    - cron: '0 14,15,18,19 * * *'
+    - cron: '0 10,14 * * *'
+      timezone: 'America/New_York'
   workflow_dispatch: {}
 
 permissions:
@@ -25,47 +26,30 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     steps:
-      - name: Check Eastern business-hour window
-        id: business_hours
-        shell: bash
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          eastern_hour="$(TZ=America/New_York date +%H)"
-          if (( 10#$eastern_hour == 10 || 10#$eastern_hour == 14 )); then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "run=false" >> "$GITHUB_OUTPUT"
-            echo "Skipping: ${eastern_hour}:00 is outside 10:00/14:00 Eastern."
-          fi
-
       - uses: actions/checkout@v4
-        if: steps.business_hours.outputs.run == 'true'
         with:
           fetch-depth: 0   # full history so gen-version.mjs counts correctly
 
       - uses: actions/setup-node@v4
-        if: steps.business_hours.outputs.run == 'true'
         with:
           node-version: 20
 
       - name: Install parser deps
-        if: steps.business_hours.outputs.run == 'true'
         working-directory: scripts/refresh-cpkc
         run: npm ci
+
+      - name: Check rail parser regressions
+        working-directory: scripts/refresh-cpkc
+        run: npm test
 
       # Exits non-zero only if EVERY port fails with no previous data to keep.
       # Partial failures still write the file (good ports updated, failed ports
       # kept + flagged) so the app can show the pulsing light.
       - name: Parse CPKC/CN PDFs
-        if: steps.business_hours.outputs.run == 'true'
         working-directory: scripts/refresh-cpkc
         run: node refresh.mjs
 
       - name: Detect published schedule changes
-        if: steps.business_hours.outputs.run == 'true'
         id: schedule_changes
         run: |
           if git diff --quiet -- frontend/src/data/cpkc-schedules.json; then
@@ -97,3 +81,4 @@ jobs:
             git commit -m "Auto-refresh schedules + rebuild offline app"
             git push
           fi
+

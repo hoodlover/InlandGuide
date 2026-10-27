@@ -253,11 +253,11 @@ export function getERD(slug, vessel, city) {
   const meta = getVesselMeta(slug, vessel);
   // Published ERD (e.g. CN "28-Jun") takes precedence over the derived rule.
   if (meta && meta.erds && meta.erds[city]) {
-    const pub = parseCutoff(meta.erds[city], info && info.generatedAt);
-    return pub ? fmtDate(pub) : meta.erds[city];
+    return formatDate(meta.erds[city], info && info.generatedAt);
   }
   const d = parseCutoff(getCutoff(slug, vessel, city), info && info.generatedAt);
   if (!d) return '';
   d.setDate(d.getDate() - ERD_DAYS_BEFORE);
   return fmtDate(d);
 }
+

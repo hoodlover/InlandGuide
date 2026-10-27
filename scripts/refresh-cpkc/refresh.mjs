@@ -166,7 +166,7 @@ function isoToRunDate(iso) {
   return `${WEEKDAYS[dt.getDay()]} ${d}-${MONTH_NAMES[m - 1]}`;
 }
 
-function parseCPKC(pages, port) {
+export function parseCPKC(pages, port) {
   const { slug, name } = port;
   const pageRows = pages.map(toRows);
 
@@ -231,7 +231,7 @@ function parseCPKC(pages, port) {
 // pages by destination group — the same vessels repeat on every page, each page
 // carrying a different set of inland cities. Each destination has two sub-columns:
 // a published Cut-off AND a published ERD (CN gives both; we don't derive ERD).
-function parseCN(pages, port) {
+export function parseCN(pages, port) {
   const { slug, name } = port;
   const pageRows = pages.map(toRows);
 
@@ -290,9 +290,12 @@ function parseCN(pages, port) {
         }
       }
     }
-    const timeRow = rows.find(r => r.items.filter(it => /\bhrs\b/i.test(it.s)).length >= 2);
+    // CN uses HH:MM in Montreal and also prints "1600hrs" without a space
+    // in Prince Rupert. Preserve either form, including weekend exceptions.
+    const isCutTime = value => /^(?:[01]?\d|2[0-3]):[0-5]\d$/.test(value) || /\b\d{3,4}\s*hrs\b/i.test(value);
+    const timeRow = rows.find(r => r.items.filter(it => isCutTime(it.s)).length >= 2);
     if (timeRow) {
-      for (const it of timeRow.items.filter(it => /\bhrs\b/i.test(it.s) && it.x > cutCols[0] - 90)) {
+      for (const it of timeRow.items.filter(it => isCutTime(it.s) && it.x > cutCols[0] - 90)) {
         let bi = 0, bd = Infinity;
         cutCols.forEach((x, i) => { const d = Math.abs(x - it.x); if (d < bd) { bd = d; bi = i; } });
         cutTimes[pageCities[bi]] = it.s.trim();
@@ -423,4 +426,7 @@ async function main() {
   if (failures.length) console.error(`\n⚠ ${failures.length} port(s) failed:\n  ${failures.join('\n  ')}`);
 }
 
-main().catch(err => { console.error(err.message || err); process.exit(1); });
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch(err => { console.error(err.message || err); process.exit(1); });
+}
+
