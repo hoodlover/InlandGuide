@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-10-26",
-  "pulledAt": "2026-10-27T04:57:05.314Z",
+  "generatedAt": "2026-10-27",
+  "pulledAt": "2026-10-27T19:17:36.354Z",
   "ports": {
     "montreal": {
       "name": "Port of Montreal",
@@ -373,8 +373,8 @@
     "montreal-racine": {
       "name": "Montreal — Racine",
       "rail": "CN",
-      "runDate": "Mon 26-Oct",
-      "generatedAt": "2026-10-26",
+      "runDate": "Tue 27-Oct",
+      "generatedAt": "2026-10-27",
       "cities": [
         "Toronto (Brampton)",
         "Chicago",
@@ -717,8 +717,8 @@
     "montreal-cast": {
       "name": "Montreal — Cast",
       "rail": "CN",
-      "runDate": "Mon 26-Oct",
-      "generatedAt": "2026-10-26",
+      "runDate": "Tue 27-Oct",
+      "generatedAt": "2026-10-27",
       "cities": [
         "Toronto (Brampton)",
         "Chicago",
@@ -1105,7 +1105,7 @@
           "terminal": "",
           "eta": "",
           "etd": "",
-          "railPortCutoff": "29-Nov",
+          "railPortCutoff": "28-Nov",
           "comments": "",
           "cutoffs": {
             "Toronto (Brampton)": "Fri, Nov-27",
@@ -1114,10 +1114,10 @@
             "Indianapolis": "Fri, Nov-20",
             "Winnipeg": "Sun, Nov-22",
             "Calgary": "Thu, Nov-19",
-            "Edmonton": "Sat, Nov-21",
-            "Saskatoon": "Thu, Nov-19",
+            "Edmonton": "Fri, Nov-20",
+            "Saskatoon": "Wed, Nov-18",
             "Regina": "Mon, Nov-16",
-            "Vancouver": "Thu, Nov-19"
+            "Vancouver": "Wed, Nov-18"
           },
           "erds": {
             "Toronto (Brampton)": "Nov-23",
@@ -1126,10 +1126,10 @@
             "Indianapolis": "Nov-15",
             "Winnipeg": "Nov-17",
             "Calgary": "Nov-14",
-            "Edmonton": "Nov-16",
-            "Saskatoon": "Sat, Nov-14",
+            "Edmonton": "Nov-15",
+            "Saskatoon": "Fri, Nov-13",
             "Regina": "Wed, Nov-11",
-            "Vancouver": "Nov-14"
+            "Vancouver": "Nov-13"
           }
         }
       ]
@@ -1137,8 +1137,8 @@
     "montreal-viau": {
       "name": "Montreal — Viau",
       "rail": "CN",
-      "runDate": "Mon 26-Oct",
-      "generatedAt": "2026-10-26",
+      "runDate": "Tue 27-Oct",
+      "generatedAt": "2026-10-27",
       "cities": [
         "Toronto (Brampton)",
         "Chicago",
@@ -1237,31 +1237,31 @@
           "terminal": "",
           "eta": "",
           "etd": "",
-          "railPortCutoff": "04-Nov",
+          "railPortCutoff": "06-Nov",
           "comments": "",
           "cutoffs": {
-            "Toronto (Brampton)": "Tue, Nov-03",
-            "Chicago": "Sun, Nov-01",
-            "Detroit": "Sun, Nov-01",
-            "Indianapolis": "Mon, Oct-26",
-            "Winnipeg": "Wed, Oct-28",
-            "Calgary": "Sun, Oct-25",
-            "Edmonton": "Tue, Oct-27",
-            "Saskatoon": "Sun, Oct-25",
-            "Regina": "Sun, Oct-25",
-            "Vancouver": "Sun, Oct-25"
+            "Toronto (Brampton)": "Thu, Nov-05",
+            "Chicago": "Tue, Nov-03",
+            "Detroit": "Tue, Nov-03",
+            "Indianapolis": "Fri, Oct-30",
+            "Winnipeg": "Fri, Oct-30",
+            "Calgary": "Tue, Oct-27",
+            "Edmonton": "Thu, Oct-29",
+            "Saskatoon": "Tue, Oct-27",
+            "Regina": "Tue, Oct-27",
+            "Vancouver": "Tue, Oct-27"
           },
           "erds": {
-            "Toronto (Brampton)": "Oct-28",
-            "Chicago": "Oct-27",
-            "Detroit": "Oct-27",
-            "Indianapolis": "Oct-21",
-            "Winnipeg": "Oct-23",
-            "Calgary": "Oct-20",
-            "Edmonton": "Oct-22",
-            "Saskatoon": "Oct-20",
-            "Regina": "Oct-20",
-            "Vancouver": "Oct-20"
+            "Toronto (Brampton)": "Oct-30",
+            "Chicago": "Oct-29",
+            "Detroit": "Oct-29",
+            "Indianapolis": "Oct-25",
+            "Winnipeg": "Oct-25",
+            "Calgary": "Oct-22",
+            "Edmonton": "Oct-24",
+            "Saskatoon": "Oct-22",
+            "Regina": "Oct-22",
+            "Vancouver": "Oct-22"
           }
         },
         {
@@ -2629,8 +2629,8 @@
     "prince-rupert": {
       "name": "Prince Rupert",
       "rail": "CN",
-      "runDate": "Mon 26-Oct",
-      "generatedAt": "2026-10-26",
+      "runDate": "Tue 27-Oct",
+      "generatedAt": "2026-10-27",
       "cities": [
         "TORONTO (MALPORT)",
         "MONTREAL",
@@ -3069,6 +3069,50 @@
           }
         },
         {
+          "vessel": "NAVIOS NERINE",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "11-Nov",
+          "comments": "",
+          "cutoffs": {
+            "TORONTO (MALPORT)": "Sun, Nov-01",
+            "MONTREAL": "Mon, Nov-02",
+            "WINNIPEG": "Wed, Nov-04",
+            "SASKATOON": "Mon, Nov-02",
+            "REGINA": "Sat, Oct-31",
+            "CALGARY": "Tue, Nov-03",
+            "EDMONTON": "Sat, Nov-07",
+            "PRINCE GEORGE": "Sat, Nov-07",
+            "CHIPPEWA FALLS": "Thu, Oct-29",
+            "JOLIET": "Tue, Nov-03",
+            "INDIANAPOLIS": "Sat, Oct-31",
+            "CHICAGO": "Tue, Nov-03",
+            "DETROIT": "Mon, Nov-02",
+            "MEMPHIS": "Mon, Nov-02",
+            "NEW ORLEANS": "Fri, Oct-30",
+            "ARCADIA": "Tue, Nov-03"
+          },
+          "erds": {
+            "TORONTO (MALPORT)": "27-Oct",
+            "MONTREAL": "28-Oct",
+            "WINNIPEG": "30-Oct",
+            "SASKATOON": "28-Oct",
+            "REGINA": "26-Oct",
+            "CALGARY": "29-Oct",
+            "EDMONTON": "02-Nov",
+            "PRINCE GEORGE": "02-Nov",
+            "CHIPPEWA FALLS": "24-Oct",
+            "JOLIET": "29-Oct",
+            "INDIANAPOLIS": "26-Oct",
+            "CHICAGO": "29-Oct",
+            "DETROIT": "28-Oct",
+            "MEMPHIS": "28-Oct",
+            "NEW ORLEANS": "25-Oct",
+            "ARCADIA": "29-Oct"
+          }
+        },
+        {
           "vessel": "MAERSK TAIKUNG",
           "terminal": "",
           "eta": "",
@@ -3157,51 +3201,7 @@
           }
         },
         {
-          "vessel": "NAVIOS NERINE",
-          "terminal": "",
-          "eta": "",
-          "etd": "",
-          "railPortCutoff": "15-Nov",
-          "comments": "",
-          "cutoffs": {
-            "TORONTO (MALPORT)": "Fri, Nov-06",
-            "MONTREAL": "Thu, Nov-05",
-            "WINNIPEG": "Fri, Nov-06",
-            "SASKATOON": "Thu, Nov-05",
-            "REGINA": "Sat, Nov-07",
-            "CALGARY": "Sat, Nov-07",
-            "EDMONTON": "Sat, Nov-07",
-            "PRINCE GEORGE": "Wed, Nov-11",
-            "CHIPPEWA FALLS": "Sun, Nov-01",
-            "JOLIET": "Thu, Nov-05",
-            "INDIANAPOLIS": "Wed, Nov-04",
-            "CHICAGO": "Sat, Nov-07",
-            "DETROIT": "Fri, Nov-06",
-            "MEMPHIS": "Thu, Nov-05",
-            "NEW ORLEANS": "Thu, Nov-05",
-            "ARCADIA": "Fri, Nov-06"
-          },
-          "erds": {
-            "TORONTO (MALPORT)": "01-Nov",
-            "MONTREAL": "31-Oct",
-            "WINNIPEG": "01-Nov",
-            "SASKATOON": "31-Oct",
-            "REGINA": "02-Nov",
-            "CALGARY": "02-Nov",
-            "EDMONTON": "02-Nov",
-            "PRINCE GEORGE": "06-Nov",
-            "CHIPPEWA FALLS": "27-Oct",
-            "JOLIET": "31-Oct",
-            "INDIANAPOLIS": "30-Oct",
-            "CHICAGO": "02-Nov",
-            "DETROIT": "01-Nov",
-            "MEMPHIS": "31-Oct",
-            "NEW ORLEANS": "31-Oct",
-            "ARCADIA": "01-Nov"
-          }
-        },
-        {
-          "vessel": "MAERSK LIMA",
+          "vessel": "COSCO AUCKLAND",
           "terminal": "",
           "eta": "",
           "etd": "",
@@ -3421,7 +3421,7 @@
           }
         },
         {
-          "vessel": "MAERSK SHEERNESS",
+          "vessel": "MAERSK LIMA",
           "terminal": "",
           "eta": "",
           "etd": "",
@@ -3463,58 +3463,14 @@
             "NEW ORLEANS": "08-Nov",
             "ARCADIA": "08-Nov"
           }
-        },
-        {
-          "vessel": "COSCO TAICANG",
-          "terminal": "",
-          "eta": "",
-          "etd": "",
-          "railPortCutoff": "25-Nov",
-          "comments": "",
-          "cutoffs": {
-            "TORONTO (MALPORT)": "Sun, Nov-15",
-            "MONTREAL": "Mon, Nov-16",
-            "WINNIPEG": "Wed, Nov-18",
-            "SASKATOON": "Mon, Nov-16",
-            "REGINA": "Sat, Nov-14",
-            "CALGARY": "Tue, Nov-17",
-            "EDMONTON": "Sat, Nov-21",
-            "PRINCE GEORGE": "Sat, Nov-21",
-            "CHIPPEWA FALLS": "Thu, Nov-12",
-            "JOLIET": "Tue, Nov-17",
-            "INDIANAPOLIS": "Sat, Nov-14",
-            "CHICAGO": "Tue, Nov-17",
-            "DETROIT": "Mon, Nov-16",
-            "MEMPHIS": "Mon, Nov-16",
-            "NEW ORLEANS": "Fri, Nov-13",
-            "ARCADIA": "Tue, Nov-17"
-          },
-          "erds": {
-            "TORONTO (MALPORT)": "10-Nov",
-            "MONTREAL": "11-Nov",
-            "WINNIPEG": "13-Nov",
-            "SASKATOON": "11-Nov",
-            "REGINA": "09-Nov",
-            "CALGARY": "12-Nov",
-            "EDMONTON": "16-Nov",
-            "PRINCE GEORGE": "16-Nov",
-            "CHIPPEWA FALLS": "07-Nov",
-            "JOLIET": "12-Nov",
-            "INDIANAPOLIS": "09-Nov",
-            "CHICAGO": "12-Nov",
-            "DETROIT": "11-Nov",
-            "MEMPHIS": "11-Nov",
-            "NEW ORLEANS": "08-Nov",
-            "ARCADIA": "12-Nov"
-          }
         }
       ]
     },
     "centerm": {
       "name": "Centerm",
       "rail": "CN",
-      "runDate": "Mon 26-Oct",
-      "generatedAt": "2026-10-26",
+      "runDate": "Tue 27-Oct",
+      "generatedAt": "2026-10-27",
       "cities": [
         "TORONTO (MALPORT)",
         "MONTREAL",
@@ -3546,40 +3502,6 @@
         "SASKATOON": "1700 hrs (1500 Sat & Sun)"
       },
       "vessels": [
-        {
-          "vessel": "VIENNA EXPRESS",
-          "terminal": "",
-          "eta": "",
-          "etd": "",
-          "railPortCutoff": "24-Oct",
-          "comments": "",
-          "cutoffs": {
-            "TORONTO (MALPORT)": "Thu, Oct-15",
-            "MONTREAL": "Tue, Oct-13",
-            "CHICAGO": "Tue, Oct-13",
-            "DETROIT": "Wed, Oct-14",
-            "INDIANAPOLIS": "Mon, Oct-12",
-            "MEMPHIS": "Wed, Oct-14",
-            "NEW ORLEANS": "Tue, Oct-13",
-            "WINNIPEG": "Mon, Oct-12",
-            "CALGARY": "Wed, Oct-14",
-            "EDMONTON": "Fri, Oct-16",
-            "SASKATOON": "Fri, Oct-16"
-          },
-          "erds": {
-            "TORONTO (MALPORT)": "Oct-10",
-            "MONTREAL": "Oct-08",
-            "CHICAGO": "Oct-08",
-            "DETROIT": "Oct-09",
-            "INDIANAPOLIS": "Oct-07",
-            "MEMPHIS": "Oct-09",
-            "NEW ORLEANS": "Oct-08",
-            "WINNIPEG": "Oct-07",
-            "CALGARY": "Oct-09",
-            "EDMONTON": "Oct-11",
-            "SASKATOON": "Oct-11"
-          }
-        },
         {
           "vessel": "COSCO VENICE",
           "terminal": "",
@@ -3857,33 +3779,33 @@
           "terminal": "",
           "eta": "",
           "etd": "",
-          "railPortCutoff": "13-Nov",
+          "railPortCutoff": "14-Nov",
           "comments": "",
           "cutoffs": {
             "TORONTO (MALPORT)": "Thu, Nov-05",
             "MONTREAL": "Tue, Nov-03",
             "CHICAGO": "Tue, Nov-03",
-            "DETROIT": "Wed, Oct-28",
-            "INDIANAPOLIS": "Sun, Nov-01",
-            "MEMPHIS": "Mon, Nov-02",
-            "NEW ORLEANS": "Mon, Nov-02",
+            "DETROIT": "Wed, Nov-04",
+            "INDIANAPOLIS": "Mon, Nov-02",
+            "MEMPHIS": "Wed, Nov-04",
+            "NEW ORLEANS": "Tue, Nov-03",
             "WINNIPEG": "Mon, Nov-02",
             "CALGARY": "Wed, Nov-04",
             "EDMONTON": "Fri, Nov-06",
-            "SASKATOON": "Tue, Nov-03"
+            "SASKATOON": "Fri, Nov-06"
           },
           "erds": {
             "TORONTO (MALPORT)": "Oct-31",
             "MONTREAL": "Oct-29",
             "CHICAGO": "Oct-29",
-            "DETROIT": "Oct-23",
-            "INDIANAPOLIS": "Oct-27",
-            "MEMPHIS": "Oct-28",
-            "NEW ORLEANS": "Oct-28",
+            "DETROIT": "Oct-30",
+            "INDIANAPOLIS": "Oct-28",
+            "MEMPHIS": "Oct-30",
+            "NEW ORLEANS": "Oct-29",
             "WINNIPEG": "Oct-28",
             "CALGARY": "Oct-30",
             "EDMONTON": "Nov-01",
-            "SASKATOON": "Oct-29"
+            "SASKATOON": "Nov-01"
           }
         },
         {
@@ -3989,40 +3911,6 @@
           }
         },
         {
-          "vessel": "XIN DAN DONG",
-          "terminal": "",
-          "eta": "",
-          "etd": "",
-          "railPortCutoff": "22-Nov",
-          "comments": "",
-          "cutoffs": {
-            "TORONTO (MALPORT)": "Thu, Nov-12",
-            "MONTREAL": "Tue, Nov-10",
-            "CHICAGO": "Fri, Nov-13",
-            "DETROIT": "Wed, Nov-11",
-            "INDIANAPOLIS": "Tue, Nov-10",
-            "MEMPHIS": "Wed, Nov-11",
-            "NEW ORLEANS": "Wed, Nov-11",
-            "WINNIPEG": "Mon, Nov-16",
-            "CALGARY": "Fri, Nov-13",
-            "EDMONTON": "Tue, Nov-17",
-            "SASKATOON": "Fri, Nov-13"
-          },
-          "erds": {
-            "TORONTO (MALPORT)": "Nov-07",
-            "MONTREAL": "Nov-05",
-            "CHICAGO": "Nov-08",
-            "DETROIT": "Nov-06",
-            "INDIANAPOLIS": "Nov-05",
-            "MEMPHIS": "Nov-06",
-            "NEW ORLEANS": "Nov-06",
-            "WINNIPEG": "Nov-11",
-            "CALGARY": "Nov-08",
-            "EDMONTON": "Nov-12",
-            "SASKATOON": "Nov-08"
-          }
-        },
-        {
           "vessel": "MAERSK TAIKUNG",
           "terminal": "",
           "eta": "",
@@ -4050,6 +3938,40 @@
             "INDIANAPOLIS": "Nov-06",
             "MEMPHIS": "Nov-06",
             "NEW ORLEANS": "Nov-07",
+            "WINNIPEG": "Nov-11",
+            "CALGARY": "Nov-08",
+            "EDMONTON": "Nov-12",
+            "SASKATOON": "Nov-08"
+          }
+        },
+        {
+          "vessel": "XIN DAN DONG",
+          "terminal": "",
+          "eta": "",
+          "etd": "",
+          "railPortCutoff": "24-Nov",
+          "comments": "",
+          "cutoffs": {
+            "TORONTO (MALPORT)": "Mon, Nov-16",
+            "MONTREAL": "Tue, Nov-10",
+            "CHICAGO": "Fri, Nov-13",
+            "DETROIT": "Wed, Nov-11",
+            "INDIANAPOLIS": "Thu, Nov-12",
+            "MEMPHIS": "Sat, Nov-14",
+            "NEW ORLEANS": "Fri, Nov-13",
+            "WINNIPEG": "Mon, Nov-16",
+            "CALGARY": "Fri, Nov-13",
+            "EDMONTON": "Tue, Nov-17",
+            "SASKATOON": "Fri, Nov-13"
+          },
+          "erds": {
+            "TORONTO (MALPORT)": "Nov-11",
+            "MONTREAL": "Nov-05",
+            "CHICAGO": "Nov-08",
+            "DETROIT": "Nov-06",
+            "INDIANAPOLIS": "Nov-07",
+            "MEMPHIS": "Nov-09",
+            "NEW ORLEANS": "Nov-08",
             "WINNIPEG": "Nov-11",
             "CALGARY": "Nov-08",
             "EDMONTON": "Nov-12",
