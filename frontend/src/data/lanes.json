@@ -2607,7 +2607,7 @@
     "rampMC": "UNIONP 256",
     "rampCutTime": 0.875,
     "transit": 9,
-    "window": 3,
+    "window": 6,
     "ssyAdjustment": 0,
     "reefer": "N",
     "windowReefer": 0
