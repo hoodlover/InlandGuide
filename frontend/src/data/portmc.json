@@ -80,7 +80,13 @@
     "mode": "terminal",
     "terminals": [
       {
-        "code": "NORTHC 054 / WANDOT 004 / SOUTHC 256",
+        "code": "NORTHC 054",
+        "ssys": [
+          "ALL"
+        ]
+      },
+      {
+        "code": "WANDOT 004",
         "ssys": [
           "ALL"
         ]
@@ -126,15 +132,7 @@
       {
         "code": "SSAATL 001",
         "ssys": [
-          "EC1",
-          "EC5",
-          "FLS"
-        ]
-      },
-      {
-        "code": "TRAPAC 009",
-        "ssys": [
-          "SEC"
+          "ALL"
         ]
       }
     ]
@@ -148,13 +146,21 @@
           "WC1",
           "WC2",
           "WC5",
-          "US2"
+          "US2",
+          "MTL"
         ]
       },
       {
         "code": "YUSENT 002",
         "ssys": [
+          "WC1",
           "CCE"
+        ]
+      },
+      {
+        "code": "FENMAR 004",
+        "ssys": [
+          "WSN"
         ]
       }
     ]
@@ -163,16 +169,15 @@
     "mode": "terminal",
     "terminals": [
       {
-        "code": "YUSENT 002",
+        "code": "ITS 011",
         "ssys": [
-          "CCE"
+          "US2"
         ]
       },
       {
-        "code": "LONGBE 005",
+        "code": "STEVED 023",
         "ssys": [
-          "WSN",
-          "WC6"
+          "IRN"
         ]
       }
     ]
@@ -192,11 +197,17 @@
     "mode": "terminal",
     "terminals": [
       {
+        "code": "NEWORL 029",
+        "ssys": [
+          "GUF"
+        ]
+      },
+      {
         "code": "NAPOLE 017",
         "ssys": [
-          "AL4",
           "GS1",
           "EC6",
+          "AL4",
           "GM8"
         ]
       }

@@ -2606,8 +2606,8 @@
     "loccode": "USSTP",
     "rampMC": "UNIONP 256",
     "rampCutTime": 0.875,
-    "transit": 9,
-    "window": 6,
+    "transit": 12,
+    "window": 5,
     "ssyAdjustment": 0,
     "reefer": "N",
     "windowReefer": 0
@@ -2750,7 +2750,7 @@
     "rampMC": "UNIONP 256",
     "rampCutTime": 0.875,
     "transit": 14,
-    "window": 4,
+    "window": 6,
     "ssyAdjustment": 0,
     "reefer": "N",
     "windowReefer": 0
